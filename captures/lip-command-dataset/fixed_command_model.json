@@ -1,0 +1,1048 @@
+{
+  "model_type": "fixed_command_transcript_knn",
+  "created_at": "2026-04-08T10:12:51.568243+00:00",
+  "dataset_root": "/Users/bytedance/Desktop/N2/captures/lip-command-dataset",
+  "manifest_path": "/Users/bytedance/Desktop/N2/captures/lip-command-dataset/manifest.json",
+  "model_path": "/Users/bytedance/Desktop/N2/captures/lip-command-dataset/fixed_command_model.json",
+  "total_dataset_samples": 91,
+  "trained_samples": 91,
+  "failed_samples": [],
+  "phrases": [
+    {
+      "phrase_id": "coffee",
+      "phrase_text": "帮我点杯咖啡",
+      "count": 13
+    },
+    {
+      "phrase_id": "food_search",
+      "phrase_text": "帮我搜一下美食",
+      "count": 13
+    },
+    {
+      "phrase_id": "joke",
+      "phrase_text": "讲个笑话",
+      "count": 13
+    },
+    {
+      "phrase_id": "meeting_room",
+      "phrase_text": "帮我订一个会议室",
+      "count": 13
+    },
+    {
+      "phrase_id": "meeting_time",
+      "phrase_text": "明天几点的会议",
+      "count": 13
+    },
+    {
+      "phrase_id": "taxi",
+      "phrase_text": "帮我打个车",
+      "count": 13
+    },
+    {
+      "phrase_id": "weather",
+      "phrase_text": "今天天气如何",
+      "count": 13
+    }
+  ],
+  "metrics": {
+    "by_k": {
+      "1": {
+        "accuracy": 0.2967032967032967,
+        "correct": 27,
+        "total": 91,
+        "per_phrase_accuracy": {
+          "coffee": 0.3076923076923077,
+          "food_search": 0.38461538461538464,
+          "joke": 0.38461538461538464,
+          "meeting_room": 0.07692307692307693,
+          "meeting_time": 0.23076923076923078,
+          "taxi": 0.5384615384615384,
+          "weather": 0.15384615384615385
+        },
+        "confusion": {
+          "coffee": {
+            "coffee": 4,
+            "food_search": 3,
+            "meeting_room": 3,
+            "meeting_time": 1,
+            "taxi": 1,
+            "weather": 1
+          },
+          "food_search": {
+            "coffee": 3,
+            "food_search": 5,
+            "meeting_room": 2,
+            "taxi": 2,
+            "weather": 1
+          },
+          "joke": {
+            "coffee": 2,
+            "food_search": 1,
+            "joke": 5,
+            "meeting_time": 4,
+            "taxi": 1
+          },
+          "meeting_room": {
+            "coffee": 5,
+            "joke": 1,
+            "meeting_room": 1,
+            "meeting_time": 3,
+            "taxi": 3
+          },
+          "meeting_time": {
+            "coffee": 1,
+            "joke": 3,
+            "meeting_room": 1,
+            "meeting_time": 3,
+            "weather": 5
+          },
+          "taxi": {
+            "coffee": 1,
+            "food_search": 1,
+            "joke": 1,
+            "meeting_room": 2,
+            "meeting_time": 1,
+            "taxi": 7
+          },
+          "weather": {
+            "coffee": 2,
+            "food_search": 1,
+            "joke": 3,
+            "meeting_room": 1,
+            "meeting_time": 3,
+            "taxi": 1,
+            "weather": 2
+          }
+        }
+      },
+      "3": {
+        "accuracy": 0.2857142857142857,
+        "correct": 26,
+        "total": 91,
+        "per_phrase_accuracy": {
+          "coffee": 0.23076923076923078,
+          "food_search": 0.38461538461538464,
+          "joke": 0.38461538461538464,
+          "meeting_room": 0.07692307692307693,
+          "meeting_time": 0.15384615384615385,
+          "taxi": 0.5384615384615384,
+          "weather": 0.23076923076923078
+        },
+        "confusion": {
+          "coffee": {
+            "coffee": 3,
+            "food_search": 4,
+            "joke": 1,
+            "meeting_room": 3,
+            "taxi": 1,
+            "weather": 1
+          },
+          "food_search": {
+            "coffee": 3,
+            "food_search": 5,
+            "taxi": 4,
+            "weather": 1
+          },
+          "joke": {
+            "coffee": 2,
+            "food_search": 1,
+            "joke": 5,
+            "meeting_time": 4,
+            "taxi": 1
+          },
+          "meeting_room": {
+            "coffee": 5,
+            "joke": 1,
+            "meeting_room": 1,
+            "meeting_time": 2,
+            "taxi": 4
+          },
+          "meeting_time": {
+            "joke": 5,
+            "meeting_room": 2,
+            "meeting_time": 2,
+            "weather": 4
+          },
+          "taxi": {
+            "coffee": 1,
+            "food_search": 1,
+            "joke": 1,
+            "meeting_room": 2,
+            "meeting_time": 1,
+            "taxi": 7
+          },
+          "weather": {
+            "coffee": 2,
+            "food_search": 1,
+            "joke": 3,
+            "meeting_room": 1,
+            "meeting_time": 2,
+            "taxi": 1,
+            "weather": 3
+          }
+        }
+      },
+      "5": {
+        "accuracy": 0.26373626373626374,
+        "correct": 24,
+        "total": 91,
+        "per_phrase_accuracy": {
+          "coffee": 0.23076923076923078,
+          "food_search": 0.23076923076923078,
+          "joke": 0.5384615384615384,
+          "meeting_room": 0.07692307692307693,
+          "meeting_time": 0.07692307692307693,
+          "taxi": 0.5384615384615384,
+          "weather": 0.15384615384615385
+        },
+        "confusion": {
+          "coffee": {
+            "coffee": 3,
+            "food_search": 4,
+            "joke": 1,
+            "meeting_room": 3,
+            "taxi": 1,
+            "weather": 1
+          },
+          "food_search": {
+            "coffee": 5,
+            "food_search": 3,
+            "taxi": 4,
+            "weather": 1
+          },
+          "joke": {
+            "joke": 7,
+            "meeting_room": 1,
+            "meeting_time": 4,
+            "taxi": 1
+          },
+          "meeting_room": {
+            "coffee": 5,
+            "joke": 1,
+            "meeting_room": 1,
+            "meeting_time": 2,
+            "taxi": 4
+          },
+          "meeting_time": {
+            "joke": 7,
+            "meeting_room": 1,
+            "meeting_time": 1,
+            "weather": 4
+          },
+          "taxi": {
+            "food_search": 1,
+            "joke": 2,
+            "meeting_room": 2,
+            "meeting_time": 1,
+            "taxi": 7
+          },
+          "weather": {
+            "coffee": 1,
+            "food_search": 1,
+            "joke": 3,
+            "meeting_time": 4,
+            "taxi": 2,
+            "weather": 2
+          }
+        }
+      },
+      "7": {
+        "accuracy": 0.2857142857142857,
+        "correct": 26,
+        "total": 91,
+        "per_phrase_accuracy": {
+          "coffee": 0.23076923076923078,
+          "food_search": 0.38461538461538464,
+          "joke": 0.5384615384615384,
+          "meeting_room": 0.07692307692307693,
+          "meeting_time": 0.15384615384615385,
+          "taxi": 0.5384615384615384,
+          "weather": 0.07692307692307693
+        },
+        "confusion": {
+          "coffee": {
+            "coffee": 3,
+            "food_search": 4,
+            "joke": 1,
+            "meeting_room": 3,
+            "taxi": 1,
+            "weather": 1
+          },
+          "food_search": {
+            "coffee": 3,
+            "food_search": 5,
+            "taxi": 4,
+            "weather": 1
+          },
+          "joke": {
+            "joke": 7,
+            "meeting_time": 4,
+            "taxi": 2
+          },
+          "meeting_room": {
+            "coffee": 5,
+            "joke": 1,
+            "meeting_room": 1,
+            "meeting_time": 2,
+            "taxi": 4
+          },
+          "meeting_time": {
+            "joke": 6,
+            "meeting_room": 2,
+            "meeting_time": 2,
+            "weather": 3
+          },
+          "taxi": {
+            "food_search": 1,
+            "joke": 2,
+            "meeting_room": 2,
+            "meeting_time": 1,
+            "taxi": 7
+          },
+          "weather": {
+            "coffee": 1,
+            "food_search": 1,
+            "joke": 2,
+            "meeting_room": 1,
+            "meeting_time": 5,
+            "taxi": 2,
+            "weather": 1
+          }
+        }
+      }
+    },
+    "best_k": 1,
+    "best_accuracy": 0.2967032967032967
+  },
+  "examples": [
+    {
+      "sample_id": "76f8959e4322",
+      "phrase_id": "coffee",
+      "phrase_text": "帮我点杯咖啡",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "在袭击二人的嫌疑人发生之后",
+      "video_path": "samples/coffee/76f8959e4322.webm"
+    },
+    {
+      "sample_id": "52b5b45ffd29",
+      "phrase_id": "taxi",
+      "phrase_text": "帮我打个车",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "在今天凌晨之前",
+      "video_path": "samples/taxi/52b5b45ffd29.webm"
+    },
+    {
+      "sample_id": "993478d663ac",
+      "phrase_id": "meeting_time",
+      "phrase_text": "明天几点的会议",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "日本地震的一些空袭",
+      "video_path": "samples/meeting_time/993478d663ac.webm"
+    },
+    {
+      "sample_id": "35cab9760318",
+      "phrase_id": "weather",
+      "phrase_text": "今天天气如何",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "最近一些天气",
+      "video_path": "samples/weather/35cab9760318.webm"
+    },
+    {
+      "sample_id": "5c6e051aab57",
+      "phrase_id": "joke",
+      "phrase_text": "讲个笑话",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "在此前的最后一天",
+      "video_path": "samples/joke/5c6e051aab57.webm"
+    },
+    {
+      "sample_id": "5fc9d07a075e",
+      "phrase_id": "food_search",
+      "phrase_text": "帮我搜一下美食",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "在这次袭击发生之后",
+      "video_path": "samples/food_search/5fc9d07a075e.webm"
+    },
+    {
+      "sample_id": "44f23c2e5fcc",
+      "phrase_id": "meeting_room",
+      "phrase_text": "帮我订一个会议室",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "最后一次袭击",
+      "video_path": "samples/meeting_room/44f23c2e5fcc.webm"
+    },
+    {
+      "sample_id": "dc1d2b2575c6",
+      "phrase_id": "coffee",
+      "phrase_text": "帮我点杯咖啡",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "在遭遇的强烈反击",
+      "video_path": "samples/coffee/dc1d2b2575c6.webm"
+    },
+    {
+      "sample_id": "6a19bc9ae380",
+      "phrase_id": "taxi",
+      "phrase_text": "帮我打个车",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "针对这一袭击",
+      "video_path": "samples/taxi/6a19bc9ae380.webm"
+    },
+    {
+      "sample_id": "f514b9a6f6bb",
+      "phrase_id": "meeting_time",
+      "phrase_text": "明天几点的会议",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "在北京时间今天凌晨之前",
+      "video_path": "samples/meeting_time/f514b9a6f6bb.webm"
+    },
+    {
+      "sample_id": "be694dd3c7f0",
+      "phrase_id": "weather",
+      "phrase_text": "今天天气如何",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "在近日的时间今天凌晨",
+      "video_path": "samples/weather/be694dd3c7f0.webm"
+    },
+    {
+      "sample_id": "bf518d1f400d",
+      "phrase_id": "joke",
+      "phrase_text": "讲个笑话",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "在这一消息之后",
+      "video_path": "samples/joke/bf518d1f400d.webm"
+    },
+    {
+      "sample_id": "fd6c94da66a3",
+      "phrase_id": "food_search",
+      "phrase_text": "帮我搜一下美食",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "再次在俄罗斯的冲击",
+      "video_path": "samples/food_search/fd6c94da66a3.webm"
+    },
+    {
+      "sample_id": "150cb1b94873",
+      "phrase_id": "meeting_room",
+      "phrase_text": "帮我订一个会议室",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "最新消息日前",
+      "video_path": "samples/meeting_room/150cb1b94873.webm"
+    },
+    {
+      "sample_id": "e506141ce9c5",
+      "phrase_id": "coffee",
+      "phrase_text": "帮我点杯咖啡",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "造成一人死亡",
+      "video_path": "samples/coffee/e506141ce9c5.webm"
+    },
+    {
+      "sample_id": "1a225d3597f6",
+      "phrase_id": "taxi",
+      "phrase_text": "帮我打个车",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "最后一天一天",
+      "video_path": "samples/taxi/1a225d3597f6.webm"
+    },
+    {
+      "sample_id": "51bd10dd8867",
+      "phrase_id": "meeting_time",
+      "phrase_text": "明天几点的会议",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "当地时间今天凌晨",
+      "video_path": "samples/meeting_time/51bd10dd8867.webm"
+    },
+    {
+      "sample_id": "6880a3faf564",
+      "phrase_id": "weather",
+      "phrase_text": "今天天气如何",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "再来看今天的时间今天凌晨",
+      "video_path": "samples/weather/6880a3faf564.webm"
+    },
+    {
+      "sample_id": "1cec0a441d2f",
+      "phrase_id": "joke",
+      "phrase_text": "讲个笑话",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "当地时间今天凌晨",
+      "video_path": "samples/joke/1cec0a441d2f.webm"
+    },
+    {
+      "sample_id": "1cf63bedcc62",
+      "phrase_id": "food_search",
+      "phrase_text": "帮我搜一下美食",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "造成至少一人死亡",
+      "video_path": "samples/food_search/1cf63bedcc62.webm"
+    },
+    {
+      "sample_id": "d8066c8004b1",
+      "phrase_id": "meeting_room",
+      "phrase_text": "帮我订一个会议室",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "造成大量消费升级",
+      "video_path": "samples/meeting_room/d8066c8004b1.webm"
+    },
+    {
+      "sample_id": "d42f87712f02",
+      "phrase_id": "coffee",
+      "phrase_text": "帮我点杯咖啡",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "伊拉克包括也门的阿富汗",
+      "video_path": "samples/coffee/d42f87712f02.webm"
+    },
+    {
+      "sample_id": "dc7592ce0fcf",
+      "phrase_id": "taxi",
+      "phrase_text": "帮我打个车",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "在俄罗斯的一个城市之一",
+      "video_path": "samples/taxi/dc7592ce0fcf.webm"
+    },
+    {
+      "sample_id": "44dd1ec01faa",
+      "phrase_id": "meeting_time",
+      "phrase_text": "明天几点的会议",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "当地时间今天凌晨",
+      "video_path": "samples/meeting_time/44dd1ec01faa.webm"
+    },
+    {
+      "sample_id": "e071a938bbab",
+      "phrase_id": "weather",
+      "phrase_text": "今天天气如何",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "因此时间正是一个多月",
+      "video_path": "samples/weather/e071a938bbab.webm"
+    },
+    {
+      "sample_id": "d33d41d68fcb",
+      "phrase_id": "joke",
+      "phrase_text": "讲个笑话",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "最近一段时间",
+      "video_path": "samples/joke/d33d41d68fcb.webm"
+    },
+    {
+      "sample_id": "2cc84643feb6",
+      "phrase_id": "food_search",
+      "phrase_text": "帮我搜一下美食",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "造成至少一人死亡",
+      "video_path": "samples/food_search/2cc84643feb6.webm"
+    },
+    {
+      "sample_id": "e51a9c9b4272",
+      "phrase_id": "meeting_room",
+      "phrase_text": "帮我订一个会议室",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "在这一消息的是正是一个后一个时刻",
+      "video_path": "samples/meeting_room/e51a9c9b4272.webm"
+    },
+    {
+      "sample_id": "c937f397d6ad",
+      "phrase_id": "coffee",
+      "phrase_text": "帮我点杯咖啡",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "美国人民伤亡",
+      "video_path": "samples/coffee/c937f397d6ad.webm"
+    },
+    {
+      "sample_id": "70aba0645227",
+      "phrase_id": "taxi",
+      "phrase_text": "帮我打个车",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "截至今天凌晨",
+      "video_path": "samples/taxi/70aba0645227.webm"
+    },
+    {
+      "sample_id": "727dd52601ba",
+      "phrase_id": "meeting_time",
+      "phrase_text": "明天几点的会议",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "此次袭击",
+      "video_path": "samples/meeting_time/727dd52601ba.webm"
+    },
+    {
+      "sample_id": "320a8b1d06fb",
+      "phrase_id": "weather",
+      "phrase_text": "今天天气如何",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "袭击事件造成一人死亡",
+      "video_path": "samples/weather/320a8b1d06fb.webm"
+    },
+    {
+      "sample_id": "ceb7b52f03e3",
+      "phrase_id": "joke",
+      "phrase_text": "讲个笑话",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "今天凌晨之后",
+      "video_path": "samples/joke/ceb7b52f03e3.webm"
+    },
+    {
+      "sample_id": "3101b4b5e095",
+      "phrase_id": "food_search",
+      "phrase_text": "帮我搜一下美食",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "一个人要有一个人",
+      "video_path": "samples/food_search/3101b4b5e095.webm"
+    },
+    {
+      "sample_id": "782cf912b486",
+      "phrase_id": "meeting_room",
+      "phrase_text": "帮我订一个会议室",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "在今天的最后一次袭击了伊拉克的地震",
+      "video_path": "samples/meeting_room/782cf912b486.webm"
+    },
+    {
+      "sample_id": "36b3a5475f48",
+      "phrase_id": "coffee",
+      "phrase_text": "帮我点杯咖啡",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "今天凌晨",
+      "video_path": "samples/coffee/36b3a5475f48.webm"
+    },
+    {
+      "sample_id": "4f76b98829bf",
+      "phrase_id": "taxi",
+      "phrase_text": "帮我打个车",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "最后一天",
+      "video_path": "samples/taxi/4f76b98829bf.webm"
+    },
+    {
+      "sample_id": "1bb0e4c58ed9",
+      "phrase_id": "meeting_time",
+      "phrase_text": "明天几点的会议",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "今天凌晨",
+      "video_path": "samples/meeting_time/1bb0e4c58ed9.webm"
+    },
+    {
+      "sample_id": "9b44d838ff00",
+      "phrase_id": "weather",
+      "phrase_text": "今天天气如何",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "北京时间今天凌晨",
+      "video_path": "samples/weather/9b44d838ff00.webm"
+    },
+    {
+      "sample_id": "8af2e600830e",
+      "phrase_id": "joke",
+      "phrase_text": "讲个笑话",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "地震后",
+      "video_path": "samples/joke/8af2e600830e.webm"
+    },
+    {
+      "sample_id": "8c39f1667e42",
+      "phrase_id": "food_search",
+      "phrase_text": "帮我搜一下美食",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "朝鲜之后一天为时",
+      "video_path": "samples/food_search/8c39f1667e42.webm"
+    },
+    {
+      "sample_id": "e3d1cc909b51",
+      "phrase_id": "meeting_room",
+      "phrase_text": "帮我订一个会议室",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "在最后一天的时间",
+      "video_path": "samples/meeting_room/e3d1cc909b51.webm"
+    },
+    {
+      "sample_id": "e20175396c2e",
+      "phrase_id": "coffee",
+      "phrase_text": "帮我点杯咖啡",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "造成人员伤亡",
+      "video_path": "samples/coffee/e20175396c2e.webm"
+    },
+    {
+      "sample_id": "993706d44ae3",
+      "phrase_id": "taxi",
+      "phrase_text": "帮我打个车",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "在这个时间",
+      "video_path": "samples/taxi/993706d44ae3.webm"
+    },
+    {
+      "sample_id": "59801be687a7",
+      "phrase_id": "meeting_time",
+      "phrase_text": "明天几点的会议",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "北京时间今天凌晨",
+      "video_path": "samples/meeting_time/59801be687a7.webm"
+    },
+    {
+      "sample_id": "b20a4203a632",
+      "phrase_id": "weather",
+      "phrase_text": "今天天气如何",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "袭击的袭击",
+      "video_path": "samples/weather/b20a4203a632.webm"
+    },
+    {
+      "sample_id": "8bf07151d55a",
+      "phrase_id": "joke",
+      "phrase_text": "讲个笑话",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "今天凌晨之后",
+      "video_path": "samples/joke/8bf07151d55a.webm"
+    },
+    {
+      "sample_id": "3913ce6e41da",
+      "phrase_id": "food_search",
+      "phrase_text": "帮我搜一下美食",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "最后一时间发生",
+      "video_path": "samples/food_search/3913ce6e41da.webm"
+    },
+    {
+      "sample_id": "bde3b6e2add8",
+      "phrase_id": "meeting_room",
+      "phrase_text": "帮我订一个会议室",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "叙利亚危机",
+      "video_path": "samples/meeting_room/bde3b6e2add8.webm"
+    },
+    {
+      "sample_id": "60cee06b7e00",
+      "phrase_id": "coffee",
+      "phrase_text": "帮我点杯咖啡",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "美国人民日报",
+      "video_path": "samples/coffee/60cee06b7e00.webm"
+    },
+    {
+      "sample_id": "ada57d886077",
+      "phrase_id": "taxi",
+      "phrase_text": "帮我打个车",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "最后一天",
+      "video_path": "samples/taxi/ada57d886077.webm"
+    },
+    {
+      "sample_id": "8993ee5c57bc",
+      "phrase_id": "meeting_time",
+      "phrase_text": "明天几点的会议",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "在这几天的时间后一个时间",
+      "video_path": "samples/meeting_time/8993ee5c57bc.webm"
+    },
+    {
+      "sample_id": "046a93b244be",
+      "phrase_id": "weather",
+      "phrase_text": "今天天气如何",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "此次袭击事件的袭击",
+      "video_path": "samples/weather/046a93b244be.webm"
+    },
+    {
+      "sample_id": "a72a866b8dc8",
+      "phrase_id": "joke",
+      "phrase_text": "讲个笑话",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "时间今天凌晨",
+      "video_path": "samples/joke/a72a866b8dc8.webm"
+    },
+    {
+      "sample_id": "6030203e9ba2",
+      "phrase_id": "food_search",
+      "phrase_text": "帮我搜一下美食",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "据日本媒体报道",
+      "video_path": "samples/food_search/6030203e9ba2.webm"
+    },
+    {
+      "sample_id": "affc10a50f13",
+      "phrase_id": "meeting_room",
+      "phrase_text": "帮我订一个会议室",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "消费者会及时",
+      "video_path": "samples/meeting_room/affc10a50f13.webm"
+    },
+    {
+      "sample_id": "724228349b8e",
+      "phrase_id": "coffee",
+      "phrase_text": "帮我点杯咖啡",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "由于天气",
+      "video_path": "samples/coffee/724228349b8e.webm"
+    },
+    {
+      "sample_id": "ecc8554b2576",
+      "phrase_id": "taxi",
+      "phrase_text": "帮我打个车",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "最后一天",
+      "video_path": "samples/taxi/ecc8554b2576.webm"
+    },
+    {
+      "sample_id": "a0db256975ed",
+      "phrase_id": "meeting_time",
+      "phrase_text": "明天几点的会议",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "截至时间今天凌晨",
+      "video_path": "samples/meeting_time/a0db256975ed.webm"
+    },
+    {
+      "sample_id": "e8c132e1e212",
+      "phrase_id": "weather",
+      "phrase_text": "今天天气如何",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "今天下午",
+      "video_path": "samples/weather/e8c132e1e212.webm"
+    },
+    {
+      "sample_id": "68c1444a85dc",
+      "phrase_id": "joke",
+      "phrase_text": "讲个笑话",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "当地时间今天凌晨",
+      "video_path": "samples/joke/68c1444a85dc.webm"
+    },
+    {
+      "sample_id": "66190c8b52c7",
+      "phrase_id": "food_search",
+      "phrase_text": "帮我搜一下美食",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "日前发布消息",
+      "video_path": "samples/food_search/66190c8b52c7.webm"
+    },
+    {
+      "sample_id": "e059fff61d60",
+      "phrase_id": "meeting_room",
+      "phrase_text": "帮我订一个会议室",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "乌克兰之时",
+      "video_path": "samples/meeting_room/e059fff61d60.webm"
+    },
+    {
+      "sample_id": "f11870e49347",
+      "phrase_id": "coffee",
+      "phrase_text": "帮我点杯咖啡",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "消费者认为",
+      "video_path": "samples/coffee/f11870e49347.webm"
+    },
+    {
+      "sample_id": "eae083204f0d",
+      "phrase_id": "taxi",
+      "phrase_text": "帮我打个车",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "最后一天",
+      "video_path": "samples/taxi/eae083204f0d.webm"
+    },
+    {
+      "sample_id": "62eef9727506",
+      "phrase_id": "meeting_time",
+      "phrase_text": "明天几点的会议",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "日前一天空袭",
+      "video_path": "samples/meeting_time/62eef9727506.webm"
+    },
+    {
+      "sample_id": "d0b415bbe0b8",
+      "phrase_id": "weather",
+      "phrase_text": "今天天气如何",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "日前进入第一",
+      "video_path": "samples/weather/d0b415bbe0b8.webm"
+    },
+    {
+      "sample_id": "79bcabd3d0a1",
+      "phrase_id": "joke",
+      "phrase_text": "讲个笑话",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "今天凌晨",
+      "video_path": "samples/joke/79bcabd3d0a1.webm"
+    },
+    {
+      "sample_id": "cd4ad9460039",
+      "phrase_id": "food_search",
+      "phrase_text": "帮我搜一下美食",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "据日本战争",
+      "video_path": "samples/food_search/cd4ad9460039.webm"
+    },
+    {
+      "sample_id": "8abadba17e68",
+      "phrase_id": "meeting_room",
+      "phrase_text": "帮我订一个会议室",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "遭遇袭击",
+      "video_path": "samples/meeting_room/8abadba17e68.webm"
+    },
+    {
+      "sample_id": "652c9ce6c208",
+      "phrase_id": "coffee",
+      "phrase_text": "帮我点杯咖啡",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "造成人死亡",
+      "video_path": "samples/coffee/652c9ce6c208.webm"
+    },
+    {
+      "sample_id": "eee5aa039bb6",
+      "phrase_id": "taxi",
+      "phrase_text": "帮我打个车",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "消息",
+      "video_path": "samples/taxi/eee5aa039bb6.webm"
+    },
+    {
+      "sample_id": "c246aadc3f36",
+      "phrase_id": "meeting_time",
+      "phrase_text": "明天几点的会议",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "日前停火已经",
+      "video_path": "samples/meeting_time/c246aadc3f36.webm"
+    },
+    {
+      "sample_id": "824cf347f195",
+      "phrase_id": "weather",
+      "phrase_text": "今天天气如何",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "日前一度一",
+      "video_path": "samples/weather/824cf347f195.webm"
+    },
+    {
+      "sample_id": "2b391511b6e8",
+      "phrase_id": "joke",
+      "phrase_text": "讲个笑话",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "地震后",
+      "video_path": "samples/joke/2b391511b6e8.webm"
+    },
+    {
+      "sample_id": "b04742410a40",
+      "phrase_id": "food_search",
+      "phrase_text": "帮我搜一下美食",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "据日本媒体称",
+      "video_path": "samples/food_search/b04742410a40.webm"
+    },
+    {
+      "sample_id": "6b4bc751f12d",
+      "phrase_id": "meeting_room",
+      "phrase_text": "帮我订一个会议室",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "造成的空袭",
+      "video_path": "samples/meeting_room/6b4bc751f12d.webm"
+    },
+    {
+      "sample_id": "cdcd4b396eea",
+      "phrase_id": "coffee",
+      "phrase_text": "帮我点杯咖啡",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "最后一天",
+      "video_path": "samples/coffee/cdcd4b396eea.webm"
+    },
+    {
+      "sample_id": "c8d5563ebf68",
+      "phrase_id": "taxi",
+      "phrase_text": "帮我打个车",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "超过一天",
+      "video_path": "samples/taxi/c8d5563ebf68.webm"
+    },
+    {
+      "sample_id": "122186bace93",
+      "phrase_id": "meeting_time",
+      "phrase_text": "明天几点的会议",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "最近一段时间",
+      "video_path": "samples/meeting_time/122186bace93.webm"
+    },
+    {
+      "sample_id": "f7d38950d4c6",
+      "phrase_id": "weather",
+      "phrase_text": "今天天气如何",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "截至今天",
+      "video_path": "samples/weather/f7d38950d4c6.webm"
+    },
+    {
+      "sample_id": "9236cc65dc5e",
+      "phrase_id": "joke",
+      "phrase_text": "讲个笑话",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "今天凌晨",
+      "video_path": "samples/joke/9236cc65dc5e.webm"
+    },
+    {
+      "sample_id": "7edd14e8116c",
+      "phrase_id": "food_search",
+      "phrase_text": "帮我搜一下美食",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "造成人员伤亡",
+      "video_path": "samples/food_search/7edd14e8116c.webm"
+    },
+    {
+      "sample_id": "715495f9ae24",
+      "phrase_id": "meeting_room",
+      "phrase_text": "帮我订一个会议室",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "由于伊拉克执政",
+      "video_path": "samples/meeting_room/715495f9ae24.webm"
+    },
+    {
+      "sample_id": "7dc504b83a6c",
+      "phrase_id": "coffee",
+      "phrase_text": "帮我点杯咖啡",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "据日本官方称",
+      "video_path": "samples/coffee/7dc504b83a6c.webm"
+    },
+    {
+      "sample_id": "478215ff49c2",
+      "phrase_id": "taxi",
+      "phrase_text": "帮我打个车",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "最后的消息",
+      "video_path": "samples/taxi/478215ff49c2.webm"
+    },
+    {
+      "sample_id": "5886190eb606",
+      "phrase_id": "meeting_time",
+      "phrase_text": "明天几点的会议",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "目前泄漏已",
+      "video_path": "samples/meeting_time/5886190eb606.webm"
+    },
+    {
+      "sample_id": "32ee7c5b132a",
+      "phrase_id": "weather",
+      "phrase_text": "今天天气如何",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "已经有一人",
+      "video_path": "samples/weather/32ee7c5b132a.webm"
+    },
+    {
+      "sample_id": "7753a77431dd",
+      "phrase_id": "joke",
+      "phrase_text": "讲个笑话",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "地震之后",
+      "video_path": "samples/joke/7753a77431dd.webm"
+    },
+    {
+      "sample_id": "8b18c8b9c16e",
+      "phrase_id": "food_search",
+      "phrase_text": "帮我搜一下美食",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "遭到日后伤亡",
+      "video_path": "samples/food_search/8b18c8b9c16e.webm"
+    },
+    {
+      "sample_id": "47c8e67204f0",
+      "phrase_id": "meeting_room",
+      "phrase_text": "帮我订一个会议室",
+      "speaker_id": "speaker-01",
+      "raw_transcript": "消息",
+      "video_path": "samples/meeting_room/47c8e67204f0.webm"
+    }
+  ],
+  "base_engine": "external_vsr"
+}

@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lipsight Lab | 实时唇语识别原型</title>
+    <script type="module" src="/src/main.js"></script>
+  </head>
+  <body>
+    <div class="page-grain" aria-hidden="true"></div>
+    <main class="app-shell">
+      <section class="hero-panel">
+        <div class="hero-copy">
+          <p class="eyebrow">Research Console / Webcam to CMLR</p>
+          <h1 class="hero-title">打开摄像头，把嘴型片段送进中文唇语模型。</h1>
+          <p class="hero-text">
+            这个原型采用“浏览器关键点追踪 + 句级录制 + Python 后端推理”的架构。前端负责摄像头、稳定点采样和整句录制，后端兼容
+            <span class="inline-code">Visual_Speech_Recognition_for_Multiple_Languages</span>
+            的 <span class="inline-code">CMLR_V_WER8.0</span> 中文配置。
+          </p>
+          <div class="hero-actions">
+            <button class="primary-button" id="startCameraButton" type="button">打开摄像头</button>
+            <button class="secondary-button" id="toggleReadingButton" type="button" disabled>
+              录一句
+            </button>
+            <a class="ghost-link" href="/data-collection/">采集训练样本</a>
+          </div>
+        </div>
+
+        <aside class="hero-aside" aria-label="System overview">
+          <div class="aside-block">
+            <p class="aside-label">Pipeline</p>
+            <p class="aside-value">Camera -> Browser tracker -> Sentence clip -> FastAPI -> CMLR VSR</p>
+          </div>
+          <div class="aside-block">
+            <p class="aside-label">Capture Mode</p>
+            <p class="aside-value"><span id="chunkWindow">手动结束</span> 单句录制</p>
+          </div>
+          <div class="aside-block">
+            <p class="aside-label">Backend</p>
+            <p class="aside-value" id="heroBackendStatus">等待检测</p>
+          </div>
+        </aside>
+      </section>
+
+      <section class="console-grid">
+        <section class="panel capture-panel" aria-labelledby="captureTitle">
+          <div class="panel-head">
+            <div>
+              <p class="panel-kicker">Live Capture</p>
+              <h2 class="panel-title" id="captureTitle">摄像头取景</h2>
+            </div>
+            <div class="pill" id="cameraStatePill">camera idle</div>
+          </div>
+
+          <div class="video-stage">
+            <video id="cameraVideo" autoplay muted playsinline></video>
+            <div class="video-mask" aria-hidden="true"></div>
+            <canvas id="trackingCanvas" class="tracking-canvas" aria-hidden="true"></canvas>
+            <div class="video-overlay">
+              <div class="target-frame"></div>
+              <div class="overlay-notes">
+                <span>正脸</span>
+                <span>嘴部居中</span>
+                <span>稳定光线</span>
+                <span id="trackerMode">browser tracker idle</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="meter-strip">
+            <article class="meter-card">
+              <p class="meter-label">Camera</p>
+              <p class="meter-value" id="cameraResolution">未启动</p>
+            </article>
+            <article class="meter-card">
+              <p class="meter-label">Tracker</p>
+              <p class="meter-value" id="trackerState">idle</p>
+            </article>
+            <article class="meter-card">
+              <p class="meter-label">Queue</p>
+              <p class="meter-value" id="queueDepth">0</p>
+            </article>
+            <article class="meter-card">
+              <p class="meter-label">Latency</p>
+              <p class="meter-value" id="latestLatency">-</p>
+            </article>
+          </div>
+
+          <div class="tip-list">
+            <p class="tip-item">点“录一句”后再说话，说完这一句再点一次“结束并识别”。</p>
+            <p class="tip-item">建议每次只说 3 到 6 个字，语速慢一点，句子之间不要连着说。</p>
+            <p class="tip-item">页面会先在浏览器里提取人脸稳定点，再把整句视频和 landmarks 一起送进后端模型。</p>
+            <p class="tip-item">如果后端没准备好，页面仍然可以先调试摄像头、关键点跟踪与分段上传链路。</p>
+          </div>
+        </section>
+
+        <section class="panel transcript-panel" aria-labelledby="transcriptTitle">
+          <div class="panel-head">
+            <div>
+              <p class="panel-kicker">Recognition Feed</p>
+              <h2 class="panel-title" id="transcriptTitle">识别输出</h2>
+            </div>
+            <button class="ghost-button" id="refreshStatusButton" type="button">刷新后端状态</button>
+          </div>
+
+          <article class="result-card">
+            <p class="result-label">Best Library Match</p>
+            <p class="result-text" id="matchedCommand">等待摄像头和后端就绪。</p>
+            <p class="result-meta" id="matchedMeta">当前会把模型输出映射到固定句库。</p>
+          </article>
+
+          <div class="backend-console">
+            <div class="backend-row">
+              <label class="input-label" for="backendUrlInput">Backend URL</label>
+              <input
+                id="backendUrlInput"
+                class="backend-input"
+                type="text"
+                value=""
+                placeholder="留空时走 Vite 代理到 /api"
+              />
+            </div>
+            <div class="status-board">
+              <article class="status-card">
+                <p class="status-label">Engine</p>
+                <p class="status-value" id="engineName">-</p>
+              </article>
+              <article class="status-card">
+                <p class="status-label">Ready</p>
+                <p class="status-value" id="engineReady">-</p>
+              </article>
+              <article class="status-card status-card-wide">
+                <p class="status-label">Status</p>
+                <p class="status-value" id="backendSummary">正在检测后端状态…</p>
+              </article>
+            </div>
+          </div>
+
+          <div class="setup-panel">
+            <p class="setup-title">模型未就绪时，按下面的步骤准备</p>
+            <pre class="setup-code" id="setupCode"></pre>
+          </div>
+
+          <div class="library-panel">
+            <div class="log-head">
+              <p class="log-title">Phrase Library</p>
+            </div>
+            <div class="library-grid" id="phraseLibrary"></div>
+          </div>
+
+          <div class="log-panel">
+            <div class="log-head">
+              <p class="log-title">Sentence log</p>
+              <button class="ghost-button" id="clearLogButton" type="button">清空</button>
+            </div>
+            <ul class="log-list" id="resultLog"></ul>
+          </div>
+        </section>
+      </section>
+    </main>
+  </body>
+</html>

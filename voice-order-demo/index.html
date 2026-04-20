@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Voice Order Demo</title>
+    <script type="module" src="./main.js"></script>
+  </head>
+  <body>
+    <main class="voice-demo">
+      <div class="scene-noise" aria-hidden="true"></div>
+
+      <section class="voice-stage" aria-label="Voice assistant coffee order demo">
+        <div class="background-glow"></div>
+
+        <div class="aura-cluster" aria-hidden="true">
+          <span class="aura aura-one"></span>
+          <span class="aura aura-two"></span>
+          <span class="aura aura-three"></span>
+          <span class="aura aura-four"></span>
+          <span class="aura-core"></span>
+        </div>
+
+        <div class="caption-stack" aria-label="Voice transcript">
+          <p class="caption-line caption-user"></p>
+          <p class="caption-line caption-ai"></p>
+        </div>
+
+        <div class="transaction-stack" aria-label="Coffee purchase flow">
+          <div class="vendor-selector" aria-label="Coffee shop selection">
+            <article class="vendor-card vendor-card-luckin" data-vendor="luckin">
+              <p class="vendor-index">1</p>
+              <p class="vendor-name">瑞幸</p>
+              <p class="vendor-detail">最快 6 分钟 · ¥24</p>
+            </article>
+
+            <article class="vendor-card vendor-card-manner" data-vendor="manner">
+              <p class="vendor-index">2</p>
+              <p class="vendor-name">Manner</p>
+              <p class="vendor-detail">最近门店 · ¥28</p>
+            </article>
+
+            <article class="vendor-card vendor-card-starbucks" data-vendor="starbucks">
+              <p class="vendor-index">3</p>
+              <p class="vendor-name">星巴克</p>
+              <p class="vendor-detail">常喝拿铁 · ¥32</p>
+            </article>
+          </div>
+
+          <article class="coffee-card">
+            <div class="coffee-main">
+              <span class="coffee-mark" aria-hidden="true">
+                <span class="coffee-mark-foam"></span>
+              </span>
+
+              <div class="coffee-copy">
+                <p class="coffee-eyebrow">Starbucks / Coffee Order</p>
+                <p class="coffee-title">常喝的拿铁</p>
+                <p class="coffee-meta">热 · 大杯 · 约 8 分钟送达</p>
+              </div>
+
+              <span class="coffee-price">¥32</span>
+            </div>
+
+            <div class="coffee-status">
+              <span class="coffee-status-dot"></span>
+              <span class="coffee-status-text">正在下单</span>
+            </div>
+          </article>
+
+          <div class="payment-card">
+            <div class="payment-row">
+              <span class="payment-label">支付处理中</span>
+              <span class="payment-value">¥32</span>
+            </div>
+            <div class="payment-track">
+              <span class="payment-fill"></span>
+              <span class="payment-glint"></span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

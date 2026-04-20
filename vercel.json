@@ -1,0 +1,13 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "redirects": [
+    {
+      "source": "/pura-x-ai-awakening.html",
+      "destination": "/pura-x-ai-awakening/",
+      "permanent": true
+    }
+  ]
+}

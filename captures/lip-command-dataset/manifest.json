@@ -1,0 +1,1735 @@
+{
+  "version": 1,
+  "updated_at": "2026-04-08T09:51:10.910266+00:00",
+  "samples": [
+    {
+      "sample_id": "76f8959e4322",
+      "phrase_id": "coffee",
+      "phrase_text": "帮我点杯咖啡",
+      "speaker_id": "speaker-01",
+      "duration_ms": 2422,
+      "tracked_samples": 60,
+      "created_at": "2026-04-08T09:45:11.268412+00:00",
+      "video_path": "samples/coffee/76f8959e4322.webm",
+      "landmarks_path": "samples/coffee/76f8959e4322.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-coffee.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "52b5b45ffd29",
+      "phrase_id": "taxi",
+      "phrase_text": "帮我打个车",
+      "speaker_id": "speaker-01",
+      "duration_ms": 2350,
+      "tracked_samples": 59,
+      "created_at": "2026-04-08T09:45:15.460560+00:00",
+      "video_path": "samples/taxi/52b5b45ffd29.webm",
+      "landmarks_path": "samples/taxi/52b5b45ffd29.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-taxi.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "993478d663ac",
+      "phrase_id": "meeting_time",
+      "phrase_text": "明天几点的会议",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1904,
+      "tracked_samples": 47,
+      "created_at": "2026-04-08T09:45:19.124380+00:00",
+      "video_path": "samples/meeting_time/993478d663ac.webm",
+      "landmarks_path": "samples/meeting_time/993478d663ac.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-meeting_time.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "35cab9760318",
+      "phrase_id": "weather",
+      "phrase_text": "今天天气如何",
+      "speaker_id": "speaker-01",
+      "duration_ms": 2053,
+      "tracked_samples": 52,
+      "created_at": "2026-04-08T09:45:22.781515+00:00",
+      "video_path": "samples/weather/35cab9760318.webm",
+      "landmarks_path": "samples/weather/35cab9760318.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-weather.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "5c6e051aab57",
+      "phrase_id": "joke",
+      "phrase_text": "讲个笑话",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1692,
+      "tracked_samples": 43,
+      "created_at": "2026-04-08T09:45:26.465605+00:00",
+      "video_path": "samples/joke/5c6e051aab57.webm",
+      "landmarks_path": "samples/joke/5c6e051aab57.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-joke.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "5fc9d07a075e",
+      "phrase_id": "food_search",
+      "phrase_text": "帮我搜一下美食",
+      "speaker_id": "speaker-01",
+      "duration_ms": 2073,
+      "tracked_samples": 52,
+      "created_at": "2026-04-08T09:45:33.499908+00:00",
+      "video_path": "samples/food_search/5fc9d07a075e.webm",
+      "landmarks_path": "samples/food_search/5fc9d07a075e.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-food_search.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "44f23c2e5fcc",
+      "phrase_id": "meeting_room",
+      "phrase_text": "帮我订一个会议室",
+      "speaker_id": "speaker-01",
+      "duration_ms": 2761,
+      "tracked_samples": 69,
+      "created_at": "2026-04-08T09:45:39.406100+00:00",
+      "video_path": "samples/meeting_room/44f23c2e5fcc.webm",
+      "landmarks_path": "samples/meeting_room/44f23c2e5fcc.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-meeting_room.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "dc1d2b2575c6",
+      "phrase_id": "coffee",
+      "phrase_text": "帮我点杯咖啡",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1877,
+      "tracked_samples": 47,
+      "created_at": "2026-04-08T09:45:44.027316+00:00",
+      "video_path": "samples/coffee/dc1d2b2575c6.webm",
+      "landmarks_path": "samples/coffee/dc1d2b2575c6.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-coffee.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "6a19bc9ae380",
+      "phrase_id": "taxi",
+      "phrase_text": "帮我打个车",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1658,
+      "tracked_samples": 41,
+      "created_at": "2026-04-08T09:45:46.599254+00:00",
+      "video_path": "samples/taxi/6a19bc9ae380.webm",
+      "landmarks_path": "samples/taxi/6a19bc9ae380.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-taxi.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "f514b9a6f6bb",
+      "phrase_id": "meeting_time",
+      "phrase_text": "明天几点的会议",
+      "speaker_id": "speaker-01",
+      "duration_ms": 3521,
+      "tracked_samples": 88,
+      "created_at": "2026-04-08T09:45:51.061489+00:00",
+      "video_path": "samples/meeting_time/f514b9a6f6bb.webm",
+      "landmarks_path": "samples/meeting_time/f514b9a6f6bb.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-meeting_time.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "be694dd3c7f0",
+      "phrase_id": "weather",
+      "phrase_text": "今天天气如何",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1876,
+      "tracked_samples": 47,
+      "created_at": "2026-04-08T09:45:54.262774+00:00",
+      "video_path": "samples/weather/be694dd3c7f0.webm",
+      "landmarks_path": "samples/weather/be694dd3c7f0.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-weather.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "bf518d1f400d",
+      "phrase_id": "joke",
+      "phrase_text": "讲个笑话",
+      "speaker_id": "speaker-01",
+      "duration_ms": 2048,
+      "tracked_samples": 51,
+      "created_at": "2026-04-08T09:45:58.323091+00:00",
+      "video_path": "samples/joke/bf518d1f400d.webm",
+      "landmarks_path": "samples/joke/bf518d1f400d.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-joke.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "fd6c94da66a3",
+      "phrase_id": "food_search",
+      "phrase_text": "帮我搜一下美食",
+      "speaker_id": "speaker-01",
+      "duration_ms": 2782,
+      "tracked_samples": 70,
+      "created_at": "2026-04-08T09:46:05.300225+00:00",
+      "video_path": "samples/food_search/fd6c94da66a3.webm",
+      "landmarks_path": "samples/food_search/fd6c94da66a3.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-food_search.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "150cb1b94873",
+      "phrase_id": "meeting_room",
+      "phrase_text": "帮我订一个会议室",
+      "speaker_id": "speaker-01",
+      "duration_ms": 2769,
+      "tracked_samples": 69,
+      "created_at": "2026-04-08T09:46:10.631000+00:00",
+      "video_path": "samples/meeting_room/150cb1b94873.webm",
+      "landmarks_path": "samples/meeting_room/150cb1b94873.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-meeting_room.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "e506141ce9c5",
+      "phrase_id": "coffee",
+      "phrase_text": "帮我点杯咖啡",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1987,
+      "tracked_samples": 49,
+      "created_at": "2026-04-08T09:46:30.207862+00:00",
+      "video_path": "samples/coffee/e506141ce9c5.webm",
+      "landmarks_path": "samples/coffee/e506141ce9c5.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-coffee.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "1a225d3597f6",
+      "phrase_id": "taxi",
+      "phrase_text": "帮我打个车",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1959,
+      "tracked_samples": 49,
+      "created_at": "2026-04-08T09:46:32.865391+00:00",
+      "video_path": "samples/taxi/1a225d3597f6.webm",
+      "landmarks_path": "samples/taxi/1a225d3597f6.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-taxi.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "51bd10dd8867",
+      "phrase_id": "meeting_time",
+      "phrase_text": "明天几点的会议",
+      "speaker_id": "speaker-01",
+      "duration_ms": 2757,
+      "tracked_samples": 69,
+      "created_at": "2026-04-08T09:46:37.999434+00:00",
+      "video_path": "samples/meeting_time/51bd10dd8867.webm",
+      "landmarks_path": "samples/meeting_time/51bd10dd8867.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-meeting_time.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "6880a3faf564",
+      "phrase_id": "weather",
+      "phrase_text": "今天天气如何",
+      "speaker_id": "speaker-01",
+      "duration_ms": 4745,
+      "tracked_samples": 119,
+      "created_at": "2026-04-08T09:46:43.541709+00:00",
+      "video_path": "samples/weather/6880a3faf564.webm",
+      "landmarks_path": "samples/weather/6880a3faf564.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-weather.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "1cec0a441d2f",
+      "phrase_id": "joke",
+      "phrase_text": "讲个笑话",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1726,
+      "tracked_samples": 43,
+      "created_at": "2026-04-08T09:46:52.267613+00:00",
+      "video_path": "samples/joke/1cec0a441d2f.webm",
+      "landmarks_path": "samples/joke/1cec0a441d2f.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-joke.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "1cf63bedcc62",
+      "phrase_id": "food_search",
+      "phrase_text": "帮我搜一下美食",
+      "speaker_id": "speaker-01",
+      "duration_ms": 3188,
+      "tracked_samples": 80,
+      "created_at": "2026-04-08T09:46:59.643398+00:00",
+      "video_path": "samples/food_search/1cf63bedcc62.webm",
+      "landmarks_path": "samples/food_search/1cf63bedcc62.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-food_search.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "d8066c8004b1",
+      "phrase_id": "meeting_room",
+      "phrase_text": "帮我订一个会议室",
+      "speaker_id": "speaker-01",
+      "duration_ms": 3083,
+      "tracked_samples": 77,
+      "created_at": "2026-04-08T09:47:05.311932+00:00",
+      "video_path": "samples/meeting_room/d8066c8004b1.webm",
+      "landmarks_path": "samples/meeting_room/d8066c8004b1.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-meeting_room.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "d42f87712f02",
+      "phrase_id": "coffee",
+      "phrase_text": "帮我点杯咖啡",
+      "speaker_id": "speaker-01",
+      "duration_ms": 2467,
+      "tracked_samples": 62,
+      "created_at": "2026-04-08T09:47:08.983018+00:00",
+      "video_path": "samples/coffee/d42f87712f02.webm",
+      "landmarks_path": "samples/coffee/d42f87712f02.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-coffee.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "dc7592ce0fcf",
+      "phrase_id": "taxi",
+      "phrase_text": "帮我打个车",
+      "speaker_id": "speaker-01",
+      "duration_ms": 2683,
+      "tracked_samples": 67,
+      "created_at": "2026-04-08T09:47:12.399732+00:00",
+      "video_path": "samples/taxi/dc7592ce0fcf.webm",
+      "landmarks_path": "samples/taxi/dc7592ce0fcf.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-taxi.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "44dd1ec01faa",
+      "phrase_id": "meeting_time",
+      "phrase_text": "明天几点的会议",
+      "speaker_id": "speaker-01",
+      "duration_ms": 3879,
+      "tracked_samples": 97,
+      "created_at": "2026-04-08T09:47:17.026175+00:00",
+      "video_path": "samples/meeting_time/44dd1ec01faa.webm",
+      "landmarks_path": "samples/meeting_time/44dd1ec01faa.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-meeting_time.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "e071a938bbab",
+      "phrase_id": "weather",
+      "phrase_text": "今天天气如何",
+      "speaker_id": "speaker-01",
+      "duration_ms": 2934,
+      "tracked_samples": 73,
+      "created_at": "2026-04-08T09:47:20.604321+00:00",
+      "video_path": "samples/weather/e071a938bbab.webm",
+      "landmarks_path": "samples/weather/e071a938bbab.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-weather.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "d33d41d68fcb",
+      "phrase_id": "joke",
+      "phrase_text": "讲个笑话",
+      "speaker_id": "speaker-01",
+      "duration_ms": 2463,
+      "tracked_samples": 62,
+      "created_at": "2026-04-08T09:47:26.463660+00:00",
+      "video_path": "samples/joke/d33d41d68fcb.webm",
+      "landmarks_path": "samples/joke/d33d41d68fcb.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-joke.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "2cc84643feb6",
+      "phrase_id": "food_search",
+      "phrase_text": "帮我搜一下美食",
+      "speaker_id": "speaker-01",
+      "duration_ms": 2842,
+      "tracked_samples": 71,
+      "created_at": "2026-04-08T09:47:32.560325+00:00",
+      "video_path": "samples/food_search/2cc84643feb6.webm",
+      "landmarks_path": "samples/food_search/2cc84643feb6.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-food_search.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "e51a9c9b4272",
+      "phrase_id": "meeting_room",
+      "phrase_text": "帮我订一个会议室",
+      "speaker_id": "speaker-01",
+      "duration_ms": 3982,
+      "tracked_samples": 99,
+      "created_at": "2026-04-08T09:47:39.603131+00:00",
+      "video_path": "samples/meeting_room/e51a9c9b4272.webm",
+      "landmarks_path": "samples/meeting_room/e51a9c9b4272.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-meeting_room.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "c937f397d6ad",
+      "phrase_id": "coffee",
+      "phrase_text": "帮我点杯咖啡",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1618,
+      "tracked_samples": 41,
+      "created_at": "2026-04-08T09:47:41.944315+00:00",
+      "video_path": "samples/coffee/c937f397d6ad.webm",
+      "landmarks_path": "samples/coffee/c937f397d6ad.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-coffee.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "70aba0645227",
+      "phrase_id": "taxi",
+      "phrase_text": "帮我打个车",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1749,
+      "tracked_samples": 44,
+      "created_at": "2026-04-08T09:47:44.397848+00:00",
+      "video_path": "samples/taxi/70aba0645227.webm",
+      "landmarks_path": "samples/taxi/70aba0645227.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-taxi.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "727dd52601ba",
+      "phrase_id": "meeting_time",
+      "phrase_text": "明天几点的会议",
+      "speaker_id": "speaker-01",
+      "duration_ms": 3629,
+      "tracked_samples": 90,
+      "created_at": "2026-04-08T09:47:48.568159+00:00",
+      "video_path": "samples/meeting_time/727dd52601ba.webm",
+      "landmarks_path": "samples/meeting_time/727dd52601ba.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-meeting_time.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "320a8b1d06fb",
+      "phrase_id": "weather",
+      "phrase_text": "今天天气如何",
+      "speaker_id": "speaker-01",
+      "duration_ms": 2619,
+      "tracked_samples": 66,
+      "created_at": "2026-04-08T09:47:52.221028+00:00",
+      "video_path": "samples/weather/320a8b1d06fb.webm",
+      "landmarks_path": "samples/weather/320a8b1d06fb.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-weather.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "ceb7b52f03e3",
+      "phrase_id": "joke",
+      "phrase_text": "讲个笑话",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1795,
+      "tracked_samples": 45,
+      "created_at": "2026-04-08T09:47:55.596576+00:00",
+      "video_path": "samples/joke/ceb7b52f03e3.webm",
+      "landmarks_path": "samples/joke/ceb7b52f03e3.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-joke.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "3101b4b5e095",
+      "phrase_id": "food_search",
+      "phrase_text": "帮我搜一下美食",
+      "speaker_id": "speaker-01",
+      "duration_ms": 3376,
+      "tracked_samples": 84,
+      "created_at": "2026-04-08T09:48:02.794805+00:00",
+      "video_path": "samples/food_search/3101b4b5e095.webm",
+      "landmarks_path": "samples/food_search/3101b4b5e095.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-food_search.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "782cf912b486",
+      "phrase_id": "meeting_room",
+      "phrase_text": "帮我订一个会议室",
+      "speaker_id": "speaker-01",
+      "duration_ms": 3817,
+      "tracked_samples": 96,
+      "created_at": "2026-04-08T09:48:10.699367+00:00",
+      "video_path": "samples/meeting_room/782cf912b486.webm",
+      "landmarks_path": "samples/meeting_room/782cf912b486.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-meeting_room.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "36b3a5475f48",
+      "phrase_id": "coffee",
+      "phrase_text": "帮我点杯咖啡",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1613,
+      "tracked_samples": 40,
+      "created_at": "2026-04-08T09:48:16.203899+00:00",
+      "video_path": "samples/coffee/36b3a5475f48.webm",
+      "landmarks_path": "samples/coffee/36b3a5475f48.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-coffee.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "4f76b98829bf",
+      "phrase_id": "taxi",
+      "phrase_text": "帮我打个车",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1904,
+      "tracked_samples": 47,
+      "created_at": "2026-04-08T09:48:18.721155+00:00",
+      "video_path": "samples/taxi/4f76b98829bf.webm",
+      "landmarks_path": "samples/taxi/4f76b98829bf.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-taxi.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "1bb0e4c58ed9",
+      "phrase_id": "meeting_time",
+      "phrase_text": "明天几点的会议",
+      "speaker_id": "speaker-01",
+      "duration_ms": 2306,
+      "tracked_samples": 58,
+      "created_at": "2026-04-08T09:48:22.019286+00:00",
+      "video_path": "samples/meeting_time/1bb0e4c58ed9.webm",
+      "landmarks_path": "samples/meeting_time/1bb0e4c58ed9.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-meeting_time.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "9b44d838ff00",
+      "phrase_id": "weather",
+      "phrase_text": "今天天气如何",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1879,
+      "tracked_samples": 47,
+      "created_at": "2026-04-08T09:48:24.457680+00:00",
+      "video_path": "samples/weather/9b44d838ff00.webm",
+      "landmarks_path": "samples/weather/9b44d838ff00.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-weather.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "8af2e600830e",
+      "phrase_id": "joke",
+      "phrase_text": "讲个笑话",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1717,
+      "tracked_samples": 43,
+      "created_at": "2026-04-08T09:48:26.698297+00:00",
+      "video_path": "samples/joke/8af2e600830e.webm",
+      "landmarks_path": "samples/joke/8af2e600830e.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-joke.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "8c39f1667e42",
+      "phrase_id": "food_search",
+      "phrase_text": "帮我搜一下美食",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1809,
+      "tracked_samples": 45,
+      "created_at": "2026-04-08T09:48:32.285329+00:00",
+      "video_path": "samples/food_search/8c39f1667e42.webm",
+      "landmarks_path": "samples/food_search/8c39f1667e42.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-food_search.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "e3d1cc909b51",
+      "phrase_id": "meeting_room",
+      "phrase_text": "帮我订一个会议室",
+      "speaker_id": "speaker-01",
+      "duration_ms": 3322,
+      "tracked_samples": 83,
+      "created_at": "2026-04-08T09:48:38.444693+00:00",
+      "video_path": "samples/meeting_room/e3d1cc909b51.webm",
+      "landmarks_path": "samples/meeting_room/e3d1cc909b51.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-meeting_room.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "e20175396c2e",
+      "phrase_id": "coffee",
+      "phrase_text": "帮我点杯咖啡",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1517,
+      "tracked_samples": 38,
+      "created_at": "2026-04-08T09:48:40.778315+00:00",
+      "video_path": "samples/coffee/e20175396c2e.webm",
+      "landmarks_path": "samples/coffee/e20175396c2e.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-coffee.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "993706d44ae3",
+      "phrase_id": "taxi",
+      "phrase_text": "帮我打个车",
+      "speaker_id": "speaker-01",
+      "duration_ms": 2234,
+      "tracked_samples": 56,
+      "created_at": "2026-04-08T09:48:43.830106+00:00",
+      "video_path": "samples/taxi/993706d44ae3.webm",
+      "landmarks_path": "samples/taxi/993706d44ae3.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-taxi.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "59801be687a7",
+      "phrase_id": "meeting_time",
+      "phrase_text": "明天几点的会议",
+      "speaker_id": "speaker-01",
+      "duration_ms": 3156,
+      "tracked_samples": 79,
+      "created_at": "2026-04-08T09:48:47.637111+00:00",
+      "video_path": "samples/meeting_time/59801be687a7.webm",
+      "landmarks_path": "samples/meeting_time/59801be687a7.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-meeting_time.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "b20a4203a632",
+      "phrase_id": "weather",
+      "phrase_text": "今天天气如何",
+      "speaker_id": "speaker-01",
+      "duration_ms": 2260,
+      "tracked_samples": 56,
+      "created_at": "2026-04-08T09:48:50.481589+00:00",
+      "video_path": "samples/weather/b20a4203a632.webm",
+      "landmarks_path": "samples/weather/b20a4203a632.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-weather.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "8bf07151d55a",
+      "phrase_id": "joke",
+      "phrase_text": "讲个笑话",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1793,
+      "tracked_samples": 45,
+      "created_at": "2026-04-08T09:48:54.823814+00:00",
+      "video_path": "samples/joke/8bf07151d55a.webm",
+      "landmarks_path": "samples/joke/8bf07151d55a.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-joke.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "3913ce6e41da",
+      "phrase_id": "food_search",
+      "phrase_text": "帮我搜一下美食",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1770,
+      "tracked_samples": 44,
+      "created_at": "2026-04-08T09:48:59.476503+00:00",
+      "video_path": "samples/food_search/3913ce6e41da.webm",
+      "landmarks_path": "samples/food_search/3913ce6e41da.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-food_search.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "bde3b6e2add8",
+      "phrase_id": "meeting_room",
+      "phrase_text": "帮我订一个会议室",
+      "speaker_id": "speaker-01",
+      "duration_ms": 3145,
+      "tracked_samples": 79,
+      "created_at": "2026-04-08T09:49:03.143244+00:00",
+      "video_path": "samples/meeting_room/bde3b6e2add8.webm",
+      "landmarks_path": "samples/meeting_room/bde3b6e2add8.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-meeting_room.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "60cee06b7e00",
+      "phrase_id": "coffee",
+      "phrase_text": "帮我点杯咖啡",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1601,
+      "tracked_samples": 40,
+      "created_at": "2026-04-08T09:49:06.111409+00:00",
+      "video_path": "samples/coffee/60cee06b7e00.webm",
+      "landmarks_path": "samples/coffee/60cee06b7e00.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-coffee.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "ada57d886077",
+      "phrase_id": "taxi",
+      "phrase_text": "帮我打个车",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1943,
+      "tracked_samples": 48,
+      "created_at": "2026-04-08T09:49:08.526957+00:00",
+      "video_path": "samples/taxi/ada57d886077.webm",
+      "landmarks_path": "samples/taxi/ada57d886077.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-taxi.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "8993ee5c57bc",
+      "phrase_id": "meeting_time",
+      "phrase_text": "明天几点的会议",
+      "speaker_id": "speaker-01",
+      "duration_ms": 2892,
+      "tracked_samples": 72,
+      "created_at": "2026-04-08T09:49:12.077124+00:00",
+      "video_path": "samples/meeting_time/8993ee5c57bc.webm",
+      "landmarks_path": "samples/meeting_time/8993ee5c57bc.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-meeting_time.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "046a93b244be",
+      "phrase_id": "weather",
+      "phrase_text": "今天天气如何",
+      "speaker_id": "speaker-01",
+      "duration_ms": 2978,
+      "tracked_samples": 74,
+      "created_at": "2026-04-08T09:49:15.645570+00:00",
+      "video_path": "samples/weather/046a93b244be.webm",
+      "landmarks_path": "samples/weather/046a93b244be.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-weather.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "a72a866b8dc8",
+      "phrase_id": "joke",
+      "phrase_text": "讲个笑话",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1132,
+      "tracked_samples": 29,
+      "created_at": "2026-04-08T09:49:19.816960+00:00",
+      "video_path": "samples/joke/a72a866b8dc8.webm",
+      "landmarks_path": "samples/joke/a72a866b8dc8.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-joke.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "6030203e9ba2",
+      "phrase_id": "food_search",
+      "phrase_text": "帮我搜一下美食",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1711,
+      "tracked_samples": 43,
+      "created_at": "2026-04-08T09:49:24.180297+00:00",
+      "video_path": "samples/food_search/6030203e9ba2.webm",
+      "landmarks_path": "samples/food_search/6030203e9ba2.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-food_search.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "affc10a50f13",
+      "phrase_id": "meeting_room",
+      "phrase_text": "帮我订一个会议室",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1982,
+      "tracked_samples": 50,
+      "created_at": "2026-04-08T09:49:28.430321+00:00",
+      "video_path": "samples/meeting_room/affc10a50f13.webm",
+      "landmarks_path": "samples/meeting_room/affc10a50f13.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-meeting_room.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "724228349b8e",
+      "phrase_id": "coffee",
+      "phrase_text": "帮我点杯咖啡",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1391,
+      "tracked_samples": 35,
+      "created_at": "2026-04-08T09:49:30.497846+00:00",
+      "video_path": "samples/coffee/724228349b8e.webm",
+      "landmarks_path": "samples/coffee/724228349b8e.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-coffee.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "ecc8554b2576",
+      "phrase_id": "taxi",
+      "phrase_text": "帮我打个车",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1283,
+      "tracked_samples": 32,
+      "created_at": "2026-04-08T09:49:32.483176+00:00",
+      "video_path": "samples/taxi/ecc8554b2576.webm",
+      "landmarks_path": "samples/taxi/ecc8554b2576.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-taxi.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "a0db256975ed",
+      "phrase_id": "meeting_time",
+      "phrase_text": "明天几点的会议",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1852,
+      "tracked_samples": 47,
+      "created_at": "2026-04-08T09:49:34.978688+00:00",
+      "video_path": "samples/meeting_time/a0db256975ed.webm",
+      "landmarks_path": "samples/meeting_time/a0db256975ed.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-meeting_time.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "e8c132e1e212",
+      "phrase_id": "weather",
+      "phrase_text": "今天天气如何",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1848,
+      "tracked_samples": 46,
+      "created_at": "2026-04-08T09:49:37.401929+00:00",
+      "video_path": "samples/weather/e8c132e1e212.webm",
+      "landmarks_path": "samples/weather/e8c132e1e212.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-weather.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "68c1444a85dc",
+      "phrase_id": "joke",
+      "phrase_text": "讲个笑话",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1667,
+      "tracked_samples": 41,
+      "created_at": "2026-04-08T09:49:39.603327+00:00",
+      "video_path": "samples/joke/68c1444a85dc.webm",
+      "landmarks_path": "samples/joke/68c1444a85dc.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-joke.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "66190c8b52c7",
+      "phrase_id": "food_search",
+      "phrase_text": "帮我搜一下美食",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1755,
+      "tracked_samples": 44,
+      "created_at": "2026-04-08T09:49:43.697147+00:00",
+      "video_path": "samples/food_search/66190c8b52c7.webm",
+      "landmarks_path": "samples/food_search/66190c8b52c7.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-food_search.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "e059fff61d60",
+      "phrase_id": "meeting_room",
+      "phrase_text": "帮我订一个会议室",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1471,
+      "tracked_samples": 37,
+      "created_at": "2026-04-08T09:49:48.309240+00:00",
+      "video_path": "samples/meeting_room/e059fff61d60.webm",
+      "landmarks_path": "samples/meeting_room/e059fff61d60.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-meeting_room.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "f11870e49347",
+      "phrase_id": "coffee",
+      "phrase_text": "帮我点杯咖啡",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1195,
+      "tracked_samples": 30,
+      "created_at": "2026-04-08T09:49:50.099580+00:00",
+      "video_path": "samples/coffee/f11870e49347.webm",
+      "landmarks_path": "samples/coffee/f11870e49347.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-coffee.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "eae083204f0d",
+      "phrase_id": "taxi",
+      "phrase_text": "帮我打个车",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1077,
+      "tracked_samples": 27,
+      "created_at": "2026-04-08T09:49:51.721131+00:00",
+      "video_path": "samples/taxi/eae083204f0d.webm",
+      "landmarks_path": "samples/taxi/eae083204f0d.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-taxi.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "62eef9727506",
+      "phrase_id": "meeting_time",
+      "phrase_text": "明天几点的会议",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1507,
+      "tracked_samples": 38,
+      "created_at": "2026-04-08T09:49:53.756196+00:00",
+      "video_path": "samples/meeting_time/62eef9727506.webm",
+      "landmarks_path": "samples/meeting_time/62eef9727506.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-meeting_time.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "d0b415bbe0b8",
+      "phrase_id": "weather",
+      "phrase_text": "今天天气如何",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1545,
+      "tracked_samples": 38,
+      "created_at": "2026-04-08T09:49:56.007812+00:00",
+      "video_path": "samples/weather/d0b415bbe0b8.webm",
+      "landmarks_path": "samples/weather/d0b415bbe0b8.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-weather.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "79bcabd3d0a1",
+      "phrase_id": "joke",
+      "phrase_text": "讲个笑话",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1138,
+      "tracked_samples": 28,
+      "created_at": "2026-04-08T09:49:57.836857+00:00",
+      "video_path": "samples/joke/79bcabd3d0a1.webm",
+      "landmarks_path": "samples/joke/79bcabd3d0a1.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-joke.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "cd4ad9460039",
+      "phrase_id": "food_search",
+      "phrase_text": "帮我搜一下美食",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1394,
+      "tracked_samples": 35,
+      "created_at": "2026-04-08T09:50:02.941271+00:00",
+      "video_path": "samples/food_search/cd4ad9460039.webm",
+      "landmarks_path": "samples/food_search/cd4ad9460039.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-food_search.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "8abadba17e68",
+      "phrase_id": "meeting_room",
+      "phrase_text": "帮我订一个会议室",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1578,
+      "tracked_samples": 40,
+      "created_at": "2026-04-08T09:50:07.140576+00:00",
+      "video_path": "samples/meeting_room/8abadba17e68.webm",
+      "landmarks_path": "samples/meeting_room/8abadba17e68.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-meeting_room.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "652c9ce6c208",
+      "phrase_id": "coffee",
+      "phrase_text": "帮我点杯咖啡",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1048,
+      "tracked_samples": 26,
+      "created_at": "2026-04-08T09:50:09.245373+00:00",
+      "video_path": "samples/coffee/652c9ce6c208.webm",
+      "landmarks_path": "samples/coffee/652c9ce6c208.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-coffee.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "eee5aa039bb6",
+      "phrase_id": "taxi",
+      "phrase_text": "帮我打个车",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1072,
+      "tracked_samples": 27,
+      "created_at": "2026-04-08T09:50:10.827076+00:00",
+      "video_path": "samples/taxi/eee5aa039bb6.webm",
+      "landmarks_path": "samples/taxi/eee5aa039bb6.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-taxi.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "c246aadc3f36",
+      "phrase_id": "meeting_time",
+      "phrase_text": "明天几点的会议",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1800,
+      "tracked_samples": 45,
+      "created_at": "2026-04-08T09:50:13.309969+00:00",
+      "video_path": "samples/meeting_time/c246aadc3f36.webm",
+      "landmarks_path": "samples/meeting_time/c246aadc3f36.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-meeting_time.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "824cf347f195",
+      "phrase_id": "weather",
+      "phrase_text": "今天天气如何",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1401,
+      "tracked_samples": 35,
+      "created_at": "2026-04-08T09:50:15.259092+00:00",
+      "video_path": "samples/weather/824cf347f195.webm",
+      "landmarks_path": "samples/weather/824cf347f195.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-weather.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "2b391511b6e8",
+      "phrase_id": "joke",
+      "phrase_text": "讲个笑话",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1192,
+      "tracked_samples": 30,
+      "created_at": "2026-04-08T09:50:17.017005+00:00",
+      "video_path": "samples/joke/2b391511b6e8.webm",
+      "landmarks_path": "samples/joke/2b391511b6e8.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-joke.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "b04742410a40",
+      "phrase_id": "food_search",
+      "phrase_text": "帮我搜一下美食",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1919,
+      "tracked_samples": 48,
+      "created_at": "2026-04-08T09:50:22.616703+00:00",
+      "video_path": "samples/food_search/b04742410a40.webm",
+      "landmarks_path": "samples/food_search/b04742410a40.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-food_search.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "6b4bc751f12d",
+      "phrase_id": "meeting_room",
+      "phrase_text": "帮我订一个会议室",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1447,
+      "tracked_samples": 36,
+      "created_at": "2026-04-08T09:50:26.065213+00:00",
+      "video_path": "samples/meeting_room/6b4bc751f12d.webm",
+      "landmarks_path": "samples/meeting_room/6b4bc751f12d.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-meeting_room.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "cdcd4b396eea",
+      "phrase_id": "coffee",
+      "phrase_text": "帮我点杯咖啡",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1201,
+      "tracked_samples": 30,
+      "created_at": "2026-04-08T09:50:28.257288+00:00",
+      "video_path": "samples/coffee/cdcd4b396eea.webm",
+      "landmarks_path": "samples/coffee/cdcd4b396eea.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-coffee.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "c8d5563ebf68",
+      "phrase_id": "taxi",
+      "phrase_text": "帮我打个车",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1174,
+      "tracked_samples": 29,
+      "created_at": "2026-04-08T09:50:32.401413+00:00",
+      "video_path": "samples/taxi/c8d5563ebf68.webm",
+      "landmarks_path": "samples/taxi/c8d5563ebf68.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-taxi.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "122186bace93",
+      "phrase_id": "meeting_time",
+      "phrase_text": "明天几点的会议",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1395,
+      "tracked_samples": 35,
+      "created_at": "2026-04-08T09:50:36.101807+00:00",
+      "video_path": "samples/meeting_time/122186bace93.webm",
+      "landmarks_path": "samples/meeting_time/122186bace93.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-meeting_time.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "f7d38950d4c6",
+      "phrase_id": "weather",
+      "phrase_text": "今天天气如何",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1415,
+      "tracked_samples": 36,
+      "created_at": "2026-04-08T09:50:38.415764+00:00",
+      "video_path": "samples/weather/f7d38950d4c6.webm",
+      "landmarks_path": "samples/weather/f7d38950d4c6.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-weather.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "9236cc65dc5e",
+      "phrase_id": "joke",
+      "phrase_text": "讲个笑话",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1168,
+      "tracked_samples": 29,
+      "created_at": "2026-04-08T09:50:40.584025+00:00",
+      "video_path": "samples/joke/9236cc65dc5e.webm",
+      "landmarks_path": "samples/joke/9236cc65dc5e.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-joke.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "7edd14e8116c",
+      "phrase_id": "food_search",
+      "phrase_text": "帮我搜一下美食",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1493,
+      "tracked_samples": 37,
+      "created_at": "2026-04-08T09:50:44.682007+00:00",
+      "video_path": "samples/food_search/7edd14e8116c.webm",
+      "landmarks_path": "samples/food_search/7edd14e8116c.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-food_search.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "715495f9ae24",
+      "phrase_id": "meeting_room",
+      "phrase_text": "帮我订一个会议室",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1749,
+      "tracked_samples": 43,
+      "created_at": "2026-04-08T09:50:49.805002+00:00",
+      "video_path": "samples/meeting_room/715495f9ae24.webm",
+      "landmarks_path": "samples/meeting_room/715495f9ae24.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-meeting_room.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "7dc504b83a6c",
+      "phrase_id": "coffee",
+      "phrase_text": "帮我点杯咖啡",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1309,
+      "tracked_samples": 33,
+      "created_at": "2026-04-08T09:50:52.777148+00:00",
+      "video_path": "samples/coffee/7dc504b83a6c.webm",
+      "landmarks_path": "samples/coffee/7dc504b83a6c.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-coffee.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "478215ff49c2",
+      "phrase_id": "taxi",
+      "phrase_text": "帮我打个车",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1069,
+      "tracked_samples": 27,
+      "created_at": "2026-04-08T09:50:54.854806+00:00",
+      "video_path": "samples/taxi/478215ff49c2.webm",
+      "landmarks_path": "samples/taxi/478215ff49c2.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-taxi.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "5886190eb606",
+      "phrase_id": "meeting_time",
+      "phrase_text": "明天几点的会议",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1454,
+      "tracked_samples": 36,
+      "created_at": "2026-04-08T09:50:58.368270+00:00",
+      "video_path": "samples/meeting_time/5886190eb606.webm",
+      "landmarks_path": "samples/meeting_time/5886190eb606.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-meeting_time.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "32ee7c5b132a",
+      "phrase_id": "weather",
+      "phrase_text": "今天天气如何",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1252,
+      "tracked_samples": 32,
+      "created_at": "2026-04-08T09:51:00.655203+00:00",
+      "video_path": "samples/weather/32ee7c5b132a.webm",
+      "landmarks_path": "samples/weather/32ee7c5b132a.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-weather.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "7753a77431dd",
+      "phrase_id": "joke",
+      "phrase_text": "讲个笑话",
+      "speaker_id": "speaker-01",
+      "duration_ms": 980,
+      "tracked_samples": 25,
+      "created_at": "2026-04-08T09:51:03.221000+00:00",
+      "video_path": "samples/joke/7753a77431dd.webm",
+      "landmarks_path": "samples/joke/7753a77431dd.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-joke.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "8b18c8b9c16e",
+      "phrase_id": "food_search",
+      "phrase_text": "帮我搜一下美食",
+      "speaker_id": "speaker-01",
+      "duration_ms": 1262,
+      "tracked_samples": 31,
+      "created_at": "2026-04-08T09:51:06.364959+00:00",
+      "video_path": "samples/food_search/8b18c8b9c16e.webm",
+      "landmarks_path": "samples/food_search/8b18c8b9c16e.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-food_search.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    },
+    {
+      "sample_id": "47c8e67204f0",
+      "phrase_id": "meeting_room",
+      "phrase_text": "帮我订一个会议室",
+      "speaker_id": "speaker-01",
+      "duration_ms": 2139,
+      "tracked_samples": 54,
+      "created_at": "2026-04-08T09:51:10.896756+00:00",
+      "video_path": "samples/meeting_room/47c8e67204f0.webm",
+      "landmarks_path": "samples/meeting_room/47c8e67204f0.landmarks.json",
+      "metadata": {
+        "content_type": "video/webm;codecs=vp9",
+        "filename": "sample-meeting_room.webm",
+        "client_capture_fps": 25.0,
+        "client_video_width": 832,
+        "client_video_height": 468,
+        "tracker_mode": "browser-face-detector"
+      }
+    }
+  ]
+}

@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lipsight Dataset Console | 固定句采集台</title>
+    <script type="module" src="./main.js"></script>
+  </head>
+  <body>
+    <div class="page-grain" aria-hidden="true"></div>
+    <main class="collection-shell">
+      <header class="topbar">
+        <a class="top-link" href="/">返回识别原型</a>
+        <p class="top-status" id="backendState">dataset api checking</p>
+      </header>
+
+      <section class="hero-panel">
+        <div class="hero-copy">
+          <p class="eyebrow">Dataset Builder / 7 Fixed Commands</p>
+          <h1 class="hero-title">固定句采集台，让我们先把训练样本录扎实。</h1>
+          <p class="hero-text">
+            这页不追求实时识别，而是专门给 7 句固定指令采集视频样本。每条录制会连同浏览器关键点一起保存到本地数据集目录，后面就能接分类训练。
+          </p>
+
+          <div class="hero-actions">
+            <button class="primary-button" id="startCameraButton" type="button">打开摄像头</button>
+            <button class="secondary-button" id="toggleCaptureButton" type="button" disabled>录这一条</button>
+            <button class="secondary-button" id="trainModelButton" type="button">训练固定句模型</button>
+            <button class="ghost-button" id="exportManifestButton" type="button">导出 Manifest</button>
+          </div>
+        </div>
+
+        <aside class="hero-aside">
+          <article class="summary-card">
+            <p class="summary-label">Current Target</p>
+            <p class="summary-value" id="currentPhraseLabel">帮我点杯咖啡</p>
+            <p class="summary-meta" id="currentPhraseMeta">饮品 · 建议每句录 12 条以上</p>
+          </article>
+
+          <article class="summary-card">
+            <p class="summary-label">Overall Progress</p>
+            <p class="summary-value" id="overallProgressValue">0 / 84</p>
+            <div class="progress-track" aria-hidden="true">
+              <span class="progress-fill" id="overallProgressFill"></span>
+            </div>
+            <p class="summary-meta" id="overallProgressMeta">7 句 × 每句目标 12 条</p>
+          </article>
+
+          <article class="summary-card">
+            <p class="summary-label">Dataset Path</p>
+            <p class="summary-code" id="datasetPath">等待后端连接…</p>
+          </article>
+        </aside>
+      </section>
+
+      <section class="workspace-grid">
+        <section class="panel capture-panel" aria-labelledby="captureTitle">
+          <div class="panel-head">
+            <div>
+              <p class="panel-kicker">Capture Stage</p>
+              <h2 class="panel-title" id="captureTitle">单句采集</h2>
+            </div>
+            <div class="pill" id="cameraStatePill">camera idle</div>
+          </div>
+
+          <div class="video-stage">
+            <video id="cameraVideo" autoplay muted playsinline></video>
+            <div class="video-mask" aria-hidden="true"></div>
+            <canvas id="trackingCanvas" class="tracking-canvas" aria-hidden="true"></canvas>
+            <div class="video-overlay">
+              <div class="target-frame"></div>
+              <div class="overlay-notes">
+                <span>正脸</span>
+                <span>慢一点</span>
+                <span>说完停住</span>
+                <span id="trackerMode">browser tracker idle</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="meter-strip">
+            <article class="meter-card">
+              <p class="meter-label">Tracker</p>
+              <p class="meter-value" id="trackerState">idle</p>
+            </article>
+            <article class="meter-card">
+              <p class="meter-label">Camera</p>
+              <p class="meter-value" id="cameraResolution">未启动</p>
+            </article>
+            <article class="meter-card">
+              <p class="meter-label">Samples</p>
+              <p class="meter-value" id="totalSamplesValue">0</p>
+            </article>
+            <article class="meter-card">
+              <p class="meter-label">Selected Phrase</p>
+              <p class="meter-value" id="selectedPhraseCount">0 / 12</p>
+            </article>
+          </div>
+
+          <div class="control-grid">
+            <label class="field">
+              <span class="field-label">Speaker ID</span>
+              <input class="field-input" id="speakerIdInput" type="text" value="speaker-01" />
+            </label>
+            <article class="note-card">
+              <p class="note-label">Take Status</p>
+              <p class="note-copy" id="takeStatus">打开摄像头后，先选目标句，再录这一条。</p>
+            </article>
+          </div>
+
+          <div class="tip-list">
+            <p class="tip-item">同一句建议连录 12 到 20 条，嘴型幅度和语速尽量保持稳定。</p>
+            <p class="tip-item">每条控制在 2 到 4 秒，说完后停半秒再结束，方便后面切对齐。</p>
+            <p class="tip-item">如果 Tracker 长时间不是 tracking，先别录，这条大概率质量不够。</p>
+          </div>
+        </section>
+
+        <section class="panel phrase-panel" aria-labelledby="phraseTitle">
+          <div class="panel-head">
+            <div>
+              <p class="panel-kicker">Phrase Targets</p>
+              <h2 class="panel-title" id="phraseTitle">7 句固定指令</h2>
+            </div>
+            <button class="ghost-button" id="refreshDatasetButton" type="button">刷新数据集</button>
+          </div>
+
+          <div class="phrase-grid" id="phraseGrid"></div>
+        </section>
+      </section>
+
+      <section class="lower-grid">
+        <section class="panel recent-panel" aria-labelledby="recentTitle">
+          <div class="panel-head">
+            <div>
+              <p class="panel-kicker">Recent Samples</p>
+              <h2 class="panel-title" id="recentTitle">最近录制</h2>
+            </div>
+          </div>
+          <ul class="sample-list" id="sampleList"></ul>
+        </section>
+
+        <section class="panel guide-panel" aria-labelledby="guideTitle">
+          <div class="panel-head">
+            <div>
+              <p class="panel-kicker">Collection Notes</p>
+              <h2 class="panel-title" id="guideTitle">采集建议</h2>
+            </div>
+          </div>
+
+          <div class="guide-stack">
+            <article class="guide-card">
+              <p class="guide-label">1. 先均衡计数</p>
+              <p class="guide-copy">优先把 7 句都录到至少 12 条，再考虑继续加量，别只录一两句。</p>
+            </article>
+            <article class="guide-card">
+              <p class="guide-label">2. 控制环境差异</p>
+              <p class="guide-copy">同一轮先保持距离、角度和光线一致；下一轮再故意加一点变化，后面泛化会更好。</p>
+            </article>
+            <article class="guide-card">
+              <p class="guide-label">3. 说错就删</p>
+              <p class="guide-copy">Recent Samples 里可以直接删掉误录或嘴部没跟上的条目，尽量别把脏样本留到训练阶段。</p>
+            </article>
+          </div>
+        </section>
+      </section>
+    </main>
+  </body>
+</html>
