@@ -2,7 +2,7 @@
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Pura X | AI 觉醒</title>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
     <style>
@@ -12,6 +12,11 @@
         color-scheme: dark;
         --stage-size: 980px;
         --stage-scale: 1;
+        --stage-frame-size: 980px;
+        --viewport-width: 100vw;
+        --viewport-height: 100vh;
+        --viewport-offset-x: 0px;
+        --viewport-offset-y: 0px;
         --cyan-rgb: 103, 255, 245;
         --purple-rgb: 154, 94, 255;
         --ice-rgb: 209, 255, 255;
@@ -51,24 +56,42 @@
         overflow: hidden;
         background: #000;
         color: rgb(var(--ice-rgb));
+        overscroll-behavior: none;
       }
 
       body {
-        display: grid;
-        place-items: center;
+        position: fixed;
+        inset: 0;
         font-family: "Sora", "Noto Sans SC", sans-serif;
+        touch-action: manipulation;
       }
 
       .viewport-shell {
-        width: 100vw;
-        height: 100vh;
-        display: grid;
-        place-items: center;
+        position: fixed;
+        left: var(--viewport-offset-x);
+        top: var(--viewport-offset-y);
+        width: var(--viewport-width);
+        height: var(--viewport-height);
+        display: flex;
+        align-items: center;
+        justify-content: center;
         overflow: hidden;
+        padding:
+          max(16px, env(safe-area-inset-top))
+          max(16px, env(safe-area-inset-right))
+          max(16px, env(safe-area-inset-bottom))
+          max(16px, env(safe-area-inset-left));
         background:
           radial-gradient(circle at 50% 14%, rgba(var(--purple-rgb), 0.1), transparent 36%),
           radial-gradient(circle at 50% 86%, rgba(var(--cyan-rgb), 0.08), transparent 42%),
           #000;
+      }
+
+      .stage-frame {
+        position: relative;
+        flex: none;
+        width: var(--stage-frame-size);
+        height: var(--stage-frame-size);
       }
 
       .device-stage {
@@ -80,8 +103,11 @@
           radial-gradient(circle at 48% 48%, rgba(7, 10, 28, 0.72), rgba(0, 0, 0, 0.96) 60%),
           #000;
         border-radius: 58px;
+        position: absolute;
+        left: 0;
+        top: 0;
         transform: scale(var(--stage-scale));
-        transform-origin: center center;
+        transform-origin: top left;
         box-shadow:
           0 0 0 1px rgba(255, 255, 255, 0.03),
           0 34px 130px rgba(0, 0, 0, 0.6);
@@ -430,38 +456,40 @@
   </head>
   <body>
     <div class="viewport-shell">
-      <main class="device-stage" id="deviceStage" data-phase="permission">
-        <section class="aod-layer" aria-label="Always-on display clock">
-          <div class="clock-wrap" id="clockWrap">
-            <div class="clock-time" id="clockTime">00:00</div>
-          </div>
-        </section>
+      <div class="stage-frame" id="stageFrame">
+        <main class="device-stage" id="deviceStage" data-phase="permission">
+          <section class="aod-layer" aria-label="Always-on display clock">
+            <div class="clock-wrap" id="clockWrap">
+              <div class="clock-time" id="clockTime">00:00</div>
+            </div>
+          </section>
 
-        <canvas id="fxCanvas" width="980" height="980" aria-hidden="true"></canvas>
+          <canvas id="fxCanvas" width="980" height="980" aria-hidden="true"></canvas>
 
-        <section class="agent-layer" id="agentLayer" aria-hidden="true">
-          <div class="orb-shell" id="orbShell">
-            <div class="orb-aura" id="orbAura"></div>
-            <div class="orb-ring" id="orbRing"></div>
-            <div class="orb-core" id="orbCore"></div>
-            <div class="orb-liquid" id="orbLiquid"></div>
-            <div class="orb-highlight" id="orbHighlight"></div>
-          </div>
-        </section>
+          <section class="agent-layer" id="agentLayer" aria-hidden="true">
+            <div class="orb-shell" id="orbShell">
+              <div class="orb-aura" id="orbAura"></div>
+              <div class="orb-ring" id="orbRing"></div>
+              <div class="orb-core" id="orbCore"></div>
+              <div class="orb-liquid" id="orbLiquid"></div>
+              <div class="orb-highlight" id="orbHighlight"></div>
+            </div>
+          </section>
 
-        <section class="permission-overlay" id="permissionOverlay" aria-live="polite">
-          <div class="permission-card">
-            <p class="permission-kicker">Huawei Pura X / AI 觉醒</p>
-            <h1 class="permission-title" id="overlayTitle">点击开启 AI 感知</h1>
-            <p class="permission-detail" id="overlayDetail">
-              授权前置摄像头后，外屏会在你注视时由待机时钟无缝唤醒为活跃 AI 智能体。
-            </p>
-            <button class="permission-button" id="permissionButton" type="button">点击开启 AI 感知</button>
-          </div>
-        </section>
+          <section class="permission-overlay" id="permissionOverlay" aria-live="polite">
+            <div class="permission-card">
+              <p class="permission-kicker">Huawei Pura X / AI 觉醒</p>
+              <h1 class="permission-title" id="overlayTitle">点击开启 AI 感知</h1>
+              <p class="permission-detail" id="overlayDetail">
+                授权前置摄像头后，外屏会在你注视时由待机时钟无缝唤醒为活跃 AI 智能体。
+              </p>
+              <button class="permission-button" id="permissionButton" type="button">点击开启 AI 感知</button>
+            </div>
+          </section>
 
-        <video id="cameraFeed" autoplay muted playsinline></video>
-      </main>
+          <video id="cameraFeed" autoplay muted playsinline></video>
+        </main>
+      </div>
     </div>
 
     <script type="text/plain" id="pose-worker-source">
@@ -645,6 +673,7 @@ self.onmessage = async (event) => {
       });
 
       const ui = {
+        stageFrame: document.getElementById("stageFrame"),
         stage: document.getElementById("deviceStage"),
         clockWrap: document.getElementById("clockWrap"),
         clockTime: document.getElementById("clockTime"),
@@ -768,11 +797,24 @@ self.onmessage = async (event) => {
         return hours + ":" + minutes;
       }
 
-      function updateStageScale() {
-        const padding = 36;
-        const available = Math.min(window.innerWidth - padding, window.innerHeight - padding);
-        const scale = clamp(available / DEMO_CONFIG.stageSize, 0.28, 1);
+      function syncViewportMetrics() {
+        const visualViewport = window.visualViewport;
+        const width = visualViewport ? visualViewport.width : window.innerWidth;
+        const height = visualViewport ? visualViewport.height : window.innerHeight;
+        const offsetLeft = visualViewport ? visualViewport.offsetLeft : 0;
+        const offsetTop = visualViewport ? visualViewport.offsetTop : 0;
+        const shortestSide = Math.max(1, Math.min(width, height));
+        const framePadding = shortestSide < 420 ? 14 : 22;
+        const available = Math.max(1, shortestSide - framePadding * 2);
+        const scale = clamp(available / DEMO_CONFIG.stageSize, 0.22, 1);
+        const frameSize = DEMO_CONFIG.stageSize * scale;
+
+        document.documentElement.style.setProperty("--viewport-width", width.toFixed(2) + "px");
+        document.documentElement.style.setProperty("--viewport-height", height.toFixed(2) + "px");
+        document.documentElement.style.setProperty("--viewport-offset-x", offsetLeft.toFixed(2) + "px");
+        document.documentElement.style.setProperty("--viewport-offset-y", offsetTop.toFixed(2) + "px");
         document.documentElement.style.setProperty("--stage-scale", scale.toFixed(4));
+        document.documentElement.style.setProperty("--stage-frame-size", frameSize.toFixed(2) + "px");
       }
 
       function updateClock(force) {
@@ -1752,7 +1794,7 @@ self.onmessage = async (event) => {
           return;
         }
 
-        updateStageScale();
+        syncViewportMetrics();
         updateClock(true);
         resetToAodVisualState();
         initialiseMotion();
@@ -1766,7 +1808,8 @@ self.onmessage = async (event) => {
           updateClock();
         }, 1000);
 
-        window.addEventListener("resize", updateStageScale, { passive: true });
+        window.addEventListener("resize", syncViewportMetrics, { passive: true });
+        window.addEventListener("orientationchange", syncViewportMetrics, { passive: true });
         document.addEventListener("visibilitychange", handleVisibilityChange);
         window.addEventListener("pagehide", () => {
           stopRenderLoop();
@@ -1785,6 +1828,11 @@ self.onmessage = async (event) => {
           motionQuery.addEventListener("change", handleMotionPreferenceChange);
         } else if (typeof motionQuery.addListener === "function") {
           motionQuery.addListener(handleMotionPreferenceChange);
+        }
+
+        if (window.visualViewport) {
+          window.visualViewport.addEventListener("resize", syncViewportMetrics, { passive: true });
+          window.visualViewport.addEventListener("scroll", syncViewportMetrics, { passive: true });
         }
 
         if (document.fonts && document.fonts.ready) {
