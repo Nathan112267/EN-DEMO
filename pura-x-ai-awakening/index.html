@@ -24,6 +24,7 @@
         --overlay-opacity: 1;
         --clock-alpha: 1;
         --clock-scale: 1;
+        --clock-shift-x: 0px;
         --clock-shift-y: 0px;
         --clock-blur: 0px;
         --aod-halo-strength: 0.26;
@@ -170,7 +171,7 @@
         place-items: center;
         width: 100%;
         opacity: var(--clock-alpha);
-        transform: translate3d(0, var(--clock-shift-y), 0) scale(var(--clock-scale));
+        transform: translate3d(var(--clock-shift-x), var(--clock-shift-y), 0) scale(var(--clock-scale));
         filter: blur(var(--clock-blur));
         will-change: transform, opacity, filter;
       }
@@ -503,6 +504,115 @@ function toDegrees(radians) {
   return (radians * 180) / Math.PI;
 }
 
+const EYE_TRACKING = {
+  right: { cornerA: 33, cornerB: 133, upperLid: 159, lowerLid: 145, irisCenter: 468 },
+  left: { cornerA: 362, cornerB: 263, upperLid: 386, lowerLid: 374, irisCenter: 473 },
+};
+
+function midpoint(a, b) {
+  return {
+    x: (a.x + b.x) * 0.5,
+    y: (a.y + b.y) * 0.5,
+  };
+}
+
+function distance(a, b) {
+  return Math.hypot(b.x - a.x, b.y - a.y);
+}
+
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function estimateEyeGaze(landmarks, config) {
+  const cornerA = landmarks[config.cornerA];
+  const cornerB = landmarks[config.cornerB];
+  const upperLid = landmarks[config.upperLid];
+  const lowerLid = landmarks[config.lowerLid];
+  const irisCenter = landmarks[config.irisCenter];
+
+  if (!cornerA || !cornerB || !upperLid || !lowerLid || !irisCenter) {
+    return null;
+  }
+
+  const leftCorner = cornerA.x <= cornerB.x ? cornerA : cornerB;
+  const rightCorner = cornerA.x <= cornerB.x ? cornerB : cornerA;
+  const eyeWidth = distance(leftCorner, rightCorner);
+  const lidGap = Math.max(distance(upperLid, lowerLid), eyeWidth * 0.16);
+
+  if (!eyeWidth || !lidGap) {
+    return null;
+  }
+
+  const eyeCenter = midpoint(leftCorner, rightCorner);
+  const lidCenter = midpoint(upperLid, lowerLid);
+
+  return {
+    horizontal: clamp((irisCenter.x - eyeCenter.x) / (eyeWidth * 0.5), -1.4, 1.4),
+    vertical: clamp((irisCenter.y - lidCenter.y) / (lidGap * 0.65), -1.4, 1.4),
+    openness: clamp(lidGap / eyeWidth / 0.36, 0, 1.4),
+  };
+}
+
+function extractGaze(landmarks) {
+  if (!landmarks || landmarks.length < 474) {
+    return {
+      gazeYaw: 0,
+      gazePitch: 0,
+      gazeCentered: 0,
+      gazeOpenness: 0,
+      gazeValid: false,
+    };
+  }
+
+  const samples = [
+    estimateEyeGaze(landmarks, EYE_TRACKING.right),
+    estimateEyeGaze(landmarks, EYE_TRACKING.left),
+  ].filter(Boolean);
+
+  const usable = samples.filter((sample) => sample.openness > 0.08);
+  if (!usable.length) {
+    return {
+      gazeYaw: 0,
+      gazePitch: 0,
+      gazeCentered: 0,
+      gazeOpenness: 0,
+      gazeValid: false,
+    };
+  }
+
+  const horizontal =
+    usable.reduce((sum, sample) => sum + sample.horizontal, 0) / usable.length;
+  const vertical =
+    usable.reduce((sum, sample) => sum + sample.vertical, 0) / usable.length;
+  const openness =
+    usable.reduce((sum, sample) => sum + sample.openness, 0) / usable.length;
+  const gazeYaw = horizontal * 18;
+  const gazePitch = vertical * 16;
+  const gazeCentered = 1 - clamp(Math.max(Math.abs(gazeYaw) / 18, Math.abs(gazePitch) / 16), 0, 1);
+
+  return {
+    gazeYaw,
+    gazePitch,
+    gazeCentered,
+    gazeOpenness: openness,
+    gazeValid: true,
+  };
+}
+
+function enrichAttention(sample) {
+  const headCentered = 1 - clamp(Math.max(Math.abs(sample.yaw) / 24, Math.abs(sample.pitch) / 22), 0, 1);
+  const gazeCentered = sample.gazeValid ? sample.gazeCentered : headCentered * 0.75;
+  const attentiveness = clamp(headCentered * 0.35 + gazeCentered * 0.65, 0, 1);
+
+  return {
+    ...sample,
+    combinedYaw: sample.yaw * 0.45 + (sample.gazeValid ? sample.gazeYaw * 0.95 : 0),
+    combinedPitch: sample.pitch * 0.45 + (sample.gazeValid ? sample.gazePitch * 0.9 : 0),
+    attentiveness,
+  };
+}
+
 function poseFromMatrix(data) {
   const forwardX = data[2];
   const forwardY = data[6];
@@ -513,23 +623,35 @@ function poseFromMatrix(data) {
 }
 
 function extractPose(result) {
+  const landmarks = result && result.faceLandmarks && result.faceLandmarks[0];
   const matrix = result && result.facialTransformationMatrixes && result.facialTransformationMatrixes[0];
-  if (!result || !result.faceLandmarks || !result.faceLandmarks.length || !matrix || !matrix.data || matrix.data.length < 16) {
-    return {
+  if (!result || !landmarks || !matrix || !matrix.data || matrix.data.length < 16) {
+    return enrichAttention({
       facePresent: false,
       yaw: 0,
       pitch: 0,
+      gazeYaw: 0,
+      gazePitch: 0,
+      gazeCentered: 0,
+      gazeOpenness: 0,
+      gazeValid: false,
       confidence: 0,
-    };
+    });
   }
 
   const pose = poseFromMatrix(matrix.data);
-  return {
+  const gaze = extractGaze(landmarks);
+  return enrichAttention({
     facePresent: true,
     yaw: pose.yaw,
     pitch: pose.pitch,
-    confidence: 1,
-  };
+    gazeYaw: gaze.gazeYaw,
+    gazePitch: gaze.gazePitch,
+    gazeCentered: gaze.gazeCentered,
+    gazeOpenness: gaze.gazeOpenness,
+    gazeValid: gaze.gazeValid,
+    confidence: gaze.gazeValid ? Math.max(0.8, gaze.gazeOpenness) : 0.72,
+  });
 }
 
 self.onmessage = async (event) => {
@@ -559,6 +681,14 @@ self.onmessage = async (event) => {
         facePresent: false,
         yaw: 0,
         pitch: 0,
+        gazeYaw: 0,
+        gazePitch: 0,
+        gazeCentered: 0,
+        gazeOpenness: 0,
+        gazeValid: false,
+        combinedYaw: 0,
+        combinedPitch: 0,
+        attentiveness: 0,
         confidence: 0,
         timestamp: performance.now(),
       });
@@ -609,6 +739,14 @@ self.onmessage = async (event) => {
       facePresent: pose.facePresent,
       yaw: pose.yaw,
       pitch: pose.pitch,
+      gazeYaw: pose.gazeYaw,
+      gazePitch: pose.gazePitch,
+      gazeCentered: pose.gazeCentered,
+      gazeOpenness: pose.gazeOpenness,
+      gazeValid: pose.gazeValid,
+      combinedYaw: pose.combinedYaw,
+      combinedPitch: pose.combinedPitch,
+      attentiveness: pose.attentiveness,
       confidence: pose.confidence,
       timestamp,
     });
@@ -641,15 +779,18 @@ self.onmessage = async (event) => {
 
       const DEMO_CONFIG = deepFreeze({
         stageSize: 980,
-        detectionFps: 10,
+        detectionFps: 12,
         particleCount: 500,
         thresholds: {
-          attentiveDeg: 15,
-          awayDeg: 30,
+          attentiveDeg: 11,
+          awayDeg: 20,
+          headAwayDeg: 30,
+          attentionEnter: 0.56,
+          attentionExit: 0.24,
         },
         timings: {
-          wakeHoldMs: 500,
-          sleepHoldMs: 2000,
+          wakeHoldMs: 240,
+          sleepHoldMs: 900,
           wakingMs: 800,
           sleepingMs: 900,
         },
@@ -742,6 +883,14 @@ self.onmessage = async (event) => {
           facePresent: false,
           yaw: 0,
           pitch: 0,
+          gazeYaw: 0,
+          gazePitch: 0,
+          gazeCentered: 0,
+          gazeOpenness: 0,
+          gazeValid: false,
+          combinedYaw: 0,
+          combinedPitch: 0,
+          attentiveness: 0,
           confidence: 0,
           timestamp: 0,
         },
@@ -749,6 +898,14 @@ self.onmessage = async (event) => {
           facePresent: false,
           yaw: 0,
           pitch: 0,
+          gazeYaw: 0,
+          gazePitch: 0,
+          gazeCentered: 0,
+          gazeOpenness: 0,
+          gazeValid: false,
+          combinedYaw: 0,
+          combinedPitch: 0,
+          attentiveness: 0,
           confidence: 0,
           timestamp: 0,
         },
@@ -758,6 +915,10 @@ self.onmessage = async (event) => {
       };
 
       const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+      const EYE_TRACKING = Object.freeze({
+        right: Object.freeze({ cornerA: 33, cornerB: 133, upperLid: 159, lowerLid: 145, irisCenter: 468 }),
+        left: Object.freeze({ cornerA: 362, cornerB: 263, upperLid: 386, lowerLid: 374, irisCenter: 473 }),
+      });
 
       function clamp(value, min, max) {
         return Math.min(max, Math.max(min, value));
@@ -795,6 +956,106 @@ self.onmessage = async (event) => {
         const hours = String(date.getHours()).padStart(2, "0");
         const minutes = String(date.getMinutes()).padStart(2, "0");
         return hours + ":" + minutes;
+      }
+
+      function midpoint(a, b) {
+        return {
+          x: (a.x + b.x) * 0.5,
+          y: (a.y + b.y) * 0.5,
+        };
+      }
+
+      function distance(a, b) {
+        return Math.hypot(b.x - a.x, b.y - a.y);
+      }
+
+      function estimateEyeGaze(landmarks, config) {
+        const cornerA = landmarks?.[config.cornerA];
+        const cornerB = landmarks?.[config.cornerB];
+        const upperLid = landmarks?.[config.upperLid];
+        const lowerLid = landmarks?.[config.lowerLid];
+        const irisCenter = landmarks?.[config.irisCenter];
+
+        if (!cornerA || !cornerB || !upperLid || !lowerLid || !irisCenter) {
+          return null;
+        }
+
+        const leftCorner = cornerA.x <= cornerB.x ? cornerA : cornerB;
+        const rightCorner = cornerA.x <= cornerB.x ? cornerB : cornerA;
+        const eyeWidth = distance(leftCorner, rightCorner);
+        const lidGap = Math.max(distance(upperLid, lowerLid), eyeWidth * 0.16);
+
+        if (!eyeWidth || !lidGap) {
+          return null;
+        }
+
+        const eyeCenter = midpoint(leftCorner, rightCorner);
+        const lidCenter = midpoint(upperLid, lowerLid);
+
+        return {
+          horizontal: clamp((irisCenter.x - eyeCenter.x) / (eyeWidth * 0.5), -1.4, 1.4),
+          vertical: clamp((irisCenter.y - lidCenter.y) / (lidGap * 0.65), -1.4, 1.4),
+          openness: clamp(lidGap / eyeWidth / 0.36, 0, 1.4),
+        };
+      }
+
+      function extractGazeFromLandmarks(landmarks) {
+        if (!landmarks || landmarks.length < 474) {
+          return {
+            gazeYaw: 0,
+            gazePitch: 0,
+            gazeCentered: 0,
+            gazeOpenness: 0,
+            gazeValid: false,
+          };
+        }
+
+        const gazeSamples = [
+          estimateEyeGaze(landmarks, EYE_TRACKING.right),
+          estimateEyeGaze(landmarks, EYE_TRACKING.left),
+        ].filter(Boolean);
+        const usableSamples = gazeSamples.filter((sample) => sample.openness > 0.08);
+
+        if (!usableSamples.length) {
+          return {
+            gazeYaw: 0,
+            gazePitch: 0,
+            gazeCentered: 0,
+            gazeOpenness: 0,
+            gazeValid: false,
+          };
+        }
+
+        const horizontal =
+          usableSamples.reduce((sum, sample) => sum + sample.horizontal, 0) / usableSamples.length;
+        const vertical =
+          usableSamples.reduce((sum, sample) => sum + sample.vertical, 0) / usableSamples.length;
+        const openness =
+          usableSamples.reduce((sum, sample) => sum + sample.openness, 0) / usableSamples.length;
+        const gazeYaw = horizontal * 18;
+        const gazePitch = vertical * 16;
+        const gazeCentered = 1 - clamp(Math.max(Math.abs(gazeYaw) / 18, Math.abs(gazePitch) / 16), 0, 1);
+
+        return {
+          gazeYaw,
+          gazePitch,
+          gazeCentered,
+          gazeOpenness: openness,
+          gazeValid: true,
+        };
+      }
+
+      function enrichAttention(sample) {
+        const headCentered = 1 - clamp(Math.max(Math.abs(sample.yaw) / 24, Math.abs(sample.pitch) / 22), 0, 1);
+        const gazeCentered = sample.gazeValid ? sample.gazeCentered : headCentered * 0.75;
+        const attentiveness = clamp(headCentered * 0.35 + gazeCentered * 0.65, 0, 1);
+
+        return {
+          ...sample,
+          combinedYaw: sample.yaw * 0.45 + (sample.gazeValid ? sample.gazeYaw * 0.95 : 0),
+          combinedPitch: sample.pitch * 0.45 + (sample.gazeValid ? sample.gazePitch * 0.9 : 0),
+          attentiveness,
+        };
       }
 
       function syncViewportMetrics() {
@@ -1078,12 +1339,16 @@ self.onmessage = async (event) => {
 
         const attentive =
           pose.facePresent &&
-          Math.abs(pose.yaw) < DEMO_CONFIG.thresholds.attentiveDeg &&
-          Math.abs(pose.pitch) < DEMO_CONFIG.thresholds.attentiveDeg;
+          pose.attentiveness > DEMO_CONFIG.thresholds.attentionEnter &&
+          Math.abs(pose.combinedYaw) < DEMO_CONFIG.thresholds.attentiveDeg &&
+          Math.abs(pose.combinedPitch) < DEMO_CONFIG.thresholds.attentiveDeg;
         const away =
           !pose.facePresent ||
-          Math.abs(pose.yaw) > DEMO_CONFIG.thresholds.awayDeg ||
-          Math.abs(pose.pitch) > DEMO_CONFIG.thresholds.awayDeg;
+          pose.attentiveness < DEMO_CONFIG.thresholds.attentionExit ||
+          Math.abs(pose.combinedYaw) > DEMO_CONFIG.thresholds.awayDeg ||
+          Math.abs(pose.combinedPitch) > DEMO_CONFIG.thresholds.awayDeg ||
+          Math.abs(pose.yaw) > DEMO_CONFIG.thresholds.headAwayDeg ||
+          Math.abs(pose.pitch) > DEMO_CONFIG.thresholds.headAwayDeg;
 
         if (state.phase === "aod") {
           if (attentive) {
@@ -1119,6 +1384,14 @@ self.onmessage = async (event) => {
           facePresent: Boolean(sample.facePresent),
           yaw: sample.yaw || 0,
           pitch: sample.pitch || 0,
+          gazeYaw: sample.gazeYaw || 0,
+          gazePitch: sample.gazePitch || 0,
+          gazeCentered: sample.gazeCentered || 0,
+          gazeOpenness: sample.gazeOpenness || 0,
+          gazeValid: Boolean(sample.gazeValid),
+          combinedYaw: sample.combinedYaw || 0,
+          combinedPitch: sample.combinedPitch || 0,
+          attentiveness: sample.attentiveness || 0,
           confidence: sample.confidence || 0,
           timestamp,
         };
@@ -1128,6 +1401,14 @@ self.onmessage = async (event) => {
             state.smoothedPose.facePresent = true;
             state.smoothedPose.yaw = state.pose.yaw;
             state.smoothedPose.pitch = state.pose.pitch;
+            state.smoothedPose.gazeYaw = state.pose.gazeYaw;
+            state.smoothedPose.gazePitch = state.pose.gazePitch;
+            state.smoothedPose.gazeCentered = state.pose.gazeCentered;
+            state.smoothedPose.gazeOpenness = state.pose.gazeOpenness;
+            state.smoothedPose.gazeValid = state.pose.gazeValid;
+            state.smoothedPose.combinedYaw = state.pose.combinedYaw;
+            state.smoothedPose.combinedPitch = state.pose.combinedPitch;
+            state.smoothedPose.attentiveness = state.pose.attentiveness;
             state.smoothedPose.confidence = state.pose.confidence;
           } else {
             state.smoothedPose.yaw = lerp(
@@ -1140,6 +1421,42 @@ self.onmessage = async (event) => {
               state.pose.pitch,
               DEMO_CONFIG.smoothing.poseAlpha
             );
+            state.smoothedPose.gazeYaw = lerp(
+              state.smoothedPose.gazeYaw,
+              state.pose.gazeYaw,
+              DEMO_CONFIG.smoothing.poseAlpha
+            );
+            state.smoothedPose.gazePitch = lerp(
+              state.smoothedPose.gazePitch,
+              state.pose.gazePitch,
+              DEMO_CONFIG.smoothing.poseAlpha
+            );
+            state.smoothedPose.gazeCentered = lerp(
+              state.smoothedPose.gazeCentered,
+              state.pose.gazeCentered,
+              DEMO_CONFIG.smoothing.poseAlpha
+            );
+            state.smoothedPose.gazeOpenness = lerp(
+              state.smoothedPose.gazeOpenness,
+              state.pose.gazeOpenness,
+              DEMO_CONFIG.smoothing.poseAlpha
+            );
+            state.smoothedPose.gazeValid = state.pose.gazeValid;
+            state.smoothedPose.combinedYaw = lerp(
+              state.smoothedPose.combinedYaw,
+              state.pose.combinedYaw,
+              DEMO_CONFIG.smoothing.poseAlpha
+            );
+            state.smoothedPose.combinedPitch = lerp(
+              state.smoothedPose.combinedPitch,
+              state.pose.combinedPitch,
+              DEMO_CONFIG.smoothing.poseAlpha
+            );
+            state.smoothedPose.attentiveness = lerp(
+              state.smoothedPose.attentiveness,
+              state.pose.attentiveness,
+              DEMO_CONFIG.smoothing.poseAlpha
+            );
             state.smoothedPose.confidence = lerp(
               state.smoothedPose.confidence,
               state.pose.confidence,
@@ -1148,6 +1465,14 @@ self.onmessage = async (event) => {
           }
         } else {
           state.smoothedPose.facePresent = false;
+          state.smoothedPose.gazeValid = false;
+          state.smoothedPose.gazeYaw = 0;
+          state.smoothedPose.gazePitch = 0;
+          state.smoothedPose.gazeCentered = 0;
+          state.smoothedPose.gazeOpenness = 0;
+          state.smoothedPose.combinedYaw = 0;
+          state.smoothedPose.combinedPitch = 0;
+          state.smoothedPose.attentiveness = 0;
           state.smoothedPose.confidence = 0;
         }
 
@@ -1162,8 +1487,9 @@ self.onmessage = async (event) => {
 
         const centerX = DEMO_CONFIG.stageSize * 0.5;
         const centerY = DEMO_CONFIG.stageSize * 0.5;
-        const yawInfluence = state.smoothedPose.facePresent ? state.smoothedPose.yaw / 30 : 0;
-        const pitchInfluence = state.smoothedPose.facePresent ? state.smoothedPose.pitch / 30 : 0;
+        const yawInfluence = state.smoothedPose.facePresent ? state.smoothedPose.combinedYaw / 18 : 0;
+        const pitchInfluence = state.smoothedPose.facePresent ? state.smoothedPose.combinedPitch / 16 : 0;
+        const attentiveness = state.smoothedPose.facePresent ? state.smoothedPose.attentiveness : 0;
 
         fxContext.save();
         fxContext.globalCompositeOperation = "screen";
@@ -1183,12 +1509,16 @@ self.onmessage = async (event) => {
             const angle = progress * Math.PI * 2;
             const lowWave =
               Math.sin(angle * (2.2 + ringIndex * 0.55) + now * 0.0017 * (1 + ringIndex * 0.12)) *
-              (state.reduceMotion ? 3 : 8);
+              (state.reduceMotion ? 3 : 8) *
+              (0.7 + attentiveness * 0.65);
             const highWave =
-              Math.sin(angle * 8.5 - now * 0.001 + ringIndex * 1.8) * (state.reduceMotion ? 1.2 : 3.6);
+              Math.sin(angle * 8.5 - now * 0.001 + ringIndex * 1.8) *
+              (state.reduceMotion ? 1.2 : 3.6) *
+              (0.75 + attentiveness * 0.5);
             const poseWarp =
-              Math.cos(angle - yawInfluence * 1.3) * yawInfluence * 16 +
-              Math.sin(angle + pitchInfluence * 1.1) * pitchInfluence * 12;
+              (Math.cos(angle - yawInfluence * 1.3) * yawInfluence * 16 +
+                Math.sin(angle + pitchInfluence * 1.1) * pitchInfluence * 12) *
+              (0.6 + attentiveness * 1.25);
             const radius = baseRadius + lowWave + highWave + poseWarp;
             const x = centerX + Math.cos(angle) * radius;
             const y = centerY + Math.sin(angle) * radius * (0.95 + ringIndex * 0.02);
@@ -1203,8 +1533,8 @@ self.onmessage = async (event) => {
           fxContext.closePath();
           fxContext.strokeStyle =
             ringIndex % 2 === 0
-              ? rgba(DEMO_CONFIG.colors.cyan, 0.2 - ringIndex * 0.04)
-              : rgba(DEMO_CONFIG.colors.purple, 0.18 - ringIndex * 0.04);
+              ? rgba(DEMO_CONFIG.colors.cyan, 0.18 + attentiveness * 0.16 - ringIndex * 0.04)
+              : rgba(DEMO_CONFIG.colors.purple, 0.16 + attentiveness * 0.14 - ringIndex * 0.04);
           fxContext.lineWidth = 1.25 - ringIndex * 0.18;
           fxContext.stroke();
         }
@@ -1277,19 +1607,33 @@ self.onmessage = async (event) => {
         const shimmer = state.reduceMotion ? oscillators.shimmer * 0.18 : oscillators.shimmer;
         const yaw = state.smoothedPose.facePresent ? state.smoothedPose.yaw : 0;
         const pitch = state.smoothedPose.facePresent ? state.smoothedPose.pitch : 0;
-        const tiltX = clamp(-pitch * 0.52, -14, 14);
-        const tiltY = clamp(yaw * 0.68, -16, 16);
+        const focusYaw = state.smoothedPose.facePresent ? state.smoothedPose.combinedYaw : 0;
+        const focusPitch = state.smoothedPose.facePresent ? state.smoothedPose.combinedPitch : 0;
+        const attentiveness = state.smoothedPose.facePresent ? state.smoothedPose.attentiveness : 0;
+        const tiltX = clamp(-focusPitch * 0.7, -18, 18);
+        const tiltY = clamp(focusYaw * 0.84, -20, 20);
 
         document.documentElement.style.setProperty("--clock-alpha", motion.clockAlpha.toFixed(3));
         document.documentElement.style.setProperty("--clock-scale", (motion.clockScale + breathe * 0.015).toFixed(3));
         document.documentElement.style.setProperty(
+          "--clock-shift-x",
+          (
+            (state.phase === "aod" ? clamp(focusYaw * 1.15, -18, 18) : clamp(focusYaw * 0.24, -6, 6)) *
+            (0.2 + attentiveness * 0.9)
+          ).toFixed(2) + "px"
+        );
+        document.documentElement.style.setProperty(
           "--clock-shift-y",
-          (motion.clockShiftY + Math.sin(now * 0.0018) * (state.phase === "aod" ? 4 : 1.2)).toFixed(2) + "px"
+          (
+            motion.clockShiftY +
+            Math.sin(now * 0.0018) * (state.phase === "aod" ? 4 : 1.2) +
+            clamp(focusPitch * 0.58, -10, 10) * (0.15 + attentiveness * 0.7)
+          ).toFixed(2) + "px"
         );
         document.documentElement.style.setProperty("--clock-blur", motion.clockBlur.toFixed(2) + "px");
         document.documentElement.style.setProperty(
           "--aod-halo-strength",
-          (motion.haloStrength + breathe * (state.reduceMotion ? 0.01 : 0.05)).toFixed(3)
+          (motion.haloStrength + breathe * (state.reduceMotion ? 0.01 : 0.05) + attentiveness * 0.09).toFixed(3)
         );
         document.documentElement.style.setProperty(
           "--aod-halo-scale",
@@ -1308,17 +1652,29 @@ self.onmessage = async (event) => {
           "--orb-tilt-y",
           (tiltY + Math.cos(now * 0.0011) * motion.orbAlpha * 1.8).toFixed(2) + "deg"
         );
-        document.documentElement.style.setProperty("--orb-aura", motion.orbAura.toFixed(3));
+        document.documentElement.style.setProperty(
+          "--orb-aura",
+          (motion.orbAura + attentiveness * (state.reduceMotion ? 0.06 : 0.18)).toFixed(3)
+        );
         document.documentElement.style.setProperty(
           "--orb-highlight-shift-x",
-          (Math.sin(now * 0.0013 + shimmer) * (state.reduceMotion ? 3 : 16)).toFixed(2) + "px"
+          (
+            Math.sin(now * 0.0013 + shimmer) * (state.reduceMotion ? 3 : 16) +
+            clamp(focusYaw * 0.9, -12, 12)
+          ).toFixed(2) + "px"
         );
         document.documentElement.style.setProperty(
           "--orb-highlight-shift-y",
-          (Math.cos(now * 0.0011 + shimmer) * (state.reduceMotion ? 2 : 11)).toFixed(2) + "px"
+          (
+            Math.cos(now * 0.0011 + shimmer) * (state.reduceMotion ? 2 : 11) +
+            clamp(focusPitch * 0.65, -10, 10)
+          ).toFixed(2) + "px"
         );
         document.documentElement.style.setProperty("--orb-sheen-rotate", (shimmer * 14).toFixed(2) + "deg");
-        document.documentElement.style.setProperty("--ring-alpha", motion.ringAlpha.toFixed(3));
+        document.documentElement.style.setProperty(
+          "--ring-alpha",
+          (motion.ringAlpha + attentiveness * (state.reduceMotion ? 0.03 : 0.12)).toFixed(3)
+        );
 
         const morphA =
           44 + Math.sin(now * 0.0012) * 4 + morph * 5 + "% " +
@@ -1501,23 +1857,35 @@ self.onmessage = async (event) => {
       }
 
       function extractFallbackPose(result) {
+        const landmarks = result?.faceLandmarks?.[0];
         const matrix = result?.facialTransformationMatrixes?.[0];
-        if (!result?.faceLandmarks?.length || !matrix?.data?.length) {
-          return {
+        if (!landmarks || !matrix?.data?.length) {
+          return enrichAttention({
             facePresent: false,
             yaw: 0,
             pitch: 0,
+            gazeYaw: 0,
+            gazePitch: 0,
+            gazeCentered: 0,
+            gazeOpenness: 0,
+            gazeValid: false,
             confidence: 0,
-          };
+          });
         }
 
         const pose = extractPoseFromMatrix(matrix.data);
-        return {
+        const gaze = extractGazeFromLandmarks(landmarks);
+        return enrichAttention({
           facePresent: true,
           yaw: pose.yaw,
           pitch: pose.pitch,
-          confidence: 1,
-        };
+          gazeYaw: gaze.gazeYaw,
+          gazePitch: gaze.gazePitch,
+          gazeCentered: gaze.gazeCentered,
+          gazeOpenness: gaze.gazeOpenness,
+          gazeValid: gaze.gazeValid,
+          confidence: gaze.gazeValid ? Math.max(0.8, gaze.gazeOpenness) : 0.72,
+        });
       }
 
       async function initWorkerPipeline() {
@@ -1665,6 +2033,14 @@ self.onmessage = async (event) => {
             facePresent: sample.facePresent,
             yaw: sample.yaw,
             pitch: sample.pitch,
+            gazeYaw: sample.gazeYaw,
+            gazePitch: sample.gazePitch,
+            gazeCentered: sample.gazeCentered,
+            gazeOpenness: sample.gazeOpenness,
+            gazeValid: sample.gazeValid,
+            combinedYaw: sample.combinedYaw,
+            combinedPitch: sample.combinedPitch,
+            attentiveness: sample.attentiveness,
             confidence: sample.confidence,
             timestamp: performance.now(),
           });
