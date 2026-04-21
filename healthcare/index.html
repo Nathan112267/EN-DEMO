@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Healthcare | AI 皮肤健康检测</title>
+    <script type="module" src="./main.js"></script>
+  </head>
+  <body>
+    <main class="healthcare-demo">
+      <div class="atmosphere-grain" aria-hidden="true"></div>
+      <div class="ambient-halo ambient-halo-a" aria-hidden="true"></div>
+      <div class="ambient-halo ambient-halo-b" aria-hidden="true"></div>
+
+      <section class="healthcare-stage" aria-label="AI 皮肤健康检测演示">
+        <header class="stage-head">
+          <div class="stage-copy">
+            <p class="stage-kicker">Healthcare / Skin Health Intelligence</p>
+            <h1 class="stage-title">AI 圆球唤醒后，开始读取肌肤状态。</h1>
+          </div>
+
+          <div class="stage-status" aria-live="polite">
+            <span class="status-dot"></span>
+            <span id="scanStatusText">AI preparing skin health scan</span>
+          </div>
+        </header>
+
+        <div class="experience-grid">
+          <section class="scan-panel" aria-labelledby="scanPanelTitle">
+            <div class="scan-frame">
+              <p class="scan-panel-title" id="scanPanelTitle">Skin Health Scan</p>
+
+              <div class="scan-grid" aria-hidden="true"></div>
+
+              <div class="scan-rings" aria-hidden="true">
+                <span class="scan-ring scan-ring-outer"></span>
+                <span class="scan-ring scan-ring-middle"></span>
+                <span class="scan-ring scan-ring-inner"></span>
+              </div>
+
+              <div class="orb-cluster" id="orbCluster" aria-hidden="true">
+                <div class="orb-aura"></div>
+                <div class="orb-ring orb-ring-outer"></div>
+                <div class="orb-ring orb-ring-inner"></div>
+                <div class="orb-core"></div>
+                <div class="orb-liquid"></div>
+                <div class="orb-highlight"></div>
+              </div>
+
+              <div class="scan-target" id="scanTarget" aria-hidden="true">
+                <div class="target-glow"></div>
+
+                <svg class="skin-map" viewBox="0 0 400 520" role="presentation" aria-hidden="true">
+                  <defs>
+                    <linearGradient id="skinFill" x1="0%" x2="100%" y1="8%" y2="100%">
+                      <stop offset="0%" stop-color="rgba(255, 248, 242, 0.72)" />
+                      <stop offset="42%" stop-color="rgba(255, 216, 207, 0.3)" />
+                      <stop offset="100%" stop-color="rgba(132, 238, 225, 0.2)" />
+                    </linearGradient>
+                    <radialGradient id="skinHalo" cx="50%" cy="46%" r="54%">
+                      <stop offset="0%" stop-color="rgba(255, 255, 255, 0.42)" />
+                      <stop offset="58%" stop-color="rgba(122, 224, 216, 0.16)" />
+                      <stop offset="100%" stop-color="rgba(122, 224, 216, 0)" />
+                    </radialGradient>
+                  </defs>
+
+                  <ellipse class="skin-halo" cx="200" cy="248" rx="124" ry="182"></ellipse>
+                  <path
+                    class="face-outline"
+                    d="M200 56C259 58 314 103 328 176C339 241 327 322 289 389C262 433 231 462 200 474C169 462 138 433 111 389C73 322 61 241 72 176C86 103 141 58 200 56Z"
+                  />
+                  <path class="face-surface" d="M200 76C248 76 294 114 304 186C314 258 304 326 272 380C249 419 224 443 200 454C176 443 151 419 128 380C96 326 86 258 96 186C106 114 152 76 200 76Z" />
+                  <path class="face-line" d="M200 146C188 184 189 217 200 252C211 217 212 184 200 146Z" />
+                  <path class="face-line" d="M147 228C163 214 182 205 200 204C218 205 237 214 253 228" />
+                  <path class="face-line" d="M155 315C183 333 217 333 245 315" />
+                  <path class="face-line face-line-soft" d="M139 258C158 279 177 291 200 292C223 291 242 279 261 258" />
+                  <path class="scan-band" d="M118 179C151 166 178 160 200 160C222 160 249 166 282 179" />
+                  <path class="scan-band" d="M104 243C139 230 171 224 200 224C229 224 261 230 296 243" />
+                  <path class="scan-band" d="M113 328C145 341 174 348 200 348C226 348 255 341 287 328" />
+                  <circle class="analysis-point point-forehead" cx="200" cy="154" r="10" />
+                  <circle class="analysis-point point-left-cheek" cx="136" cy="262" r="10" />
+                  <circle class="analysis-point point-right-cheek" cx="264" cy="262" r="10" />
+                  <circle class="analysis-point point-chin" cx="200" cy="364" r="10" />
+                </svg>
+
+                <div class="scan-sweep" id="scanSweep"></div>
+                <span class="scan-focus focus-forehead"></span>
+                <span class="scan-focus focus-left-cheek"></span>
+                <span class="scan-focus focus-right-cheek"></span>
+                <span class="scan-focus focus-chin"></span>
+              </div>
+
+              <div class="particle-field" aria-hidden="true">
+                <span class="particle"></span>
+                <span class="particle"></span>
+                <span class="particle"></span>
+                <span class="particle"></span>
+                <span class="particle"></span>
+                <span class="particle"></span>
+                <span class="particle"></span>
+                <span class="particle"></span>
+                <span class="particle"></span>
+                <span class="particle"></span>
+              </div>
+
+              <div class="stage-readout">
+                <p class="readout-label">Scan Layer</p>
+                <p class="readout-value" id="scanLayerText">Idle biofield alignment</p>
+              </div>
+            </div>
+          </section>
+
+          <section class="insight-panel" aria-labelledby="insightTitle">
+            <div class="intro-block">
+              <p class="intro-kicker">AI Skin Health Detection</p>
+              <h2 class="intro-title" id="insightTitle">自动循环演示，从肤理扫描到结论汇总。</h2>
+              <p class="intro-copy">
+                页面不会调用摄像头，只演示 AI 圆球如何完成皮肤健康检测流程，适合直接在手机上预览节奏与视觉效果。
+              </p>
+            </div>
+
+            <div class="metric-grid">
+              <article class="metric-card metric-card-hydration" data-metric="hydration">
+                <div class="metric-head">
+                  <p class="metric-label">Hydration</p>
+                  <p class="metric-name">水润度</p>
+                </div>
+                <div class="metric-row">
+                  <p class="metric-score"><span data-score>--</span><span class="metric-unit">%</span></p>
+                  <p class="metric-state" data-state>waiting</p>
+                </div>
+                <div class="metric-bar"><span class="metric-bar-fill" data-fill></span></div>
+              </article>
+
+              <article class="metric-card metric-card-barrier" data-metric="barrier">
+                <div class="metric-head">
+                  <p class="metric-label">Barrier</p>
+                  <p class="metric-name">屏障状态</p>
+                </div>
+                <div class="metric-row">
+                  <p class="metric-score"><span data-score>--</span><span class="metric-unit">%</span></p>
+                  <p class="metric-state" data-state>waiting</p>
+                </div>
+                <div class="metric-bar"><span class="metric-bar-fill" data-fill></span></div>
+              </article>
+
+              <article class="metric-card metric-card-texture" data-metric="texture">
+                <div class="metric-head">
+                  <p class="metric-label">Texture</p>
+                  <p class="metric-name">细腻度</p>
+                </div>
+                <div class="metric-row">
+                  <p class="metric-score"><span data-score>--</span><span class="metric-unit">%</span></p>
+                  <p class="metric-state" data-state>waiting</p>
+                </div>
+                <div class="metric-bar"><span class="metric-bar-fill" data-fill></span></div>
+              </article>
+
+              <article class="metric-card metric-card-redness" data-metric="redness">
+                <div class="metric-head">
+                  <p class="metric-label">Redness Risk</p>
+                  <p class="metric-name">泛红风险</p>
+                </div>
+                <div class="metric-row">
+                  <p class="metric-score"><span data-score>--</span><span class="metric-unit">%</span></p>
+                  <p class="metric-state" data-state>waiting</p>
+                </div>
+                <div class="metric-bar"><span class="metric-bar-fill" data-fill></span></div>
+              </article>
+            </div>
+
+            <article class="summary-card" id="summaryCard" data-tone="balanced">
+              <p class="summary-kicker">Scan Summary</p>
+              <h3 class="summary-title" id="summaryTitle">等待本轮检测启动</h3>
+              <p class="summary-copy" id="summaryCopy">
+                AI 圆球将依次读取水润度、屏障状态、细腻度与泛红风险。
+              </p>
+              <div class="summary-tags">
+                <span class="summary-tag" id="summaryTagOne">Calm spectrum</span>
+                <span class="summary-tag" id="summaryTagTwo">Barrier trace</span>
+              </div>
+            </article>
+          </section>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

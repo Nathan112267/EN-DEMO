@@ -8,6 +8,7 @@ This workspace contains multiple browser demos built with Vite, including the Hu
 - Data collection: `/data-collection/`
 - Voice order demo: `/voice-order-demo/`
 - Pura X AI Awakening: `/pura-x-ai-awakening/`
+- Healthcare skin scan demo: `/healthcare/`
 
 ## Deploy to Vercel
 
@@ -32,6 +33,7 @@ These settings are also captured in [vercel.json](/Users/bytedance/Desktop/N2/ve
 After deploy, the Pura X page will be available at:
 
 - `/pura-x-ai-awakening/`
+- `/healthcare/`
 
 The old path is also supported and will redirect automatically:
 

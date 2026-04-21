@@ -17,6 +17,7 @@ export default defineConfig({
         puraXAiAwakening: fileURLToPath(
           new URL("./pura-x-ai-awakening/index.html", import.meta.url)
         ),
+        healthcare: fileURLToPath(new URL("./healthcare/index.html", import.meta.url)),
         dataCollection: fileURLToPath(new URL("./data-collection/index.html", import.meta.url)),
         voiceOrderDemo: fileURLToPath(new URL("./voice-order-demo/index.html", import.meta.url)),
       },
