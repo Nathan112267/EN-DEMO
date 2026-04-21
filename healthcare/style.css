@@ -226,6 +226,9 @@ body {
   transform: translate3d(-50%, -50%, 0) scale(0.8);
   transform-style: preserve-3d;
   will-change: transform;
+  transition:
+    opacity 320ms var(--ease-out-quart),
+    filter 320ms var(--ease-out-quart);
 }
 
 .orb-aura,
@@ -313,12 +316,29 @@ body {
   mix-blend-mode: screen;
 }
 
-.healthcare-chip {
+.agent-layer[data-conversation-state="options"] .orb-shell {
+  opacity: 0.42;
+  filter: saturate(0.82) brightness(0.72);
+}
+
+.agent-layer[data-conversation-state="prompt"] .orb-shell {
+  opacity: 0.18;
+  filter: saturate(0.62) brightness(0.54) blur(2px);
+}
+
+.conversation-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.conversation-bubble {
   position: absolute;
   left: 50%;
-  top: 676px;
-  width: min(620px, calc(100% - 128px));
-  padding: 20px 24px 22px;
+  top: 548px;
+  width: min(760px, calc(100% - 112px));
+  padding: 22px 28px 24px;
   border-radius: 30px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.028)),
@@ -332,40 +352,329 @@ body {
   transform: translate3d(-50%, 22px, 0);
   filter: blur(18px);
   will-change: transform, opacity, filter;
+  transition:
+    top 280ms var(--ease-out-quart),
+    width 280ms var(--ease-out-quart),
+    padding 280ms var(--ease-out-quart),
+    background 280ms var(--ease-out-quart),
+    border-color 280ms var(--ease-out-quart),
+    box-shadow 280ms var(--ease-out-quart);
 }
 
-.healthcare-kicker,
-.healthcare-title {
+.agent-layer[data-conversation-state="prompt"] .conversation-bubble {
+  top: 50%;
+  width: min(860px, calc(100% - 104px));
+  padding: 0;
+  background: none;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.agent-layer[data-conversation-state="options"] .conversation-bubble {
+  top: 148px;
+  width: min(820px, calc(100% - 96px));
+}
+
+.conversation-text {
+  margin: 0;
+  font-size: 42px;
+  font-weight: 300;
+  line-height: 1.24;
+  letter-spacing: -0.045em;
+  color: rgba(238, 245, 255, 0.96);
+}
+
+.agent-layer[data-conversation-state="prompt"] .conversation-text {
+  max-width: 9.6em;
+  margin: 0 auto;
+  font-size: 72px;
+  line-height: 1.08;
+  letter-spacing: -0.06em;
+  text-align: center;
+  color: rgba(246, 250, 255, 0.98);
+  text-shadow:
+    0 0 18px rgba(var(--cyan-rgb), 0.12),
+    0 0 48px rgba(var(--purple-rgb), 0.1);
+  animation: prompt-breathe 3.2s ease-in-out infinite;
+}
+
+@keyframes prompt-breathe {
+  0%,
+  100% {
+    opacity: 0.88;
+    transform: translate3d(0, 0, 0) scale(0.992);
+  }
+
+  50% {
+    opacity: 1;
+    transform: translate3d(0, -2px, 0) scale(1.008);
+  }
+}
+
+.podcast-tray {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 980px;
+  height: 708px;
+  margin-top: -308px;
+  opacity: 0;
+  transform: translate3d(-50%, 28px, 0);
+  filter: blur(18px);
+  will-change: transform, opacity, filter;
+}
+
+.podcast-card {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  width: 720px;
+  min-height: 508px;
+  padding: 54px 50px 56px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 58px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
+    rgba(6, 8, 18, 0.84);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 40px 96px rgba(0, 0, 0, 0.4);
+  color: rgba(238, 246, 255, 0.92);
+  text-align: left;
+  opacity: 0;
+  transform: translate3d(-50%, 26px, 0) scale(0.82);
+}
+
+.podcast-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle at 18% 18%, rgba(var(--cyan-rgb), 0.12), transparent 34%),
+    radial-gradient(circle at 82% 22%, rgba(var(--purple-rgb), 0.1), transparent 38%),
+    radial-gradient(circle at 72% 78%, rgba(var(--warm-rgb), 0.08), transparent 28%);
+  opacity: 0.82;
+  pointer-events: none;
+}
+
+.podcast-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.podcast-card-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 196px;
+  gap: 32px;
+  align-items: start;
+}
+
+.podcast-card-copy,
+.podcast-card-index,
+.podcast-card-title,
+.podcast-card-subtitle,
+.podcast-card-note,
+.podcast-card-time,
+.podcast-card-action-text {
   margin: 0;
 }
 
-.healthcare-kicker {
-  color: rgba(201, 223, 246, 0.62);
-  font-size: 13px;
-  letter-spacing: 0.22em;
+.podcast-card-index {
+  margin-bottom: 30px;
+  font-size: 19px;
+  letter-spacing: 0.28em;
   text-transform: uppercase;
+  color: rgba(var(--cyan-rgb), 0.7);
 }
 
-.healthcare-title {
-  margin-top: 10px;
-  color: rgba(244, 249, 255, 0.96);
-  font-size: 40px;
+.podcast-card-title {
+  font-size: 82px;
   font-weight: 300;
-  line-height: 1.08;
-  letter-spacing: -0.052em;
+  line-height: 1.05;
+  letter-spacing: -0.05em;
 }
 
-@media (max-width: 560px) {
-  .healthcare-chip {
-    top: 650px;
-    width: min(720px, calc(100% - 84px));
-    padding: 18px 22px 20px;
-    border-radius: 28px;
-  }
+.podcast-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
 
-  .healthcare-title {
-    font-size: 34px;
-  }
+.podcast-card-subtitle {
+  font-size: 17px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(225, 235, 255, 0.44);
+}
+
+.podcast-card-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 112px;
+  padding: 11px 18px;
+  border-radius: 999px;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: rgba(242, 247, 255, 0.96);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.05)),
+    rgba(17, 22, 36, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 12px 28px rgba(0, 0, 0, 0.18);
+}
+
+.podcast-art {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 42px;
+  background:
+    radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.42), transparent 24%),
+    radial-gradient(circle at 50% 62%, rgba(var(--cyan-rgb), 0.22), transparent 58%),
+    conic-gradient(
+      from 225deg,
+      rgba(var(--cyan-rgb), 0.84),
+      rgba(var(--purple-rgb), 0.72) 48%,
+      rgba(var(--warm-rgb), 0.54) 82%,
+      rgba(var(--cyan-rgb), 0.84)
+    );
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 26px 48px rgba(0, 0, 0, 0.24);
+  overflow: hidden;
+}
+
+.podcast-art-core,
+.podcast-art-wave,
+.podcast-play-icon {
+  position: absolute;
+}
+
+.podcast-art-core {
+  inset: 28%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 36% 34%, rgba(255, 255, 255, 0.78), transparent 24%),
+    radial-gradient(circle at 56% 56%, rgba(var(--cyan-rgb), 0.56), transparent 68%);
+  filter: blur(2px);
+}
+
+.podcast-art-wave {
+  left: 50%;
+  top: 50%;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  transform: translate(-50%, -50%);
+}
+
+.podcast-art-wave-a {
+  width: 116px;
+  height: 116px;
+}
+
+.podcast-art-wave-b {
+  width: 148px;
+  height: 148px;
+  opacity: 0.5;
+}
+
+.podcast-play-icon {
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  border-top: 18px solid transparent;
+  border-bottom: 18px solid transparent;
+  border-left: 28px solid rgba(255, 255, 255, 0.92);
+  transform: translate(-40%, -50%);
+  filter: drop-shadow(0 0 16px rgba(255, 255, 255, 0.18));
+}
+
+.podcast-card-note {
+  margin-top: 92px;
+  max-width: 520px;
+  font-size: 31px;
+  font-weight: 300;
+  line-height: 1.22;
+  letter-spacing: -0.04em;
+  color: rgba(236, 244, 255, 0.86);
+}
+
+.podcast-progress {
+  position: relative;
+  overflow: hidden;
+  height: 10px;
+  margin-top: 50px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.podcast-progress-fill,
+.podcast-progress-glint {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: inherit;
+}
+
+.podcast-progress-fill {
+  width: 100%;
+  background: linear-gradient(90deg, rgba(var(--cyan-rgb), 0.98), rgba(var(--warm-rgb), 0.82));
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.podcast-progress-glint {
+  width: 26%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.86), transparent);
+  opacity: 0;
+  transform: translateX(-140%);
+}
+
+.podcast-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 26px;
+}
+
+.podcast-card-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 46px;
+  padding: 0 18px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.podcast-card-action-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(var(--cyan-rgb), 0.94);
+  box-shadow: 0 0 0 8px rgba(var(--cyan-rgb), 0.12);
+}
+
+.podcast-card-action-text {
+  font-size: 16px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(236, 244, 255, 0.84);
+}
+
+.podcast-card-time {
+  font-size: 18px;
+  letter-spacing: 0.08em;
+  color: rgba(220, 232, 255, 0.56);
 }
 
 @media (prefers-reduced-motion: reduce) {

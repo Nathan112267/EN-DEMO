@@ -16,7 +16,7 @@
             </div>
           </section>
 
-          <section class="agent-layer" id="agentLayer" aria-hidden="true">
+          <section class="agent-layer" id="agentLayer" aria-hidden="true" data-conversation-state="hidden">
             <div class="orb-shell" id="orbShell">
               <div class="orb-aura"></div>
               <div class="orb-ring"></div>
@@ -25,9 +25,47 @@
               <div class="orb-highlight"></div>
             </div>
 
-            <div class="healthcare-chip" id="healthcareChip">
-              <p class="healthcare-kicker">Healthcare AI</p>
-              <p class="healthcare-title">Skin Health Intelligence</p>
+            <div class="conversation-layer">
+              <div class="conversation-bubble" id="conversationBubble">
+                <p class="conversation-text" id="conversationText">是否继续播放博客</p>
+              </div>
+
+              <div class="podcast-tray" id="podcastTray" aria-hidden="true">
+                <article class="podcast-card" id="podcastCard">
+                  <div class="podcast-card-head">
+                    <div class="podcast-card-copy">
+                      <p class="podcast-card-index">Continue Listening</p>
+                      <p class="podcast-card-title">声动早咖啡</p>
+                      <div class="podcast-card-meta">
+                        <p class="podcast-card-subtitle">Podcast / Morning Brief</p>
+                        <span class="podcast-card-badge">继续播放</span>
+                      </div>
+                    </div>
+
+                    <div class="podcast-art" aria-hidden="true">
+                      <span class="podcast-art-core"></span>
+                      <span class="podcast-art-wave podcast-art-wave-a"></span>
+                      <span class="podcast-art-wave podcast-art-wave-b"></span>
+                      <span class="podcast-play-icon"></span>
+                    </div>
+                  </div>
+
+                  <p class="podcast-card-note">继续从上次暂停的位置，接着播放今天的早间内容。</p>
+
+                  <div class="podcast-progress" aria-hidden="true">
+                    <span class="podcast-progress-fill" id="podcastProgressFill"></span>
+                    <span class="podcast-progress-glint" id="podcastProgressGlint"></span>
+                  </div>
+
+                  <div class="podcast-card-footer">
+                    <div class="podcast-card-action">
+                      <span class="podcast-card-action-dot"></span>
+                      <span class="podcast-card-action-text">Resume Playback</span>
+                    </div>
+                    <p class="podcast-card-time">31:08 / 42:36</p>
+                  </div>
+                </article>
+              </div>
             </div>
           </section>
         </main>

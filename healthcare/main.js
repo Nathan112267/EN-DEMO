@@ -12,7 +12,14 @@ const ui = {
   orbCore: document.querySelector(".orb-core"),
   orbLiquid: document.querySelector(".orb-liquid"),
   orbHighlight: document.querySelector(".orb-highlight"),
-  healthcareChip: document.querySelector("#healthcareChip"),
+  conversationBubble: document.querySelector("#conversationBubble"),
+  conversationText: document.querySelector("#conversationText"),
+  podcastTray: document.querySelector("#podcastTray"),
+  podcastCard: document.querySelector("#podcastCard"),
+  podcastProgressFill: document.querySelector("#podcastProgressFill"),
+  podcastProgressGlint: document.querySelector("#podcastProgressGlint"),
+  podcastArtCore: document.querySelector(".podcast-art-core"),
+  podcastArtWaves: document.querySelectorAll(".podcast-art-wave"),
 };
 
 const root = document.documentElement;
@@ -21,13 +28,16 @@ const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)
 const DEMO_CONFIG = {
   stageSize: 980,
   timings: {
-    initialDelayMs: 900,
-    chipDelayMs: 180,
+    initialDelayMs: 3000,
+    promptDelayMs: 440,
+    cardDelayMs: 2000,
   },
 };
 
 let openingTimeline = null;
 let ambientTimeline = null;
+let podcastTimeline = null;
+let openingTimeoutId = 0;
 
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
@@ -67,12 +77,28 @@ function syncViewportMetrics() {
   root.style.setProperty("--stage-frame-size", `${frameSize.toFixed(2)}px`);
 }
 
+function setConversationState(nextState) {
+  ui.agentLayer.dataset.conversationState = nextState;
+  ui.podcastTray.setAttribute("aria-hidden", nextState === "options" ? "false" : "true");
+}
+
+function setConversationText(text) {
+  ui.conversationText.textContent = text;
+}
+
 function setInitialVisualState() {
+  if (openingTimeoutId) {
+    window.clearTimeout(openingTimeoutId);
+    openingTimeoutId = 0;
+  }
   if (openingTimeline) {
     openingTimeline.kill();
   }
   if (ambientTimeline) {
     ambientTimeline.kill();
+  }
+  if (podcastTimeline) {
+    podcastTimeline.kill();
   }
 
   gsap.set(ui.clockWrap, {
@@ -86,6 +112,10 @@ function setInitialVisualState() {
   gsap.set(ui.agentLayer, {
     autoAlpha: 0,
   });
+
+  ui.agentLayer.setAttribute("aria-hidden", "true");
+  setConversationState("hidden");
+  setConversationText("是否继续播放博客");
 
   gsap.set(ui.orbShell, {
     xPercent: -50,
@@ -125,10 +155,46 @@ function setInitialVisualState() {
     transformOrigin: "50% 50%",
   });
 
-  gsap.set(ui.healthcareChip, {
+  gsap.set(ui.conversationBubble, {
     autoAlpha: 0,
     y: 22,
+    scale: 0.985,
     filter: "blur(18px)",
+  });
+
+  gsap.set(ui.podcastTray, {
+    autoAlpha: 0,
+    y: 28,
+    filter: "blur(18px)",
+  });
+
+  gsap.set(ui.podcastCard, {
+    autoAlpha: 0,
+    y: 26,
+    scale: 0.82,
+    filter: "blur(18px)",
+    transformOrigin: "50% 0%",
+  });
+
+  gsap.set(ui.podcastProgressFill, {
+    scaleX: 0,
+    transformOrigin: "left center",
+  });
+
+  gsap.set(ui.podcastProgressGlint, {
+    opacity: 0,
+    xPercent: -140,
+  });
+
+  gsap.set(ui.podcastArtCore, {
+    scale: 1,
+    transformOrigin: "50% 50%",
+  });
+
+  gsap.set(ui.podcastArtWaves, {
+    scale: 1,
+    opacity: (_, target) => (target.classList.contains("podcast-art-wave-a") ? 0.7 : 0.42),
+    transformOrigin: "50% 50%",
   });
 
   ui.deviceStage.dataset.phase = "aod";
@@ -140,8 +206,6 @@ function startAmbientMotion() {
     .to(
       ui.orbShell,
       {
-        y: -18,
-        scale: prefersReducedMotion ? 1.012 : 1.045,
         rotationX: 1.6,
         rotationY: -1.9,
         duration: prefersReducedMotion ? 1.8 : 3.2,
@@ -181,30 +245,182 @@ function startAmbientMotion() {
       },
       0
     )
+    .to(ui.orbLiquid, {
+      scale: 1.04,
+      rotate: 8,
+      duration: prefersReducedMotion ? 1.8 : 3.2,
+      ease: "sine.inOut",
+    }, 0)
+    .to(ui.orbCore, {
+      rotate: -4,
+      duration: prefersReducedMotion ? 1.8 : 3.2,
+      ease: "sine.inOut",
+    }, 0);
+}
+
+function startPodcastMotion() {
+  if (podcastTimeline) {
+    podcastTimeline.kill();
+  }
+
+  podcastTimeline = gsap.timeline({ repeat: -1, defaults: { overwrite: true } });
+
+  podcastTimeline
     .to(
-      ui.orbLiquid,
+      ui.podcastArtCore,
       {
-        scale: 1.04,
-        rotate: 8,
-        duration: prefersReducedMotion ? 1.8 : 3.2,
+        scale: prefersReducedMotion ? 1.02 : 1.08,
+        duration: prefersReducedMotion ? 1.3 : 1.9,
         ease: "sine.inOut",
       },
       0
+    )
+    .to(
+      ui.podcastArtWaves,
+      {
+        scale: (_, target) => (target.classList.contains("podcast-art-wave-a") ? 1.08 : 1.16),
+        opacity: (_, target) => (target.classList.contains("podcast-art-wave-a") ? 0.92 : 0.56),
+        duration: prefersReducedMotion ? 1.3 : 1.9,
+        ease: "sine.inOut",
+        stagger: 0.08,
+      },
+      0
+    )
+    .to(
+      ui.podcastProgressGlint,
+      {
+        opacity: prefersReducedMotion ? 0.44 : 0.72,
+        xPercent: 320,
+        duration: prefersReducedMotion ? 1.4 : 1.8,
+        ease: "none",
+      },
+      0
     );
+}
+
+function showConversationPrompt() {
+  setConversationText("是否继续播放博客");
+  setConversationState("prompt");
+  gsap.killTweensOf(ui.conversationBubble);
+
+  if (prefersReducedMotion) {
+    gsap.set(ui.conversationBubble, {
+      autoAlpha: 1,
+      y: 0,
+      scale: 1,
+      filter: "blur(0px)",
+    });
+    gsap.set(ui.orbShell, { y: -18 });
+    return;
+  }
+
+  gsap.fromTo(
+    ui.conversationBubble,
+    { autoAlpha: 0, y: 18, scale: 0.985, filter: "blur(22px)" },
+    {
+      autoAlpha: 1,
+      y: 0,
+      scale: 1,
+      filter: "blur(0px)",
+      duration: 0.72,
+      ease: "expo.out",
+      overwrite: true,
+    }
+  );
+
+  gsap.to(ui.orbShell, {
+    y: -18,
+    duration: 0.56,
+    ease: "power3.out",
+    overwrite: true,
+  });
+}
+
+function showPodcastCard() {
+  setConversationState("options");
+  gsap.killTweensOf([ui.conversationBubble, ui.podcastTray, ui.podcastCard, ui.podcastProgressFill, ui.podcastProgressGlint, ui.orbShell]);
+
+  if (prefersReducedMotion) {
+    gsap.set(ui.conversationBubble, {
+      autoAlpha: 1,
+      y: 0,
+      scale: 1,
+      filter: "blur(0px)",
+    });
+    gsap.set(ui.podcastTray, {
+      autoAlpha: 1,
+      y: 0,
+      filter: "blur(0px)",
+    });
+    gsap.set(ui.podcastCard, {
+      autoAlpha: 1,
+      y: 0,
+      scale: 1,
+      filter: "blur(0px)",
+    });
+    gsap.set(ui.podcastProgressFill, { scaleX: 0.73 });
+    gsap.set(ui.podcastProgressGlint, { opacity: 0.44, xPercent: 160 });
+    gsap.set(ui.orbShell, { y: -94, scale: 0.94 });
+    startPodcastMotion();
+    return;
+  }
+
+  gsap.to(ui.orbShell, {
+    y: -94,
+    scale: 0.94,
+    duration: 0.78,
+    ease: "power3.out",
+    overwrite: true,
+  });
+
+  gsap.fromTo(
+    ui.podcastTray,
+    { autoAlpha: 0, y: 28, filter: "blur(18px)" },
+    {
+      autoAlpha: 1,
+      y: 0,
+      filter: "blur(0px)",
+      duration: 0.42,
+      ease: "power3.out",
+      overwrite: true,
+    }
+  );
+
+  gsap.fromTo(
+    ui.podcastCard,
+    { autoAlpha: 0, y: 26, scale: 0.82, filter: "blur(18px)" },
+    {
+      autoAlpha: 1,
+      y: 0,
+      scale: 1,
+      filter: "blur(0px)",
+      duration: 0.78,
+      ease: "expo.out",
+      overwrite: true,
+      onComplete: () => {
+        startPodcastMotion();
+      },
+    }
+  );
+
+  gsap.to(ui.podcastProgressFill, {
+    scaleX: 0.73,
+    duration: 1.1,
+    delay: 0.24,
+    ease: "power2.out",
+    overwrite: true,
+  });
 }
 
 function startOpeningSequence() {
   setInitialVisualState();
 
   openingTimeline = gsap.timeline({
-    delay: DEMO_CONFIG.timings.initialDelayMs / 1000,
+    paused: true,
     defaults: { overwrite: true },
     onStart: () => {
       ui.deviceStage.dataset.phase = "waking";
-    },
-    onComplete: () => {
-      ui.deviceStage.dataset.phase = "agent";
-      startAmbientMotion();
+      ui.agentLayer.setAttribute("aria-hidden", "false");
     },
   });
 
@@ -274,23 +490,22 @@ function startOpeningSequence() {
     .to(
       ui.orbShell,
       {
-        y: -18,
+        y: -8,
         duration: prefersReducedMotion ? 0.16 : 0.54,
         ease: "power3.out",
       },
       ">-0.06"
     )
-    .to(
-      ui.healthcareChip,
-      {
-        autoAlpha: 1,
-        y: 0,
-        filter: "blur(0px)",
-        duration: prefersReducedMotion ? 0.12 : 0.72,
-        ease: "expo.out",
-      },
-      `>-${prefersReducedMotion ? 0.04 : DEMO_CONFIG.timings.chipDelayMs / 1000}`
-    );
+    .call(() => {
+      ui.deviceStage.dataset.phase = "agent";
+      startAmbientMotion();
+    })
+    .call(showConversationPrompt, null, `+=${DEMO_CONFIG.timings.promptDelayMs / 1000}`)
+    .call(showPodcastCard, null, `+=${DEMO_CONFIG.timings.cardDelayMs / 1000}`);
+
+  openingTimeoutId = window.setTimeout(() => {
+    openingTimeline.play(0);
+  }, DEMO_CONFIG.timings.initialDelayMs);
 }
 
 function init() {
