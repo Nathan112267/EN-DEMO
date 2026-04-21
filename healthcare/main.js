@@ -342,11 +342,12 @@ function showPodcastCard() {
 
   if (prefersReducedMotion) {
     gsap.set(ui.conversationBubble, {
-      autoAlpha: 1,
-      y: 0,
+      autoAlpha: 0,
+      y: -10,
       scale: 1,
-      filter: "blur(0px)",
+      filter: "blur(12px)",
     });
+    setConversationText("");
     gsap.set(ui.podcastTray, {
       autoAlpha: 1,
       y: 0,
@@ -371,6 +372,18 @@ function showPodcastCard() {
     duration: 0.78,
     ease: "power3.out",
     overwrite: true,
+  });
+
+  gsap.to(ui.conversationBubble, {
+    autoAlpha: 0,
+    y: -10,
+    filter: "blur(12px)",
+    duration: 0.24,
+    ease: "power2.out",
+    overwrite: true,
+    onComplete: () => {
+      setConversationText("");
+    },
   });
 
   gsap.fromTo(
