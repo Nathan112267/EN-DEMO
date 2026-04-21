@@ -59,7 +59,7 @@ const DEMO_CONFIG = {
   timings: {
     initialDelayMs: 3000,
     promptDelayMs: 440,
-    detailHoldAfterCardMs: 3000,
+    detailHoldAfterCardMs: 6000,
     expandDurationMs: 1180,
   },
 };
@@ -682,7 +682,7 @@ function expandToInnerDetail() {
     .to(
       ui.podcastTray,
       {
-        y: -560,
+        y: -602,
         duration: 1.06,
         ease: "expo.inOut",
       },
@@ -691,7 +691,7 @@ function expandToInnerDetail() {
     .to(
       ui.podcastCard,
       {
-        y: -24,
+        y: -18,
         scale: 1.08,
         borderRadius: 68,
         duration: 1.06,
@@ -702,9 +702,9 @@ function expandToInnerDetail() {
     .to(
       ui.podcastArt,
       {
-        x: -246,
-        y: -256,
-        scale: 0.58,
+        x: -278,
+        y: -278,
+        scale: 0.56,
         borderRadius: 30,
         duration: 1.02,
         ease: "expo.inOut",
@@ -714,9 +714,9 @@ function expandToInnerDetail() {
     .to(
       ui.podcastCardTitle,
       {
-        x: -176,
-        y: -84,
-        scale: 0.48,
+        x: -206,
+        y: -98,
+        scale: 0.46,
         duration: 1.02,
         ease: "expo.inOut",
       },
