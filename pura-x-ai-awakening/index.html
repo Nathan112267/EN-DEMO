@@ -44,6 +44,7 @@
         --orb-highlight-shift-x: 0px;
         --orb-highlight-shift-y: 0px;
         --orb-sheen-rotate: 0deg;
+        --orb-lift: 0px;
         --orb-morph-a: 44% 56% 52% 48% / 44% 38% 62% 56%;
         --orb-morph-b: 58% 42% 46% 54% / 58% 63% 37% 42%;
         --ring-alpha: 0.08;
@@ -235,6 +236,10 @@
         will-change: opacity;
       }
 
+      .agent-layer.is-interactive {
+        pointer-events: auto;
+      }
+
       .orb-shell {
         position: absolute;
         top: 50%;
@@ -242,12 +247,22 @@
         width: 326px;
         height: 326px;
         transform:
-          translate3d(-50%, -50%, 0)
+          translate3d(-50%, calc(-50% + var(--orb-lift)), 0)
           scale(var(--orb-scale))
           rotateX(var(--orb-tilt-x))
           rotateY(var(--orb-tilt-y));
         transform-style: preserve-3d;
         will-change: transform;
+        pointer-events: none;
+        transition:
+          opacity 280ms var(--ease-out-quart),
+          filter 280ms var(--ease-out-quart);
+      }
+
+      .agent-layer[data-conversation-state="options"] .orb-shell,
+      .agent-layer[data-conversation-state="confirmed"] .orb-shell {
+        opacity: 0.42;
+        filter: saturate(0.82) brightness(0.72);
       }
 
       .orb-aura,
@@ -330,6 +345,442 @@
         transform: translate3d(var(--orb-highlight-shift-x), var(--orb-highlight-shift-y), 44px) rotate(var(--orb-sheen-rotate));
         filter: blur(var(--orb-highlight-blur));
         mix-blend-mode: screen;
+      }
+
+      .conversation-layer {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 2;
+      }
+
+      .conversation-bubble {
+        position: absolute;
+        left: 50%;
+        top: 548px;
+        width: min(760px, calc(100% - 112px));
+        padding: 22px 28px 24px;
+        border-radius: 30px;
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.028)),
+          rgba(8, 11, 24, 0.82);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.12),
+          0 22px 60px rgba(0, 0, 0, 0.34),
+          0 0 40px rgba(var(--purple-rgb), 0.08);
+        opacity: 0;
+        transform: translate3d(-50%, 22px, 0);
+        filter: blur(18px);
+        will-change: transform, opacity, filter;
+        pointer-events: none;
+        transition:
+          top 280ms var(--ease-out-quart),
+          width 280ms var(--ease-out-quart);
+      }
+
+      .agent-layer[data-conversation-state="options"] .conversation-bubble,
+      .agent-layer[data-conversation-state="confirmed"] .conversation-bubble {
+        top: 148px;
+        width: min(820px, calc(100% - 96px));
+      }
+
+      .conversation-text {
+        margin: 0;
+        font-size: 42px;
+        font-weight: 300;
+        line-height: 1.24;
+        letter-spacing: -0.045em;
+        color: rgba(238, 245, 255, 0.96);
+      }
+
+      .coffee-tray {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        bottom: auto;
+        width: 980px;
+        height: 520px;
+        margin-top: -232px;
+        opacity: 0;
+        transform: translate3d(-50%, 28px, 0);
+        filter: blur(18px);
+        will-change: transform, opacity, filter;
+        pointer-events: none;
+      }
+
+      .coffee-card {
+        position: absolute;
+        top: 22px;
+        left: 50%;
+        width: 560px;
+        min-height: 352px;
+        padding: 34px 38px 42px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 48px;
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
+          rgba(6, 8, 18, 0.84);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.1),
+          0 40px 96px rgba(0, 0, 0, 0.4);
+        color: rgba(238, 246, 255, 0.92);
+        text-align: left;
+        cursor: default;
+        opacity: 0;
+        transform: translate3d(-50%, 26px, 0) scale(0.82);
+        transition:
+          border-color 180ms var(--ease-out-quart),
+          box-shadow 180ms var(--ease-out-quart),
+          background 180ms var(--ease-out-quart);
+      }
+
+      .coffee-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background:
+          radial-gradient(circle at 18% 18%, rgba(var(--cyan-rgb), 0.12), transparent 34%),
+          radial-gradient(circle at 82% 22%, rgba(var(--purple-rgb), 0.1), transparent 38%);
+        opacity: 0.82;
+        pointer-events: none;
+      }
+
+      .coffee-card > * {
+        position: relative;
+        z-index: 1;
+        display: block;
+      }
+
+      .coffee-card-head {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 150px;
+        gap: 24px;
+        align-items: start;
+      }
+
+      .coffee-card-copy {
+        min-width: 0;
+      }
+
+      .coffee-card-index {
+        margin-bottom: 24px;
+        font-size: 16px;
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+        color: rgba(var(--cyan-rgb), 0.7);
+      }
+
+      .coffee-card-title {
+        font-size: 62px;
+        font-weight: 300;
+        line-height: 1.05;
+        letter-spacing: -0.05em;
+      }
+
+      .coffee-card-meta {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-top: 12px;
+        flex-wrap: wrap;
+      }
+
+      .coffee-card-subtitle {
+        margin-top: 0;
+        font-size: 15px;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: rgba(225, 235, 255, 0.44);
+      }
+
+      .coffee-card-price {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 78px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        color: rgba(242, 247, 255, 0.96);
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.05)),
+          rgba(17, 22, 36, 0.82);
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.08),
+          0 12px 28px rgba(0, 0, 0, 0.18);
+      }
+
+      .coffee-card-note {
+        margin-top: 62px;
+        font-size: 18px;
+        line-height: 1.6;
+        color: rgba(224, 236, 255, 0.72);
+      }
+
+      .coffee-card-visual {
+        position: relative;
+        width: 150px;
+        height: 150px;
+        align-self: start;
+        justify-self: end;
+        border-radius: 38px;
+        background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.04), transparent 72%);
+        overflow: hidden;
+        display: grid;
+        place-items: center;
+      }
+
+      .coffee-card-visual::before {
+        content: "";
+        position: absolute;
+        inset: 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: radial-gradient(circle at 32% 26%, rgba(255, 255, 255, 0.1), transparent 42%);
+        pointer-events: none;
+      }
+
+      .coffee-card-visual svg {
+        position: relative;
+        z-index: 1;
+        width: 112px;
+        height: 112px;
+        display: block;
+      }
+
+      .coffee-card[data-coffee-id="americano"] .coffee-card-visual {
+        background: radial-gradient(circle at 50% 50%, rgba(var(--cyan-rgb), 0.07), transparent 72%);
+      }
+
+      .coffee-card[data-coffee-id="latte"] .coffee-card-visual {
+        background: radial-gradient(circle at 50% 50%, rgba(255, 214, 160, 0.08), transparent 72%);
+      }
+
+      .coffee-card[data-coffee-id="flat-white"] .coffee-card-visual {
+        background: radial-gradient(circle at 50% 50%, rgba(var(--purple-rgb), 0.08), transparent 72%);
+      }
+
+      .coffee-card.is-selected {
+        border-color: rgba(var(--cyan-rgb), 0.42);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.14),
+          0 42px 102px rgba(0, 0, 0, 0.42),
+          0 0 56px rgba(var(--cyan-rgb), 0.2);
+      }
+
+      .coffee-card.is-confirmed {
+        border-color: rgba(var(--cyan-rgb), 0.68);
+        background:
+          linear-gradient(180deg, rgba(var(--cyan-rgb), 0.16), rgba(255, 255, 255, 0.03)),
+          rgba(7, 11, 22, 0.9);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.16),
+          0 48px 112px rgba(0, 0, 0, 0.44),
+          0 0 64px rgba(var(--cyan-rgb), 0.26);
+      }
+
+      .coffee-card:focus-visible {
+        outline: none;
+        border-color: rgba(var(--cyan-rgb), 0.72);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.16),
+          0 0 0 2px rgba(var(--cyan-rgb), 0.24),
+          0 24px 56px rgba(0, 0, 0, 0.34);
+      }
+
+      .payment-layer {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 3;
+      }
+
+      .payment-card {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 560px;
+        min-height: 352px;
+        padding: 34px 38px 42px;
+        border-radius: 48px;
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.024)),
+          rgba(7, 10, 20, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.12),
+          0 28px 78px rgba(0, 0, 0, 0.36),
+          0 0 44px rgba(var(--cyan-rgb), 0.08);
+        opacity: 0;
+        transform: none;
+        filter: blur(18px);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 28px;
+        will-change: transform, opacity, filter;
+      }
+
+      .payment-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .payment-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        border-radius: 999px;
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.04)),
+          rgba(17, 21, 34, 0.82);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .payment-chip-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: rgba(var(--cyan-rgb), 0.76);
+        box-shadow: 0 0 0 6px rgba(var(--cyan-rgb), 0.1);
+      }
+
+      .payment-chip-text {
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: rgba(232, 242, 255, 0.76);
+      }
+
+      .payment-amount {
+        font-size: 38px;
+        font-weight: 300;
+        letter-spacing: -0.05em;
+        color: rgba(245, 248, 255, 0.96);
+      }
+
+      .payment-status {
+        margin: 24px 0 0;
+        font-size: 42px;
+        font-weight: 300;
+        line-height: 1.08;
+        letter-spacing: -0.045em;
+        color: rgba(241, 247, 255, 0.96);
+      }
+
+      .payment-detail {
+        margin: 12px 0 0;
+        font-size: 16px;
+        line-height: 1.65;
+        color: rgba(226, 236, 255, 0.68);
+      }
+
+      .payment-track {
+        position: relative;
+        overflow: hidden;
+        height: 10px;
+        margin-top: 26px;
+        border-radius: 999px;
+        background: rgba(21, 28, 46, 0.92);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      .payment-fill,
+      .payment-glint {
+        position: absolute;
+        inset: 0 auto 0 0;
+        border-radius: inherit;
+      }
+
+      .payment-fill {
+        width: 100%;
+        background: linear-gradient(90deg, rgba(var(--cyan-rgb), 0.88), rgba(var(--purple-rgb), 0.72));
+        transform: scaleX(0);
+        transform-origin: left center;
+      }
+
+      .payment-glint {
+        width: 26%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.88), transparent);
+        opacity: 0;
+        transform: translateX(-140%);
+      }
+
+      .payment-success {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-top: 22px;
+        opacity: 0;
+        transform: translate3d(0, 10px, 0);
+      }
+
+      .payment-success-mark {
+        position: relative;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: linear-gradient(180deg, rgba(var(--cyan-rgb), 0.92), rgba(var(--purple-rgb), 0.82));
+        box-shadow:
+          0 12px 30px rgba(var(--cyan-rgb), 0.18),
+          0 0 20px rgba(var(--purple-rgb), 0.14);
+      }
+
+      .payment-success-mark::before {
+        content: "";
+        position: absolute;
+        left: 16px;
+        top: 12px;
+        width: 12px;
+        height: 20px;
+        border-right: 4px solid rgba(0, 0, 0, 0.76);
+        border-bottom: 4px solid rgba(0, 0, 0, 0.76);
+        transform: rotate(45deg);
+      }
+
+      .payment-success-title {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 500;
+        color: rgba(242, 248, 255, 0.96);
+      }
+
+      .payment-success-subtitle {
+        margin: 6px 0 0;
+        font-size: 15px;
+        color: rgba(226, 236, 255, 0.68);
+      }
+
+      .agent-layer[data-payment-state="auth"] .payment-chip-dot {
+        background: rgba(var(--cyan-rgb), 0.86);
+        box-shadow: 0 0 0 6px rgba(var(--cyan-rgb), 0.12);
+      }
+
+      .agent-layer[data-payment-state="paying"] .payment-chip-dot {
+        background: rgba(var(--purple-rgb), 0.88);
+        box-shadow: 0 0 0 6px rgba(var(--purple-rgb), 0.12);
+      }
+
+      .agent-layer[data-payment-state="success"] .payment-card {
+        border-color: rgba(var(--cyan-rgb), 0.16);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.14),
+          0 28px 78px rgba(0, 0, 0, 0.38),
+          0 0 54px rgba(var(--cyan-rgb), 0.12);
+      }
+
+      .agent-layer[data-payment-state="success"] .payment-chip-dot {
+        background: rgba(182, 255, 206, 0.92);
+        box-shadow: 0 0 0 6px rgba(182, 255, 206, 0.14);
       }
 
       .permission-overlay {
@@ -448,6 +899,68 @@
         .device-stage {
           border-radius: 44px;
         }
+
+        .conversation-bubble {
+          width: min(760px, calc(100% - 84px));
+          top: 532px;
+        }
+
+        .agent-layer[data-conversation-state="options"] .conversation-bubble,
+        .agent-layer[data-conversation-state="confirmed"] .conversation-bubble {
+          top: 132px;
+          width: min(800px, calc(100% - 88px));
+        }
+
+        .conversation-text {
+          font-size: 38px;
+        }
+
+        .coffee-tray {
+          width: 960px;
+          height: 500px;
+          margin-top: -224px;
+        }
+
+        .coffee-card {
+          width: 520px;
+          min-height: 332px;
+        }
+
+        .coffee-card-head {
+          grid-template-columns: minmax(0, 1fr) 136px;
+          gap: 20px;
+        }
+
+        .coffee-card-visual {
+          width: 136px;
+          height: 136px;
+          border-radius: 34px;
+        }
+
+        .coffee-card-visual svg {
+          width: 104px;
+          height: 104px;
+        }
+
+        .coffee-card-price {
+          min-width: 72px;
+          padding: 7px 12px;
+          font-size: 14px;
+        }
+
+        .payment-card {
+          width: 520px;
+          min-height: 332px;
+          padding: 30px 34px 38px;
+        }
+
+        .payment-amount {
+          font-size: 34px;
+        }
+
+        .payment-status {
+          font-size: 38px;
+        }
       }
 
       @media (prefers-reduced-motion: reduce) {
@@ -474,13 +987,46 @@
 
           <canvas id="fxCanvas" width="980" height="980" aria-hidden="true"></canvas>
 
-          <section class="agent-layer" id="agentLayer" aria-hidden="true">
+          <section class="agent-layer" id="agentLayer" aria-hidden="true" data-conversation-state="hidden" data-payment-state="hidden">
             <div class="orb-shell" id="orbShell">
               <div class="orb-aura" id="orbAura"></div>
               <div class="orb-ring" id="orbRing"></div>
               <div class="orb-core" id="orbCore"></div>
               <div class="orb-liquid" id="orbLiquid"></div>
               <div class="orb-highlight" id="orbHighlight"></div>
+            </div>
+
+            <div class="conversation-layer" id="conversationLayer">
+              <div class="conversation-bubble" id="conversationBubble">
+                <p class="conversation-text" id="conversationText">需要帮你再点一杯咖啡吗？</p>
+              </div>
+
+              <div class="coffee-tray" id="coffeeTray" aria-label="咖啡选项"></div>
+            </div>
+
+            <div class="payment-layer" id="paymentLayer" aria-hidden="true">
+              <div class="payment-card" id="paymentCard">
+                <div class="payment-head">
+                  <div class="payment-chip">
+                    <span class="payment-chip-dot" id="paymentChipDot"></span>
+                    <span class="payment-chip-text" id="paymentChipText">Pura X Pay</span>
+                  </div>
+                  <span class="payment-amount" id="paymentAmount">¥00</span>
+                </div>
+                <p class="payment-status" id="paymentStatus">等待支付确认</p>
+                <p class="payment-detail" id="paymentDetail">订单已锁定，准备发起支付。</p>
+                <div class="payment-track" id="paymentTrack" aria-hidden="true">
+                  <span class="payment-fill" id="paymentFill"></span>
+                  <span class="payment-glint" id="paymentGlint"></span>
+                </div>
+                <div class="payment-success" id="paymentSuccess">
+                  <span class="payment-success-mark"></span>
+                  <div>
+                    <p class="payment-success-title" id="paymentSuccessTitle">支付成功</p>
+                    <p class="payment-success-subtitle" id="paymentSuccessSubtitle">拿铁已下单</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </section>
 
@@ -501,11 +1047,24 @@
     </div>
 
     <script type="text/plain" id="pose-worker-source">
-import { FilesetResolver, FaceLandmarker } from 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.34/+esm';
+import { FilesetResolver, FaceLandmarker, HandLandmarker } from 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.34/+esm';
 
-let landmarker = null;
+let faceLandmarker = null;
+let handLandmarker = null;
 let ready = false;
 let config = null;
+
+const handRuntime = {
+  lastCenterX: 0,
+  lastTimestamp: 0,
+  lastSwipeAt: 0,
+  pinchClosed: false,
+  pinchStartedAt: 0,
+  pinchLatched: false,
+  missingFrames: 0,
+  present: false,
+  cached: null,
+};
 
 function toDegrees(radians) {
   return (radians * 180) / Math.PI;
@@ -514,6 +1073,16 @@ function toDegrees(radians) {
 const EYE_TRACKING = {
   right: { cornerA: 33, cornerB: 133, upperLid: 159, lowerLid: 145, irisCenter: 468 },
   left: { cornerA: 362, cornerB: 263, upperLid: 386, lowerLid: 374, irisCenter: 473 },
+};
+
+const HAND_POINTS = {
+  wrist: 0,
+  thumbTip: 4,
+  indexMcp: 5,
+  middleMcp: 9,
+  ringMcp: 13,
+  pinkyMcp: 17,
+  indexTip: 8,
 };
 
 function midpoint(a, b) {
@@ -529,6 +1098,31 @@ function distance(a, b) {
 
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
+}
+
+function blankHandState(supported) {
+  return {
+    supported: Boolean(supported),
+    present: false,
+    centerX: 0,
+    velocityX: 0,
+    swipeDirection: 0,
+    pinchActive: false,
+    pinchConfirmed: false,
+  };
+}
+
+function resetHandRuntime(supported) {
+  handRuntime.lastCenterX = 0;
+  handRuntime.lastTimestamp = 0;
+  handRuntime.lastSwipeAt = 0;
+  handRuntime.pinchClosed = false;
+  handRuntime.pinchStartedAt = 0;
+  handRuntime.pinchLatched = false;
+  handRuntime.missingFrames = 0;
+  handRuntime.present = false;
+  handRuntime.cached = blankHandState(supported);
+  return handRuntime.cached;
 }
 
 function estimateEyeGaze(landmarks, config) {
@@ -664,6 +1258,151 @@ function extractPose(result) {
   });
 }
 
+function getPalmCenter(landmarks) {
+  const points = [
+    landmarks[HAND_POINTS.wrist],
+    landmarks[HAND_POINTS.indexMcp],
+    landmarks[HAND_POINTS.middleMcp],
+    landmarks[HAND_POINTS.ringMcp],
+    landmarks[HAND_POINTS.pinkyMcp],
+  ].filter(Boolean);
+
+  if (!points.length) {
+    return null;
+  }
+
+  const sum = points.reduce(
+    (acc, point) => {
+      acc.x += point.x;
+      acc.y += point.y;
+      return acc;
+    },
+    { x: 0, y: 0 }
+  );
+
+  return {
+    x: sum.x / points.length,
+    y: sum.y / points.length,
+  };
+}
+
+function extractHandGesture(result, timestamp, gestureEnabled, skipped) {
+  const supported = Boolean(handLandmarker);
+
+  if (!gestureEnabled || !supported) {
+    return resetHandRuntime(supported);
+  }
+
+  if (skipped && handRuntime.cached) {
+    return {
+      ...handRuntime.cached,
+      swipeDirection: 0,
+      pinchConfirmed: false,
+    };
+  }
+
+  const landmarks = result && result.landmarks && result.landmarks[0];
+  if (!landmarks || !landmarks.length) {
+    if (handRuntime.present && handRuntime.cached && handRuntime.missingFrames < 3) {
+      handRuntime.missingFrames += 1;
+      return {
+        ...handRuntime.cached,
+        swipeDirection: 0,
+        pinchConfirmed: false,
+      };
+    }
+    return resetHandRuntime(supported);
+  }
+
+  const palmCenter = getPalmCenter(landmarks);
+  const thumbTip = landmarks[HAND_POINTS.thumbTip];
+  const indexTip = landmarks[HAND_POINTS.indexTip];
+  const indexMcp = landmarks[HAND_POINTS.indexMcp];
+  const pinkyMcp = landmarks[HAND_POINTS.pinkyMcp];
+
+  if (!palmCenter || !thumbTip || !indexTip || !indexMcp || !pinkyMcp) {
+    if (handRuntime.present && handRuntime.cached && handRuntime.missingFrames < 3) {
+      handRuntime.missingFrames += 1;
+      return {
+        ...handRuntime.cached,
+        swipeDirection: 0,
+        pinchConfirmed: false,
+      };
+    }
+    return resetHandRuntime(supported);
+  }
+
+  const palmWidth = Math.max(distance(indexMcp, pinkyMcp), 0.045);
+  const pinchDistance = distance(thumbTip, indexTip) / palmWidth;
+  const dt = Math.max(timestamp - handRuntime.lastTimestamp, 1);
+  const dx = palmCenter.x - handRuntime.lastCenterX;
+  const velocityX = handRuntime.present ? (dx / dt) * 1000 : 0;
+  let swipeDirection = 0;
+
+  if (
+    handRuntime.present &&
+    !handRuntime.pinchClosed &&
+    Math.abs(dx) > config.handGesture.swipeDisplacementThreshold &&
+    Math.abs(velocityX) > config.handGesture.swipeVelocityThreshold &&
+    timestamp - handRuntime.lastSwipeAt > config.handGesture.swipeCooldownMs
+  ) {
+    swipeDirection = velocityX > 0 ? 1 : -1;
+    handRuntime.lastSwipeAt = timestamp;
+  }
+
+  let pinchActive = handRuntime.pinchClosed
+    ? pinchDistance < config.handGesture.pinchOpenThreshold
+    : pinchDistance < config.handGesture.pinchCloseThreshold;
+  let pinchConfirmed = false;
+
+  if (pinchActive && !handRuntime.pinchClosed) {
+    handRuntime.pinchStartedAt = timestamp;
+    handRuntime.pinchLatched = false;
+  }
+
+  if (
+    pinchActive &&
+    handRuntime.pinchStartedAt &&
+    !handRuntime.pinchLatched &&
+    timestamp - handRuntime.pinchStartedAt >= config.handGesture.pinchHoldMs
+  ) {
+    pinchConfirmed = true;
+    handRuntime.pinchLatched = true;
+  }
+
+  if (!pinchActive) {
+    handRuntime.pinchClosed = false;
+    handRuntime.pinchStartedAt = 0;
+    handRuntime.pinchLatched = false;
+  } else {
+    handRuntime.pinchClosed = true;
+  }
+
+  handRuntime.missingFrames = 0;
+  handRuntime.lastCenterX = palmCenter.x;
+  handRuntime.lastTimestamp = timestamp;
+  handRuntime.present = true;
+  handRuntime.cached = {
+    supported: true,
+    present: true,
+    centerX: palmCenter.x,
+    velocityX,
+    swipeDirection: 0,
+    pinchActive,
+    pinchConfirmed: false,
+  };
+
+  return {
+    supported: true,
+    present: true,
+    centerX: palmCenter.x,
+    velocityX,
+    swipeDirection,
+    pinchActive,
+    pinchConfirmed,
+  };
+}
+
 self.onmessage = async (event) => {
   const payload = event.data || {};
 
@@ -671,7 +1410,7 @@ self.onmessage = async (event) => {
     try {
       config = payload.config;
       const vision = await FilesetResolver.forVisionTasks(config.wasmUrl);
-      landmarker = await FaceLandmarker.createFromOptions(vision, {
+      faceLandmarker = await FaceLandmarker.createFromOptions(vision, {
         baseOptions: {
           modelAssetPath: config.modelUrl,
           delegate: 'CPU',
@@ -684,6 +1423,9 @@ self.onmessage = async (event) => {
         outputFaceBlendshapes: false,
         outputFacialTransformationMatrixes: true,
       });
+
+      handLandmarker = null;
+      resetHandRuntime(false);
       ready = true;
       self.postMessage({
         type: 'pose',
@@ -700,6 +1442,8 @@ self.onmessage = async (event) => {
         combinedPitch: 0,
         attentiveness: 0,
         confidence: 0,
+        hand: blankHandState(false),
+        handAvailable: false,
         timestamp: performance.now(),
       });
     } catch (error) {
@@ -713,13 +1457,21 @@ self.onmessage = async (event) => {
 
   if (payload.type === 'dispose') {
     ready = false;
-    if (landmarker && typeof landmarker.close === 'function') {
+    if (faceLandmarker && typeof faceLandmarker.close === 'function') {
       try {
-        landmarker.close();
+        faceLandmarker.close();
       } catch (_error) {
       }
     }
-    landmarker = null;
+    if (handLandmarker && typeof handLandmarker.close === 'function') {
+      try {
+        handLandmarker.close();
+      } catch (_error) {
+      }
+    }
+    faceLandmarker = null;
+    handLandmarker = null;
+    resetHandRuntime(false);
     return;
   }
 
@@ -729,8 +1481,10 @@ self.onmessage = async (event) => {
 
   const imageBitmap = payload.imageBitmap;
   const timestamp = payload.timestamp;
+  const gestureEnabled = Boolean(payload.gestureEnabled);
+  const faceEnabled = payload.faceEnabled !== false;
 
-  if (!ready || !landmarker || !imageBitmap) {
+  if (!ready || !faceLandmarker || !imageBitmap) {
     if (imageBitmap && typeof imageBitmap.close === 'function') {
       imageBitmap.close();
     }
@@ -738,11 +1492,45 @@ self.onmessage = async (event) => {
   }
 
   try {
-    const result = landmarker.detectForVideo(imageBitmap, timestamp);
+    const faceResult = faceEnabled ? faceLandmarker.detectForVideo(imageBitmap, timestamp) : null;
+    let handResult = null;
+
+    if (gestureEnabled && handLandmarker) {
+      try {
+        handResult = handLandmarker.detectForVideo(imageBitmap, timestamp);
+      } catch (_error) {
+        try {
+          handLandmarker.close();
+        } catch (_closeError) {
+        }
+        handLandmarker = null;
+        resetHandRuntime(false);
+      }
+    } else if (!gestureEnabled) {
+      resetHandRuntime(Boolean(handLandmarker));
+    }
+
     if (typeof imageBitmap.close === 'function') {
       imageBitmap.close();
     }
-    const pose = extractPose(result);
+    const pose = faceEnabled
+      ? extractPose(faceResult)
+      : {
+          facePresent: false,
+          yaw: 0,
+          pitch: 0,
+          gazeYaw: 0,
+          gazePitch: 0,
+          gazeCentered: 0,
+          gazeOpenness: 0,
+          gazeValid: false,
+          headCentered: 0,
+          combinedYaw: 0,
+          combinedPitch: 0,
+          attentiveness: 0,
+          confidence: 0,
+        };
+    const hand = extractHandGesture(handResult, timestamp, gestureEnabled, false);
     self.postMessage({
       type: 'pose',
       ready: true,
@@ -758,6 +1546,8 @@ self.onmessage = async (event) => {
       combinedPitch: pose.combinedPitch,
       attentiveness: pose.attentiveness,
       confidence: pose.confidence,
+      hand,
+      handAvailable: Boolean(handLandmarker),
       timestamp,
     });
   } catch (error) {
@@ -773,7 +1563,7 @@ self.onmessage = async (event) => {
     </script>
 
     <script type="module">
-      import { FilesetResolver, FaceLandmarker } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.34/+esm";
+      import { FilesetResolver, FaceLandmarker, HandLandmarker } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.34/+esm";
 
       function deepFreeze(value) {
         if (!value || typeof value !== "object" || Object.isFrozen(value)) {
@@ -817,10 +1607,60 @@ self.onmessage = async (event) => {
           radius: 148,
           waveCount: 3,
         },
+        conversation: {
+          promptDelayMs: 3000,
+          cardsDelayMs: 2000,
+          defaultCoffeeIndex: 1,
+          autoCycleDelayMs: 1250,
+          autoCycleTransitionMs: 420,
+          autoConfirmDelayMs: 1200,
+          paymentWaitMs: 2000,
+          paymentAuthMs: 800,
+          paymentPayMs: 1200,
+          paymentRevealMs: 400,
+          autoSequence: ["americano", "flat-white", "latte"],
+        },
+        coffeeOptions: [
+          {
+            id: "americano",
+            label: "美式",
+            subtitle: "Americano",
+            price: "¥23",
+            note: "清爽提神，入口更利落。",
+          },
+          {
+            id: "latte",
+            label: "拿铁",
+            subtitle: "Latte",
+            price: "¥29",
+            note: "奶感丝滑，风味更平衡。",
+          },
+          {
+            id: "flat-white",
+            label: "馥芮白",
+            subtitle: "Flat White",
+            price: "¥31",
+            note: "咖啡感更浓，收口更干净。",
+          },
+        ],
+        handGesture: {
+          zoneLeftMax: 0.4,
+          zoneRightMin: 0.6,
+          hoverVelocityThreshold: 0.34,
+          hoverConfirmHoldMs: 380,
+          swipeVelocityThreshold: 0.36,
+          swipeDisplacementThreshold: 0.028,
+          swipeCooldownMs: 360,
+          pinchCloseThreshold: 0.52,
+          pinchOpenThreshold: 0.72,
+          pinchHoldMs: 50,
+        },
         mediaPipe: {
           wasmUrl: "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.34/wasm",
           modelUrl:
             "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
+          handModelUrl:
+            "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
         },
         colors: {
           cyan: "103, 255, 245",
@@ -841,12 +1681,14 @@ self.onmessage = async (event) => {
           lowPower,
           reducedMotion,
           detectionFps: lowPower ? 12 : DEMO_CONFIG.detectionFps,
-          particleCount: lowPower ? 280 : DEMO_CONFIG.particleCount,
-          waveCount: lowPower ? 2 : DEMO_CONFIG.orb.waveCount,
-          waveSteps: lowPower ? 72 : 110,
-          captureWidth: lowPower ? 720 : 960,
+          particleCount: lowPower ? 180 : DEMO_CONFIG.particleCount,
+          waveCount: lowPower ? 1 : DEMO_CONFIG.orb.waveCount,
+          waveSteps: lowPower ? 52 : 110,
+          captureWidth: lowPower ? 960 : 960,
           captureHeight: lowPower ? 720 : 960,
-          motionGain: lowPower ? 0.82 : 1,
+          effectScale: lowPower ? 0.64 : 1,
+          effectFps: lowPower ? 36 : 60,
+          motionGain: lowPower ? 0.72 : 1,
         });
       }
 
@@ -865,6 +1707,23 @@ self.onmessage = async (event) => {
         orbCore: document.getElementById("orbCore"),
         orbLiquid: document.getElementById("orbLiquid"),
         orbHighlight: document.getElementById("orbHighlight"),
+        conversationLayer: document.getElementById("conversationLayer"),
+        conversationBubble: document.getElementById("conversationBubble"),
+        conversationText: document.getElementById("conversationText"),
+        coffeeTray: document.getElementById("coffeeTray"),
+        paymentLayer: document.getElementById("paymentLayer"),
+        paymentCard: document.getElementById("paymentCard"),
+        paymentChipDot: document.getElementById("paymentChipDot"),
+        paymentChipText: document.getElementById("paymentChipText"),
+        paymentAmount: document.getElementById("paymentAmount"),
+        paymentStatus: document.getElementById("paymentStatus"),
+        paymentDetail: document.getElementById("paymentDetail"),
+        paymentTrack: document.getElementById("paymentTrack"),
+        paymentFill: document.getElementById("paymentFill"),
+        paymentGlint: document.getElementById("paymentGlint"),
+        paymentSuccess: document.getElementById("paymentSuccess"),
+        paymentSuccessTitle: document.getElementById("paymentSuccessTitle"),
+        paymentSuccessSubtitle: document.getElementById("paymentSuccessSubtitle"),
         overlay: document.getElementById("permissionOverlay"),
         overlayTitle: document.getElementById("overlayTitle"),
         overlayDetail: document.getElementById("overlayDetail"),
@@ -873,7 +1732,7 @@ self.onmessage = async (event) => {
         workerSource: document.getElementById("pose-worker-source"),
       };
 
-      const fxContext = ui.fxCanvas.getContext("2d");
+      const fxContext = ui.fxCanvas.getContext("2d", { alpha: true, desynchronized: true });
       const sampleCanvas = document.createElement("canvas");
       sampleCanvas.width = DEMO_CONFIG.stageSize;
       sampleCanvas.height = DEMO_CONFIG.stageSize;
@@ -886,6 +1745,7 @@ self.onmessage = async (event) => {
         clockBlur: 0,
         haloStrength: 0.26,
         haloScale: 1,
+        orbLift: 0,
         orbAlpha: 0,
         orbScale: 0.8,
         orbAura: 0.14,
@@ -903,21 +1763,37 @@ self.onmessage = async (event) => {
         phase: "permission",
         clockValue: "00:00",
         renderRaf: 0,
+        lastFxFrameAt: 0,
+        fxActive: false,
         detectionTimer: 0,
         transitionTimer: 0,
+        promptTimer: 0,
+        cardsTimer: 0,
+        conversationTimeline: null,
+        paymentTimeline: null,
         pointCache: new Map(),
         particleTransition: null,
         worker: null,
         workerUrl: "",
         workerReady: false,
         pipelineMode: "",
+        handPipelineMode: "",
         fallbackLandmarker: null,
+        mainHandLandmarker: null,
         capturePending: false,
         fallbackBusy: false,
+        mainHandBusy: false,
         stream: null,
         permissionBusy: false,
         wakeCandidateSince: 0,
         sleepCandidateSince: 0,
+        conversationState: "hidden",
+        paymentState: "hidden",
+        paymentLocked: false,
+        selectedCoffeeIndex: DEMO_CONFIG.conversation.defaultCoffeeIndex,
+        confirmedCoffeeId: "",
+        handZoneIndex: -1,
+        handZoneSince: 0,
         pose: {
           facePresent: false,
           yaw: 0,
@@ -950,6 +1826,15 @@ self.onmessage = async (event) => {
           confidence: 0,
           timestamp: 0,
         },
+        handState: {
+          supported: false,
+          present: false,
+          centerX: 0,
+          velocityX: 0,
+          swipeDirection: 0,
+          pinchActive: false,
+          pinchConfirmed: false,
+        },
         overlayMode: "permission",
         resumeHint: false,
         reduceMotion: window.matchMedia("(prefers-reduced-motion: reduce)").matches,
@@ -960,6 +1845,25 @@ self.onmessage = async (event) => {
         right: Object.freeze({ cornerA: 33, cornerB: 133, upperLid: 159, lowerLid: 145, irisCenter: 468 }),
         left: Object.freeze({ cornerA: 362, cornerB: 263, upperLid: 386, lowerLid: 374, irisCenter: 473 }),
       });
+      const HAND_POINTS = Object.freeze({
+        wrist: 0,
+        thumbTip: 4,
+        indexMcp: 5,
+        middleMcp: 9,
+        ringMcp: 13,
+        pinkyMcp: 17,
+        indexTip: 8,
+      });
+      const mainHandRuntime = {
+        lastCenterX: 0,
+        lastTimestamp: 0,
+        lastSwipeAt: 0,
+        pinchClosed: false,
+        pinchStartedAt: 0,
+        pinchLatched: false,
+        missingFrames: 0,
+        present: false,
+      };
 
       function clamp(value, min, max) {
         return Math.min(max, Math.max(min, value));
@@ -1015,20 +1919,36 @@ self.onmessage = async (event) => {
         );
         document.documentElement.style.setProperty(
           "--orb-surface-backdrop",
-          reducedEffects ? "blur(12px) saturate(124%)" : "blur(22px) saturate(150%)"
+          reducedEffects ? "none" : "blur(22px) saturate(150%)"
         );
         document.documentElement.style.setProperty(
           "--orb-liquid-blur",
-          reducedEffects ? "12px" : "18px"
+          reducedEffects ? "8px" : "18px"
         );
         document.documentElement.style.setProperty(
           "--orb-highlight-blur",
-          reducedEffects ? "3px" : "6px"
+          reducedEffects ? "2px" : "6px"
         );
         document.documentElement.style.setProperty(
           "--overlay-backdrop",
-          reducedEffects ? "blur(12px) saturate(104%)" : "blur(22px) saturate(110%)"
+          reducedEffects ? "blur(8px)" : "blur(22px) saturate(110%)"
         );
+      }
+
+      function configureFxCanvas() {
+        const scale = RUNTIME_TUNING.effectScale;
+        const width = Math.max(1, Math.round(DEMO_CONFIG.stageSize * scale));
+        const height = Math.max(1, Math.round(DEMO_CONFIG.stageSize * scale));
+
+        if (ui.fxCanvas.width !== width || ui.fxCanvas.height !== height) {
+          ui.fxCanvas.width = width;
+          ui.fxCanvas.height = height;
+        }
+
+        fxContext.setTransform(scale, 0, 0, scale, 0, 0);
+        fxContext.imageSmoothingEnabled = true;
+        state.lastFxFrameAt = 0;
+        state.fxActive = false;
       }
 
       function midpoint(a, b) {
@@ -1209,6 +2129,1069 @@ self.onmessage = async (event) => {
         ui.stage.dataset.phase = nextPhase;
       }
 
+      function blankHandState(supported = false) {
+        return {
+          supported: Boolean(supported),
+          present: false,
+          centerX: 0,
+          velocityX: 0,
+          swipeDirection: 0,
+          pinchActive: false,
+          pinchConfirmed: false,
+        };
+      }
+
+      function setConversationText(text) {
+        ui.conversationText.textContent = text;
+      }
+
+      function setConversationState(nextState) {
+        state.conversationState = nextState;
+        ui.agentLayer.dataset.conversationState = nextState;
+        ui.agentLayer.classList.remove("is-interactive");
+      }
+
+      function setPaymentState(nextState) {
+        state.paymentState = nextState;
+        ui.agentLayer.dataset.paymentState = nextState;
+      }
+
+      function clearPromptTimer() {
+        if (!state.promptTimer) {
+          return;
+        }
+        window.clearTimeout(state.promptTimer);
+        state.promptTimer = 0;
+      }
+
+      function clearCardsTimer() {
+        if (!state.cardsTimer) {
+          return;
+        }
+        window.clearTimeout(state.cardsTimer);
+        state.cardsTimer = 0;
+      }
+
+      function clearConversationTimers() {
+        clearPromptTimer();
+        clearCardsTimer();
+      }
+
+      function clearConversationTimeline() {
+        if (!state.conversationTimeline) {
+          return;
+        }
+        state.conversationTimeline.kill();
+        state.conversationTimeline = null;
+      }
+
+      function clearPaymentTimeline() {
+        if (!state.paymentTimeline) {
+          return;
+        }
+        state.paymentTimeline.kill();
+        state.paymentTimeline = null;
+      }
+
+      function resetHandState(supported = state.handState.supported) {
+        const next = blankHandState(supported);
+        Object.assign(state.handState, next);
+        state.handZoneIndex = -1;
+        state.handZoneSince = 0;
+      }
+
+      function resetMainHandRuntime() {
+        mainHandRuntime.lastCenterX = 0;
+        mainHandRuntime.lastTimestamp = 0;
+        mainHandRuntime.lastSwipeAt = 0;
+        mainHandRuntime.pinchClosed = false;
+        mainHandRuntime.pinchStartedAt = 0;
+        mainHandRuntime.pinchLatched = false;
+        mainHandRuntime.missingFrames = 0;
+        mainHandRuntime.present = false;
+      }
+
+      function getPalmCenterFromHand(landmarks) {
+        const points = [
+          landmarks?.[HAND_POINTS.wrist],
+          landmarks?.[HAND_POINTS.indexMcp],
+          landmarks?.[HAND_POINTS.middleMcp],
+          landmarks?.[HAND_POINTS.ringMcp],
+          landmarks?.[HAND_POINTS.pinkyMcp],
+        ].filter(Boolean);
+
+        if (!points.length) {
+          return null;
+        }
+
+        const sum = points.reduce(
+          (acc, point) => {
+            acc.x += point.x;
+            acc.y += point.y;
+            return acc;
+          },
+          { x: 0, y: 0 }
+        );
+
+        return {
+          x: sum.x / points.length,
+          y: sum.y / points.length,
+        };
+      }
+
+      function extractMainHandGesture(landmarks, timestamp) {
+        if (!landmarks || !landmarks.length) {
+          if (mainHandRuntime.present && mainHandRuntime.missingFrames < 3) {
+            mainHandRuntime.missingFrames += 1;
+            return {
+              supported: true,
+              present: true,
+              centerX: mainHandRuntime.lastCenterX,
+              velocityX: 0,
+              swipeDirection: 0,
+              pinchActive: mainHandRuntime.pinchClosed,
+              pinchConfirmed: false,
+            };
+          }
+          resetMainHandRuntime();
+          return blankHandState(Boolean(state.mainHandLandmarker));
+        }
+
+        const palmCenter = getPalmCenterFromHand(landmarks);
+        const thumbTip = landmarks[HAND_POINTS.thumbTip];
+        const indexTip = landmarks[HAND_POINTS.indexTip];
+        const indexMcp = landmarks[HAND_POINTS.indexMcp];
+        const pinkyMcp = landmarks[HAND_POINTS.pinkyMcp];
+
+        if (!palmCenter || !thumbTip || !indexTip || !indexMcp || !pinkyMcp) {
+          if (mainHandRuntime.present && mainHandRuntime.missingFrames < 3) {
+            mainHandRuntime.missingFrames += 1;
+            return {
+              supported: true,
+              present: true,
+              centerX: mainHandRuntime.lastCenterX,
+              velocityX: 0,
+              swipeDirection: 0,
+              pinchActive: mainHandRuntime.pinchClosed,
+              pinchConfirmed: false,
+            };
+          }
+          resetMainHandRuntime();
+          return blankHandState(Boolean(state.mainHandLandmarker));
+        }
+
+        const palmWidth = Math.max(distance(indexMcp, pinkyMcp), 0.045);
+        const pinchDistance = distance(thumbTip, indexTip) / palmWidth;
+        const dt = Math.max(timestamp - mainHandRuntime.lastTimestamp, 1);
+        const dx = palmCenter.x - mainHandRuntime.lastCenterX;
+        const velocityX = mainHandRuntime.present ? (dx / dt) * 1000 : 0;
+        let swipeDirection = 0;
+
+        if (
+          mainHandRuntime.present &&
+          !mainHandRuntime.pinchClosed &&
+          Math.abs(dx) > DEMO_CONFIG.handGesture.swipeDisplacementThreshold &&
+          Math.abs(velocityX) > DEMO_CONFIG.handGesture.swipeVelocityThreshold &&
+          timestamp - mainHandRuntime.lastSwipeAt > DEMO_CONFIG.handGesture.swipeCooldownMs
+        ) {
+          swipeDirection = velocityX > 0 ? 1 : -1;
+          mainHandRuntime.lastSwipeAt = timestamp;
+        }
+
+        const pinchActive = mainHandRuntime.pinchClosed
+          ? pinchDistance < DEMO_CONFIG.handGesture.pinchOpenThreshold
+          : pinchDistance < DEMO_CONFIG.handGesture.pinchCloseThreshold;
+        let pinchConfirmed = false;
+
+        if (pinchActive && !mainHandRuntime.pinchClosed) {
+          mainHandRuntime.pinchStartedAt = timestamp;
+          mainHandRuntime.pinchLatched = false;
+        }
+
+        if (
+          pinchActive &&
+          mainHandRuntime.pinchStartedAt &&
+          !mainHandRuntime.pinchLatched &&
+          timestamp - mainHandRuntime.pinchStartedAt >= DEMO_CONFIG.handGesture.pinchHoldMs
+        ) {
+          pinchConfirmed = true;
+          mainHandRuntime.pinchLatched = true;
+        }
+
+        if (!pinchActive) {
+          mainHandRuntime.pinchClosed = false;
+          mainHandRuntime.pinchStartedAt = 0;
+          mainHandRuntime.pinchLatched = false;
+        } else {
+          mainHandRuntime.pinchClosed = true;
+        }
+
+        mainHandRuntime.missingFrames = 0;
+        mainHandRuntime.lastCenterX = palmCenter.x;
+        mainHandRuntime.lastTimestamp = timestamp;
+        mainHandRuntime.present = true;
+
+        return {
+          supported: true,
+          present: true,
+          centerX: palmCenter.x,
+          velocityX,
+          swipeDirection,
+          pinchActive,
+          pinchConfirmed,
+        };
+      }
+
+      async function initMainHandLandmarker() {
+        if (state.mainHandLandmarker) {
+          state.handPipelineMode = "main";
+          state.handState.supported = true;
+          return;
+        }
+
+        const vision = await FilesetResolver.forVisionTasks(DEMO_CONFIG.mediaPipe.wasmUrl);
+        state.mainHandLandmarker = await HandLandmarker.createFromOptions(vision, {
+          baseOptions: {
+            modelAssetPath: DEMO_CONFIG.mediaPipe.handModelUrl,
+            delegate: "CPU",
+          },
+          runningMode: "VIDEO",
+          numHands: 1,
+          minHandDetectionConfidence: 0.3,
+          minHandPresenceConfidence: 0.3,
+          minTrackingConfidence: 0.3,
+        });
+        resetMainHandRuntime();
+        state.handPipelineMode = "main";
+        state.handState.supported = true;
+      }
+
+      function disposeMainHandLandmarker() {
+        if (state.mainHandLandmarker && typeof state.mainHandLandmarker.close === "function") {
+          try {
+            state.mainHandLandmarker.close();
+          } catch (_error) {
+          }
+        }
+        state.mainHandLandmarker = null;
+        state.mainHandBusy = false;
+        resetMainHandRuntime();
+        if (state.handPipelineMode === "main") {
+          state.handPipelineMode = "";
+        }
+      }
+
+      async function ensureHandGesturePipeline() {
+        if (RUNTIME_TUNING.coarsePointer) {
+          if (state.handPipelineMode === "main" && state.mainHandLandmarker) {
+            return true;
+          }
+
+          try {
+            await initMainHandLandmarker();
+            return true;
+          } catch (error) {
+            console.warn("Main-thread hand detection unavailable.", error);
+            state.handPipelineMode = "";
+            state.handState.supported = false;
+            return false;
+          }
+        }
+
+        if (state.handPipelineMode === "worker" && state.workerReady && state.handState.supported) {
+          return true;
+        }
+        if (state.handPipelineMode === "main" && state.mainHandLandmarker) {
+          return true;
+        }
+
+        try {
+          await initMainHandLandmarker();
+          return true;
+        } catch (error) {
+          console.warn("Main-thread hand detection unavailable.", error);
+          state.handPipelineMode = "";
+          state.handState.supported = false;
+          return false;
+        }
+      }
+
+      function getCoffeeByIndex(index) {
+        return DEMO_CONFIG.coffeeOptions[index] || DEMO_CONFIG.coffeeOptions[0];
+      }
+
+      function getCoffeeIndexById(coffeeId) {
+        return DEMO_CONFIG.coffeeOptions.findIndex((coffee) => coffee.id === coffeeId);
+      }
+
+      function getConfirmedCoffee() {
+        const confirmedIndex = getConfirmedCoffeeIndex();
+        return getCoffeeByIndex(confirmedIndex >= 0 ? confirmedIndex : state.selectedCoffeeIndex);
+      }
+
+      function getCoffeeVisualMarkup(coffeeId) {
+        const liquidColors = {
+          americano: "#3E2619",
+          latte: "#C7916B",
+          "flat-white": "#B68462",
+        };
+
+        const liquidColor = liquidColors[coffeeId] || liquidColors.americano;
+
+        return `
+          <span class="coffee-card-visual" aria-hidden="true">
+            <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <ellipse cx="80" cy="134" rx="28" ry="7" fill="#05070E" fill-opacity="0.28"/>
+              <path d="M57 33c-3 5-3 11 0 16" stroke="#98FFF3" stroke-width="4" stroke-linecap="round" stroke-opacity="0.72"/>
+              <path d="M74 28c-3 6-3 14 0 20" stroke="#D9FBF8" stroke-width="4" stroke-linecap="round" stroke-opacity="0.58"/>
+              <path d="M43 54h44c17 0 29 12 29 29v19c0 16-12 28-28 28H72c-16 0-28-12-28-28V61c0-4 3-7 7-7Z" fill="#EEF5FF" fill-opacity="0.96"/>
+              <path d="M48 64h44c11 0 20 9 20 20v16c0 14-10 24-24 24H72c-14 0-24-10-24-24V68c0-2 2-4 4-4Z" fill="${liquidColor}"/>
+              <path d="M116 68h8c11 0 20 9 20 20s-9 20-20 20h-8" stroke="#EEF5FF" stroke-width="7" stroke-linecap="round"/>
+              <path d="M56 70h37" stroke="#A8FFF7" stroke-width="3.5" stroke-linecap="round" stroke-opacity="0.46"/>
+            </svg>
+          </span>
+        `;
+      }
+
+      function resolveCoffeeIndexFromHandX(centerX) {
+        const normalizedX = clamp(Number.isFinite(centerX) ? centerX : 0.5, 0, 1);
+        if (normalizedX <= DEMO_CONFIG.handGesture.zoneLeftMax) {
+          return 0;
+        }
+        if (normalizedX >= DEMO_CONFIG.handGesture.zoneRightMin) {
+          return DEMO_CONFIG.coffeeOptions.length - 1;
+        }
+        return 1;
+      }
+
+      function getConfirmedCoffeeIndex() {
+        return DEMO_CONFIG.coffeeOptions.findIndex((coffee) => coffee.id === state.confirmedCoffeeId);
+      }
+
+      function buildCoffeeCards() {
+        if (ui.coffeeCards && ui.coffeeCards.length) {
+          return;
+        }
+
+        const fragment = document.createDocumentFragment();
+        DEMO_CONFIG.coffeeOptions.forEach((coffee, index) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "coffee-card";
+          button.dataset.coffeeId = coffee.id;
+          button.setAttribute("aria-label", coffee.label);
+          button.disabled = true;
+          button.tabIndex = -1;
+          button.innerHTML =
+            '<span class="coffee-card-index">' +
+            String(index + 1).padStart(2, "0") +
+            '</span><div class="coffee-card-head"><div class="coffee-card-copy"><span class="coffee-card-title">' +
+            coffee.label +
+            '</span><div class="coffee-card-meta"><span class="coffee-card-subtitle">' +
+            coffee.subtitle +
+            '</span><span class="coffee-card-price">' +
+            coffee.price +
+            "</span></div></div>" +
+            getCoffeeVisualMarkup(coffee.id) +
+            '</div><span class="coffee-card-note">' +
+            coffee.note +
+            "</span>";
+          fragment.appendChild(button);
+        });
+
+        ui.coffeeTray.innerHTML = "";
+        ui.coffeeTray.appendChild(fragment);
+        ui.coffeeCards = Array.from(ui.coffeeTray.querySelectorAll(".coffee-card"));
+      }
+
+      function getCoffeeCardLayout(index) {
+        const confirmedIndex = getConfirmedCoffeeIndex();
+        const pivotIndex = confirmedIndex >= 0 ? confirmedIndex : state.selectedCoffeeIndex;
+        const relativeIndex = index - pivotIndex;
+
+        if (state.conversationState === "confirmed" && confirmedIndex >= 0) {
+          if (index === confirmedIndex) {
+            return { x: 0, y: -16, scale: 1.22, opacity: 1, blur: 0, zIndex: 4 };
+          }
+          if (relativeIndex < 0) {
+            return { x: -392, y: 40, scale: 0.66, opacity: 0.16, blur: 3.8, zIndex: 1 };
+          }
+          return { x: 392, y: 40, scale: 0.66, opacity: 0.16, blur: 3.8, zIndex: 1 };
+        }
+
+        const layouts = {
+          "-2": { x: -548, y: 58, scale: 0.42, opacity: 0.06, blur: 6.4, zIndex: 1 },
+          "-1": { x: -362, y: 28, scale: 0.68, opacity: 0.42, blur: 2.8, zIndex: 2 },
+          "0": { x: 0, y: 0, scale: 1.18, opacity: 1, blur: 0, zIndex: 3 },
+          "1": { x: 362, y: 28, scale: 0.68, opacity: 0.42, blur: 2.8, zIndex: 2 },
+          "2": { x: 548, y: 58, scale: 0.42, opacity: 0.06, blur: 6.4, zIndex: 1 },
+        };
+
+        return (
+          layouts[String(relativeIndex)] ||
+          (relativeIndex < 0
+            ? { x: -610, y: 64, scale: 0.38, opacity: 0.04, blur: 6.8, zIndex: 1 }
+            : { x: 610, y: 64, scale: 0.38, opacity: 0.04, blur: 6.8, zIndex: 1 })
+        );
+      }
+
+      function renderCoffeeCards(immediate = false) {
+        if (!ui.coffeeCards || !ui.coffeeCards.length) {
+          return;
+        }
+
+        ui.coffeeCards.forEach((card, index) => {
+          const coffee = getCoffeeByIndex(index);
+          const layout = getCoffeeCardLayout(index);
+          const isConfirmed = state.confirmedCoffeeId === coffee.id;
+          const isSelected = state.selectedCoffeeIndex === index && !state.confirmedCoffeeId;
+          card.classList.toggle("is-selected", isSelected);
+          card.classList.toggle("is-confirmed", isConfirmed);
+          card.style.zIndex = String(layout.zIndex);
+          card.style.filter = "blur(" + layout.blur.toFixed(2) + "px)";
+          card.disabled = true;
+          card.setAttribute("aria-pressed", String(isSelected || isConfirmed));
+
+          const animation = {
+            x: layout.x,
+            y: layout.y,
+            scale: layout.scale,
+            opacity: layout.opacity,
+            duration:
+              state.reduceMotion || immediate
+                ? 0
+                : state.conversationState === "options" && !state.confirmedCoffeeId
+                  ? DEMO_CONFIG.conversation.autoCycleTransitionMs / 1000
+                  : 0.34,
+            ease: "power3.out",
+            overwrite: true,
+          };
+
+          if (state.reduceMotion || immediate) {
+            gsap.set(card, animation);
+          } else {
+            gsap.to(card, animation);
+          }
+        });
+      }
+
+      function pulseOrbRing() {
+        gsap.killTweensOf(ui.orbRing);
+        gsap.fromTo(
+          ui.orbRing,
+          { scale: 1, opacity: 0.78 },
+          {
+            scale: 1.06,
+            opacity: 1,
+            duration: state.reduceMotion ? 0.14 : 0.22,
+            ease: "power2.out",
+            yoyo: true,
+            repeat: 1,
+            clearProps: "scale,opacity",
+          }
+        );
+      }
+
+      function syncPaymentCopy(nextState, coffee = getConfirmedCoffee()) {
+        ui.paymentChipText.textContent = "Pura X Pay";
+        ui.paymentAmount.textContent = coffee.price || "";
+        ui.paymentSuccessTitle.textContent = "支付成功";
+        ui.paymentSuccessSubtitle.textContent = coffee.label + "已下单";
+
+        if (nextState === "waiting") {
+          ui.paymentStatus.textContent = "等待支付确认";
+          ui.paymentDetail.textContent = coffee.label + "订单已锁定，准备发起支付。";
+          return;
+        }
+
+        if (nextState === "auth") {
+          ui.paymentStatus.textContent = "人脸认证中";
+          ui.paymentDetail.textContent = "正在确认持有人脸 · " + coffee.label;
+          return;
+        }
+
+        if (nextState === "paying") {
+          ui.paymentStatus.textContent = "支付处理中";
+          ui.paymentDetail.textContent = coffee.label + " " + coffee.price + " · 正在完成支付";
+          return;
+        }
+
+        if (nextState === "success") {
+          ui.paymentStatus.textContent = "支付成功";
+          ui.paymentDetail.textContent = coffee.label + "已下单，正在为你准备。";
+          return;
+        }
+
+        ui.paymentStatus.textContent = "等待支付确认";
+        ui.paymentDetail.textContent = "";
+      }
+
+      function resetPaymentVisuals(immediate = false) {
+        state.paymentLocked = false;
+        setPaymentState("hidden");
+        syncPaymentCopy("hidden", getCoffeeByIndex(DEMO_CONFIG.conversation.defaultCoffeeIndex));
+
+        gsap.killTweensOf([
+          ui.paymentCard,
+          ui.paymentFill,
+          ui.paymentGlint,
+          ui.paymentSuccess,
+          ui.paymentStatus,
+          ui.paymentDetail,
+        ]);
+
+        const hiddenState = {
+          xPercent: -50,
+          yPercent: -50,
+          autoAlpha: 0,
+          y: 8,
+          scale: 0.97,
+          filter: "blur(18px)",
+        };
+
+        if (immediate || state.reduceMotion) {
+          gsap.set(ui.paymentCard, hiddenState);
+          gsap.set(ui.paymentSuccess, { autoAlpha: 0, y: 10 });
+          gsap.set(ui.paymentFill, { scaleX: 0, transformOrigin: "left center" });
+          gsap.set(ui.paymentGlint, { opacity: 0, xPercent: -140 });
+          return;
+        }
+
+        gsap.to(ui.paymentCard, {
+          xPercent: -50,
+          yPercent: -50,
+          autoAlpha: 0,
+          y: 8,
+          scale: 0.97,
+          filter: "blur(18px)",
+          duration: 0.2,
+          ease: "power2.out",
+          overwrite: true,
+        });
+        gsap.to(ui.paymentSuccess, {
+          autoAlpha: 0,
+          y: 10,
+          duration: 0.18,
+          ease: "power2.out",
+          overwrite: true,
+        });
+        gsap.set(ui.paymentFill, { scaleX: 0, transformOrigin: "left center" });
+        gsap.set(ui.paymentGlint, { opacity: 0, xPercent: -140 });
+      }
+
+      function startPaymentFlow() {
+        clearPaymentTimeline();
+
+        if (state.phase !== "agent" || !state.confirmedCoffeeId) {
+          return;
+        }
+
+        const coffee = getConfirmedCoffee();
+        resetPaymentVisuals(true);
+        state.paymentLocked = true;
+        setPaymentState("waiting");
+        syncPaymentCopy("waiting", coffee);
+
+        const waitDuration = state.reduceMotion ? 0.36 : DEMO_CONFIG.conversation.paymentWaitMs / 1000;
+        const authDuration = state.reduceMotion ? 0.28 : DEMO_CONFIG.conversation.paymentAuthMs / 1000;
+        const payingDuration = state.reduceMotion ? 0.38 : DEMO_CONFIG.conversation.paymentPayMs / 1000;
+        const revealDuration = state.reduceMotion ? 0.2 : DEMO_CONFIG.conversation.paymentRevealMs / 1000;
+
+        const timeline = gsap.timeline({
+          paused: true,
+          onComplete: () => {
+            state.paymentTimeline = null;
+          },
+        });
+
+        state.paymentTimeline = timeline;
+
+        timeline
+          .to({}, { duration: waitDuration })
+          .add(() => {
+            if (state.phase !== "agent" || !state.confirmedCoffeeId) {
+              return;
+            }
+            setPaymentState("auth");
+            syncPaymentCopy("auth", coffee);
+          })
+          .to(
+            ui.coffeeTray,
+            {
+              autoAlpha: 0.56,
+              y: 18,
+              scale: 0.92,
+              filter: "blur(6px)",
+              duration: state.reduceMotion ? 0.18 : 0.34,
+              ease: "power3.out",
+              overwrite: true,
+            },
+            "<"
+          )
+          .fromTo(
+            ui.paymentCard,
+            { xPercent: -50, yPercent: -50, autoAlpha: 0, y: 8, scale: 0.97, filter: "blur(18px)" },
+            {
+              xPercent: -50,
+              yPercent: -50,
+              autoAlpha: 1,
+              y: 0,
+              scale: 1,
+              filter: "blur(0px)",
+              duration: state.reduceMotion ? 0.22 : 0.42,
+              ease: "expo.out",
+              overwrite: true,
+            },
+            "<"
+          )
+          .to(
+            ui.paymentFill,
+            {
+              scaleX: 0.34,
+              duration: authDuration,
+              ease: "power2.out",
+              transformOrigin: "left center",
+            },
+            "<0.06"
+          )
+          .to(
+            ui.paymentGlint,
+            {
+              opacity: 0.82,
+              xPercent: 34,
+              duration: authDuration,
+              ease: "power2.out",
+            },
+            "<"
+          )
+          .add(() => {
+            setPaymentState("paying");
+            syncPaymentCopy("paying", coffee);
+          })
+          .to(ui.paymentFill, {
+            scaleX: 0.82,
+            duration: payingDuration,
+            ease: "expo.inOut",
+            transformOrigin: "left center",
+          })
+          .to(
+            ui.paymentGlint,
+            {
+              xPercent: 136,
+              duration: payingDuration,
+              ease: "power1.inOut",
+            },
+            "<"
+          )
+          .add(() => {
+            setPaymentState("success");
+            syncPaymentCopy("success", coffee);
+          })
+          .to(
+            ui.paymentFill,
+            {
+              scaleX: 1,
+              duration: revealDuration,
+              ease: "expo.out",
+              transformOrigin: "left center",
+            },
+            ">"
+          )
+          .to(
+            ui.paymentGlint,
+            {
+              opacity: 0.9,
+              xPercent: 190,
+              duration: revealDuration,
+              ease: "power2.out",
+            },
+            "<"
+          )
+          .fromTo(
+            ui.paymentSuccess,
+            { autoAlpha: 0, y: 10 },
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: state.reduceMotion ? 0.18 : 0.3,
+              ease: "power3.out",
+            },
+            "<0.05"
+          )
+          .to(ui.paymentGlint, {
+            opacity: 0,
+            duration: state.reduceMotion ? 0.12 : 0.24,
+            ease: "power1.out",
+          })
+          .add(() => {
+            state.paymentLocked = false;
+          });
+
+        timeline.play(0);
+      }
+
+      function dismissConversation(immediate = false) {
+        clearConversationTimers();
+        clearConversationTimeline();
+        clearPaymentTimeline();
+        setConversationState("hidden");
+        setPaymentState("hidden");
+        resetHandState(state.handState.supported);
+        state.paymentLocked = false;
+
+        gsap.killTweensOf([
+          ui.conversationBubble,
+          ui.coffeeTray,
+          ui.conversationText,
+          ui.paymentCard,
+          ui.paymentFill,
+          ui.paymentGlint,
+          ui.paymentSuccess,
+          motion,
+          ui.orbRing,
+        ]);
+        if (ui.coffeeCards && ui.coffeeCards.length) {
+          gsap.killTweensOf(ui.coffeeCards);
+        }
+
+        if (immediate || state.reduceMotion) {
+          state.selectedCoffeeIndex = DEMO_CONFIG.conversation.defaultCoffeeIndex;
+          state.confirmedCoffeeId = "";
+          renderCoffeeCards(true);
+          gsap.set(ui.conversationBubble, { autoAlpha: 0, y: 22, filter: "blur(18px)" });
+          gsap.set(ui.coffeeTray, { autoAlpha: 0, y: 28, scale: 1, filter: "blur(18px)" });
+          resetPaymentVisuals(true);
+          motion.orbLift = 0;
+          return;
+        }
+
+        gsap.to(ui.conversationBubble, {
+          autoAlpha: 0,
+          y: 22,
+          filter: "blur(18px)",
+          duration: 0.18,
+          ease: "power2.out",
+          overwrite: true,
+        });
+        gsap.to(ui.coffeeTray, {
+          autoAlpha: 0,
+          y: 28,
+          scale: 1,
+          filter: "blur(18px)",
+          duration: 0.18,
+          ease: "power2.out",
+          overwrite: true,
+        });
+        resetPaymentVisuals(false);
+        gsap.to(motion, {
+          orbLift: 0,
+          duration: 0.26,
+          ease: "power3.out",
+          overwrite: true,
+        });
+      }
+
+      function setAutoCoffeeSelection(index, immediate = false) {
+        const nextIndex = clamp(index, 0, DEMO_CONFIG.coffeeOptions.length - 1);
+        if (nextIndex === state.selectedCoffeeIndex && !immediate) {
+          return;
+        }
+
+        state.selectedCoffeeIndex = nextIndex;
+        renderCoffeeCards(immediate);
+      }
+
+      function startAutoCoffeeSequence() {
+        clearConversationTimeline();
+        if (state.phase !== "agent" || state.conversationState !== "options" || state.confirmedCoffeeId) {
+          return;
+        }
+
+        const sequence = DEMO_CONFIG.conversation.autoSequence
+          .map((coffeeId) => getCoffeeIndexById(coffeeId))
+          .filter((index) => index >= 0);
+        if (!sequence.length) {
+          return;
+        }
+
+        const cycleDelay = state.reduceMotion ? 0.52 : DEMO_CONFIG.conversation.autoCycleDelayMs / 1000;
+        const confirmDelay = state.reduceMotion ? 0.26 : DEMO_CONFIG.conversation.autoConfirmDelayMs / 1000;
+        const timeline = gsap.timeline({
+          paused: true,
+          onComplete: () => {
+            state.conversationTimeline = null;
+          },
+        });
+
+        state.conversationTimeline = timeline;
+
+        sequence.forEach((index, sequenceIndex) => {
+          timeline.to(
+            {},
+            {
+              duration: sequenceIndex === 0 ? cycleDelay * 0.5 : cycleDelay,
+              onComplete: () => {
+                if (state.phase !== "agent" || state.conversationState !== "options" || state.confirmedCoffeeId) {
+                  return;
+                }
+                setAutoCoffeeSelection(index, false);
+              },
+            }
+          );
+        });
+
+        const finalIndex = sequence[sequence.length - 1];
+        timeline.to(
+          {},
+          {
+            duration: confirmDelay,
+            onComplete: () => {
+              confirmSelectedCoffee(finalIndex);
+            },
+          }
+        );
+        timeline.play(0);
+      }
+
+      function showConversationPrompt() {
+        if (state.phase !== "agent") {
+          return;
+        }
+
+        setConversationText("需要帮你再点一杯咖啡吗？");
+        setConversationState("prompt");
+        gsap.killTweensOf([ui.conversationBubble, motion]);
+        if (state.reduceMotion) {
+          gsap.set(ui.conversationBubble, { autoAlpha: 1, y: 0, filter: "blur(0px)" });
+          motion.orbLift = -64;
+          return;
+        }
+
+        gsap.fromTo(
+          ui.conversationBubble,
+          { autoAlpha: 0, y: 22, filter: "blur(18px)" },
+          {
+            autoAlpha: 1,
+            y: 0,
+            filter: "blur(0px)",
+            duration: 0.4,
+            ease: "power3.out",
+            overwrite: true,
+          }
+        );
+        gsap.to(motion, {
+          orbLift: -64,
+          duration: 0.34,
+          ease: "power3.out",
+          overwrite: true,
+        });
+      }
+
+      function showCoffeeOptions() {
+        if (state.phase !== "agent") {
+          return;
+        }
+
+        state.selectedCoffeeIndex = DEMO_CONFIG.conversation.defaultCoffeeIndex;
+        state.confirmedCoffeeId = "";
+        state.handZoneIndex = -1;
+        state.handZoneSince = 0;
+        setConversationState("options");
+        renderCoffeeCards(true);
+        gsap.killTweensOf([ui.conversationBubble, ui.coffeeTray, motion]);
+        clearPaymentTimeline();
+        setPaymentState("hidden");
+        state.paymentLocked = false;
+        gsap.set(ui.paymentCard, { xPercent: -50, yPercent: -50, autoAlpha: 0, y: 8, scale: 0.97, filter: "blur(18px)" });
+        gsap.set(ui.paymentSuccess, { autoAlpha: 0, y: 10 });
+        gsap.set(ui.paymentFill, { scaleX: 0, transformOrigin: "left center" });
+        gsap.set(ui.paymentGlint, { opacity: 0, xPercent: -140 });
+
+        if (state.reduceMotion) {
+          gsap.set(ui.conversationBubble, { autoAlpha: 0, y: -10, filter: "blur(12px)" });
+          gsap.set(ui.coffeeTray, { autoAlpha: 1, y: 0, scale: 1, filter: "blur(0px)" });
+          motion.orbLift = -94;
+          startAutoCoffeeSequence();
+          return;
+        }
+
+        gsap.to(ui.conversationBubble, {
+          autoAlpha: 0,
+          y: -10,
+          filter: "blur(12px)",
+          duration: 0.24,
+          ease: "power2.out",
+          overwrite: true,
+        });
+
+        gsap.fromTo(
+          ui.coffeeTray,
+          { autoAlpha: 0, y: 28, scale: 1, filter: "blur(18px)" },
+          {
+            autoAlpha: 1,
+            y: 0,
+            scale: 1,
+            filter: "blur(0px)",
+            duration: 0.42,
+            ease: "power3.out",
+            overwrite: true,
+            onComplete: () => {
+              startAutoCoffeeSequence();
+            },
+          }
+        );
+        gsap.to(motion, {
+          orbLift: -94,
+          duration: 0.34,
+          ease: "power3.out",
+          overwrite: true,
+        });
+      }
+
+      function startConversationFlow() {
+        dismissConversation(true);
+        if (state.phase !== "agent") {
+          return;
+        }
+
+        state.promptTimer = window.setTimeout(() => {
+          showConversationPrompt();
+          state.cardsTimer = window.setTimeout(() => {
+            showCoffeeOptions();
+          }, DEMO_CONFIG.conversation.cardsDelayMs);
+        }, DEMO_CONFIG.conversation.promptDelayMs);
+      }
+
+      function shiftCoffeeSelection(direction) {
+        if (state.phase !== "agent" || state.conversationState !== "options" || state.confirmedCoffeeId) {
+          return;
+        }
+
+        const nextIndex = clamp(
+          state.selectedCoffeeIndex + direction,
+          0,
+          DEMO_CONFIG.coffeeOptions.length - 1
+        );
+        if (nextIndex === state.selectedCoffeeIndex) {
+          return;
+        }
+
+        state.selectedCoffeeIndex = nextIndex;
+        renderCoffeeCards(false);
+      }
+
+      function confirmSelectedCoffee(forcedIndex = state.selectedCoffeeIndex) {
+        if (state.phase !== "agent" || state.conversationState !== "options" || state.confirmedCoffeeId) {
+          return;
+        }
+
+        const confirmedIndex = clamp(forcedIndex, 0, DEMO_CONFIG.coffeeOptions.length - 1);
+        state.selectedCoffeeIndex = confirmedIndex;
+        const coffee = getCoffeeByIndex(confirmedIndex);
+        state.confirmedCoffeeId = coffee.id;
+        state.handZoneIndex = -1;
+        state.handZoneSince = 0;
+        setConversationState("confirmed");
+        resetHandState(state.handState.supported);
+        setConversationText("");
+        renderCoffeeCards(false);
+        pulseOrbRing();
+
+        gsap.killTweensOf([motion, ui.conversationBubble, ui.conversationText]);
+        if (state.reduceMotion) {
+          gsap.set(ui.conversationBubble, { autoAlpha: 0, y: -12, filter: "blur(14px)" });
+        }
+        if (!state.reduceMotion) {
+          gsap.to(motion, {
+            orbLift: -102,
+            duration: 0.28,
+            ease: "power3.out",
+            overwrite: true,
+          });
+          gsap.to(ui.conversationBubble, {
+            autoAlpha: 0,
+            y: -12,
+            filter: "blur(14px)",
+            duration: 0.18,
+            ease: "power2.out",
+            overwrite: true,
+          });
+        }
+
+        startPaymentFlow();
+      }
+
+      function handleCoffeeCardClick(index) {
+        if (state.phase !== "agent" || state.conversationState !== "options" || state.confirmedCoffeeId) {
+          return;
+        }
+
+        if (state.selectedCoffeeIndex === index) {
+          confirmSelectedCoffee();
+          return;
+        }
+
+        state.selectedCoffeeIndex = index;
+        renderCoffeeCards(false);
+      }
+
+      function processHandSample(handSample) {
+        const next = handSample || blankHandState(false);
+        if (next.present) {
+          state.handState.supported = Boolean(next.supported);
+          state.handState.present = true;
+          state.handState.centerX = lerp(state.handState.centerX, next.centerX || 0, 0.38);
+          state.handState.velocityX = lerp(state.handState.velocityX, next.velocityX || 0, 0.34);
+        } else {
+          resetHandState(next.supported);
+        }
+
+        state.handState.swipeDirection = next.swipeDirection || 0;
+        state.handState.pinchActive = Boolean(next.pinchActive);
+        state.handState.pinchConfirmed = Boolean(next.pinchConfirmed);
+
+        if (state.phase !== "agent" || state.conversationState !== "options" || state.confirmedCoffeeId) {
+          state.handZoneIndex = -1;
+          state.handZoneSince = 0;
+          return;
+        }
+
+        if (!next.present) {
+          state.handZoneIndex = -1;
+          state.handZoneSince = 0;
+          return;
+        }
+
+        const now = performance.now();
+        const nextZoneIndex = resolveCoffeeIndexFromHandX(state.handState.centerX);
+
+        if (nextZoneIndex !== state.selectedCoffeeIndex) {
+          state.selectedCoffeeIndex = nextZoneIndex;
+          renderCoffeeCards(false);
+        }
+
+        if (nextZoneIndex !== state.handZoneIndex) {
+          state.handZoneIndex = nextZoneIndex;
+          state.handZoneSince = now;
+          return;
+        }
+
+        const slowEnough =
+          Math.abs(state.handState.velocityX) <= DEMO_CONFIG.handGesture.hoverVelocityThreshold;
+        const holdLongEnough =
+          state.handZoneSince > 0 &&
+          now - state.handZoneSince >= DEMO_CONFIG.handGesture.hoverConfirmHoldMs;
+
+        if (slowEnough && holdLongEnough) {
+          state.handZoneSince = 0;
+          confirmSelectedCoffee();
+        }
+      }
+
+      function isHandOnlyInteractionMode() {
+        return false;
+      }
+
       function sampleClockPoints(text) {
         const cacheKey = text + "|" + RUNTIME_TUNING.particleCount;
         const cached = state.pointCache.get(cacheKey);
@@ -1234,7 +3217,7 @@ self.onmessage = async (event) => {
 
         const imageData = sampleContext.getImageData(0, 0, DEMO_CONFIG.stageSize, DEMO_CONFIG.stageSize).data;
         const candidates = [];
-        const step = 4;
+        const step = RUNTIME_TUNING.lowPower ? 6 : 4;
         for (let y = 0; y < DEMO_CONFIG.stageSize; y += step) {
           for (let x = 0; x < DEMO_CONFIG.stageSize; x += step) {
             const alpha = imageData[(y * DEMO_CONFIG.stageSize + x) * 4 + 3];
@@ -1276,7 +3259,7 @@ self.onmessage = async (event) => {
             midY: point.y + Math.sin(angle) * burstRadius + randomBetween(-18, 18),
             endX: centerX + randomBetween(-42, 42),
             endY: centerY + randomBetween(-42, 42),
-            size: randomBetween(1.2, 3.6),
+            size: RUNTIME_TUNING.lowPower ? randomBetween(1, 2.4) : randomBetween(1.2, 3.6),
             alpha: randomBetween(0.52, 0.96),
             tint: Math.random(),
             seed: Math.random() * Math.PI * 2,
@@ -1298,7 +3281,7 @@ self.onmessage = async (event) => {
             midY: centerY + Math.sin(angle) * outerRadius,
             endX: point.x,
             endY: point.y,
-            size: randomBetween(1.2, 3.4),
+            size: RUNTIME_TUNING.lowPower ? randomBetween(1, 2.2) : randomBetween(1.2, 3.4),
             alpha: randomBetween(0.56, 0.98),
             tint: Math.random(),
             seed: Math.random() * Math.PI * 2,
@@ -1324,10 +3307,12 @@ self.onmessage = async (event) => {
       function completeWakeTransition() {
         state.particleTransition = null;
         setPhase("agent");
+        startConversationFlow();
       }
 
       function completeSleepTransition() {
         state.particleTransition = null;
+        dismissConversation(true);
         setPhase("aod");
       }
 
@@ -1374,6 +3359,7 @@ self.onmessage = async (event) => {
         }
 
         clearTransitionTimer();
+        dismissConversation(false);
         setPhase("sleeping");
         state.wakeCandidateSince = 0;
         state.sleepCandidateSince = 0;
@@ -1386,6 +3372,7 @@ self.onmessage = async (event) => {
           orbAura: 0.18,
           ringAlpha: 0.08,
           waveAlpha: 0,
+          orbLift: 0,
           duration: state.reduceMotion ? 0.18 : 0.34,
           ease: "power2.inOut",
         });
@@ -1410,6 +3397,18 @@ self.onmessage = async (event) => {
         const pose = state.smoothedPose;
 
         if (state.phase === "waking" || state.phase === "sleeping") {
+          return;
+        }
+
+        if (state.paymentLocked) {
+          state.sleepCandidateSince = 0;
+          state.wakeCandidateSince = 0;
+          return;
+        }
+
+        if (isHandOnlyInteractionMode()) {
+          state.sleepCandidateSince = 0;
+          state.wakeCandidateSince = 0;
           return;
         }
 
@@ -1478,111 +3477,120 @@ self.onmessage = async (event) => {
 
       function processPoseSample(sample) {
         const timestamp = sample.timestamp || performance.now();
-        state.pose = {
-          facePresent: Boolean(sample.facePresent),
-          yaw: sample.yaw || 0,
-          pitch: sample.pitch || 0,
-          headCentered: sample.headCentered || 0,
-          gazeYaw: sample.gazeYaw || 0,
-          gazePitch: sample.gazePitch || 0,
-          gazeCentered: sample.gazeCentered || 0,
-          gazeOpenness: sample.gazeOpenness || 0,
-          gazeValid: Boolean(sample.gazeValid),
-          combinedYaw: sample.combinedYaw || 0,
-          combinedPitch: sample.combinedPitch || 0,
-          attentiveness: sample.attentiveness || 0,
-          confidence: sample.confidence || 0,
-          timestamp,
-        };
+        const hand =
+          state.handPipelineMode === "main"
+            ? null
+            : sample.hand || blankHandState(Boolean(sample.handAvailable));
+        if (!isHandOnlyInteractionMode()) {
+          state.pose = {
+            facePresent: Boolean(sample.facePresent),
+            yaw: sample.yaw || 0,
+            pitch: sample.pitch || 0,
+            headCentered: sample.headCentered || 0,
+            gazeYaw: sample.gazeYaw || 0,
+            gazePitch: sample.gazePitch || 0,
+            gazeCentered: sample.gazeCentered || 0,
+            gazeOpenness: sample.gazeOpenness || 0,
+            gazeValid: Boolean(sample.gazeValid),
+            combinedYaw: sample.combinedYaw || 0,
+            combinedPitch: sample.combinedPitch || 0,
+            attentiveness: sample.attentiveness || 0,
+            confidence: sample.confidence || 0,
+            timestamp,
+          };
 
-        if (state.pose.facePresent) {
-          if (!state.smoothedPose.facePresent) {
-            state.smoothedPose.facePresent = true;
-            state.smoothedPose.yaw = state.pose.yaw;
-            state.smoothedPose.pitch = state.pose.pitch;
-            state.smoothedPose.headCentered = state.pose.headCentered;
-            state.smoothedPose.gazeYaw = state.pose.gazeYaw;
-            state.smoothedPose.gazePitch = state.pose.gazePitch;
-            state.smoothedPose.gazeCentered = state.pose.gazeCentered;
-            state.smoothedPose.gazeOpenness = state.pose.gazeOpenness;
-            state.smoothedPose.gazeValid = state.pose.gazeValid;
-            state.smoothedPose.combinedYaw = state.pose.combinedYaw;
-            state.smoothedPose.combinedPitch = state.pose.combinedPitch;
-            state.smoothedPose.attentiveness = state.pose.attentiveness;
-            state.smoothedPose.confidence = state.pose.confidence;
+          if (state.pose.facePresent) {
+            if (!state.smoothedPose.facePresent) {
+              state.smoothedPose.facePresent = true;
+              state.smoothedPose.yaw = state.pose.yaw;
+              state.smoothedPose.pitch = state.pose.pitch;
+              state.smoothedPose.headCentered = state.pose.headCentered;
+              state.smoothedPose.gazeYaw = state.pose.gazeYaw;
+              state.smoothedPose.gazePitch = state.pose.gazePitch;
+              state.smoothedPose.gazeCentered = state.pose.gazeCentered;
+              state.smoothedPose.gazeOpenness = state.pose.gazeOpenness;
+              state.smoothedPose.gazeValid = state.pose.gazeValid;
+              state.smoothedPose.combinedYaw = state.pose.combinedYaw;
+              state.smoothedPose.combinedPitch = state.pose.combinedPitch;
+              state.smoothedPose.attentiveness = state.pose.attentiveness;
+              state.smoothedPose.confidence = state.pose.confidence;
+            } else {
+              state.smoothedPose.yaw = lerp(
+                state.smoothedPose.yaw,
+                state.pose.yaw,
+                DEMO_CONFIG.smoothing.poseAlpha
+              );
+              state.smoothedPose.pitch = lerp(
+                state.smoothedPose.pitch,
+                state.pose.pitch,
+                DEMO_CONFIG.smoothing.poseAlpha
+              );
+              state.smoothedPose.headCentered = lerp(
+                state.smoothedPose.headCentered,
+                state.pose.headCentered,
+                DEMO_CONFIG.smoothing.poseAlpha
+              );
+              state.smoothedPose.gazeYaw = lerp(
+                state.smoothedPose.gazeYaw,
+                state.pose.gazeYaw,
+                DEMO_CONFIG.smoothing.poseAlpha
+              );
+              state.smoothedPose.gazePitch = lerp(
+                state.smoothedPose.gazePitch,
+                state.pose.gazePitch,
+                DEMO_CONFIG.smoothing.poseAlpha
+              );
+              state.smoothedPose.gazeCentered = lerp(
+                state.smoothedPose.gazeCentered,
+                state.pose.gazeCentered,
+                DEMO_CONFIG.smoothing.poseAlpha
+              );
+              state.smoothedPose.gazeOpenness = lerp(
+                state.smoothedPose.gazeOpenness,
+                state.pose.gazeOpenness,
+                DEMO_CONFIG.smoothing.poseAlpha
+              );
+              state.smoothedPose.gazeValid = state.pose.gazeValid;
+              state.smoothedPose.combinedYaw = lerp(
+                state.smoothedPose.combinedYaw,
+                state.pose.combinedYaw,
+                DEMO_CONFIG.smoothing.poseAlpha
+              );
+              state.smoothedPose.combinedPitch = lerp(
+                state.smoothedPose.combinedPitch,
+                state.pose.combinedPitch,
+                DEMO_CONFIG.smoothing.poseAlpha
+              );
+              state.smoothedPose.attentiveness = lerp(
+                state.smoothedPose.attentiveness,
+                state.pose.attentiveness,
+                DEMO_CONFIG.smoothing.poseAlpha
+              );
+              state.smoothedPose.confidence = lerp(
+                state.smoothedPose.confidence,
+                state.pose.confidence,
+                DEMO_CONFIG.smoothing.poseAlpha
+              );
+            }
           } else {
-            state.smoothedPose.yaw = lerp(
-              state.smoothedPose.yaw,
-              state.pose.yaw,
-              DEMO_CONFIG.smoothing.poseAlpha
-            );
-            state.smoothedPose.pitch = lerp(
-              state.smoothedPose.pitch,
-              state.pose.pitch,
-              DEMO_CONFIG.smoothing.poseAlpha
-            );
-            state.smoothedPose.headCentered = lerp(
-              state.smoothedPose.headCentered,
-              state.pose.headCentered,
-              DEMO_CONFIG.smoothing.poseAlpha
-            );
-            state.smoothedPose.gazeYaw = lerp(
-              state.smoothedPose.gazeYaw,
-              state.pose.gazeYaw,
-              DEMO_CONFIG.smoothing.poseAlpha
-            );
-            state.smoothedPose.gazePitch = lerp(
-              state.smoothedPose.gazePitch,
-              state.pose.gazePitch,
-              DEMO_CONFIG.smoothing.poseAlpha
-            );
-            state.smoothedPose.gazeCentered = lerp(
-              state.smoothedPose.gazeCentered,
-              state.pose.gazeCentered,
-              DEMO_CONFIG.smoothing.poseAlpha
-            );
-            state.smoothedPose.gazeOpenness = lerp(
-              state.smoothedPose.gazeOpenness,
-              state.pose.gazeOpenness,
-              DEMO_CONFIG.smoothing.poseAlpha
-            );
-            state.smoothedPose.gazeValid = state.pose.gazeValid;
-            state.smoothedPose.combinedYaw = lerp(
-              state.smoothedPose.combinedYaw,
-              state.pose.combinedYaw,
-              DEMO_CONFIG.smoothing.poseAlpha
-            );
-            state.smoothedPose.combinedPitch = lerp(
-              state.smoothedPose.combinedPitch,
-              state.pose.combinedPitch,
-              DEMO_CONFIG.smoothing.poseAlpha
-            );
-            state.smoothedPose.attentiveness = lerp(
-              state.smoothedPose.attentiveness,
-              state.pose.attentiveness,
-              DEMO_CONFIG.smoothing.poseAlpha
-            );
-            state.smoothedPose.confidence = lerp(
-              state.smoothedPose.confidence,
-              state.pose.confidence,
-              DEMO_CONFIG.smoothing.poseAlpha
-            );
+            state.smoothedPose.facePresent = false;
+            state.smoothedPose.headCentered = 0;
+            state.smoothedPose.gazeValid = false;
+            state.smoothedPose.gazeYaw = 0;
+            state.smoothedPose.gazePitch = 0;
+            state.smoothedPose.gazeCentered = 0;
+            state.smoothedPose.gazeOpenness = 0;
+            state.smoothedPose.combinedYaw = 0;
+            state.smoothedPose.combinedPitch = 0;
+            state.smoothedPose.attentiveness = 0;
+            state.smoothedPose.confidence = 0;
           }
-        } else {
-          state.smoothedPose.facePresent = false;
-          state.smoothedPose.headCentered = 0;
-          state.smoothedPose.gazeValid = false;
-          state.smoothedPose.gazeYaw = 0;
-          state.smoothedPose.gazePitch = 0;
-          state.smoothedPose.gazeCentered = 0;
-          state.smoothedPose.gazeOpenness = 0;
-          state.smoothedPose.combinedYaw = 0;
-          state.smoothedPose.combinedPitch = 0;
-          state.smoothedPose.attentiveness = 0;
-          state.smoothedPose.confidence = 0;
-        }
 
-        state.smoothedPose.timestamp = timestamp;
+          state.smoothedPose.timestamp = timestamp;
+        }
+        if (hand) {
+          processHandSample(hand);
+        }
         updateStateMachine(performance.now());
       }
 
@@ -1655,6 +3663,7 @@ self.onmessage = async (event) => {
 
         const transition = state.particleTransition;
         const progress = clamp((now - transition.startAt) / transition.duration, 0, 1);
+        const useRects = RUNTIME_TUNING.lowPower;
 
         fxContext.save();
         fxContext.globalCompositeOperation = "screen";
@@ -1688,16 +3697,21 @@ self.onmessage = async (event) => {
             alpha *= lerp(1, 0.8, progress);
           }
 
-          const flicker = 0.84 + Math.sin(now * 0.01 + particle.seed) * 0.16;
+          const flicker = useRects ? 0.92 : 0.84 + Math.sin(now * 0.01 + particle.seed) * 0.16;
           const color =
             particle.tint < 0.55
               ? rgba(DEMO_CONFIG.colors.cyan, clamp(alpha * flicker, 0, 1))
               : rgba(DEMO_CONFIG.colors.purple, clamp(alpha * flicker, 0, 1));
 
           fxContext.fillStyle = color;
-          fxContext.beginPath();
-          fxContext.arc(x, y, particle.size, 0, Math.PI * 2);
-          fxContext.fill();
+          if (useRects) {
+            const size = particle.size * 1.2;
+            fxContext.fillRect(x - size * 0.5, y - size * 0.5, size, size);
+          } else {
+            fxContext.beginPath();
+            fxContext.arc(x, y, particle.size, 0, Math.PI * 2);
+            fxContext.fill();
+          }
         });
 
         fxContext.restore();
@@ -1752,6 +3766,7 @@ self.onmessage = async (event) => {
           "--orb-scale",
           (motion.orbScale + breathe * (state.reduceMotion ? 0.012 : 0.05)).toFixed(3)
         );
+        document.documentElement.style.setProperty("--orb-lift", motion.orbLift.toFixed(2) + "px");
         document.documentElement.style.setProperty(
           "--orb-tilt-x",
           (tiltX + Math.sin(now * 0.0015) * motion.orbAlpha * 1.4).toFixed(2) + "deg"
@@ -1817,10 +3832,27 @@ self.onmessage = async (event) => {
       }
 
       function render(now) {
-        fxContext.clearRect(0, 0, DEMO_CONFIG.stageSize, DEMO_CONFIG.stageSize);
         applyPresentation(now);
-        drawWaves(now);
-        drawParticles(now);
+
+        const needsFx = motion.waveAlpha > 0.01 || Boolean(state.particleTransition);
+        if (!needsFx) {
+          if (state.fxActive) {
+            fxContext.clearRect(0, 0, DEMO_CONFIG.stageSize, DEMO_CONFIG.stageSize);
+            state.fxActive = false;
+          }
+          state.renderRaf = window.requestAnimationFrame(render);
+          return;
+        }
+
+        const effectInterval = 1000 / RUNTIME_TUNING.effectFps;
+        if (now - state.lastFxFrameAt >= effectInterval) {
+          fxContext.clearRect(0, 0, DEMO_CONFIG.stageSize, DEMO_CONFIG.stageSize);
+          drawWaves(now);
+          drawParticles(now);
+          state.lastFxFrameAt = now;
+          state.fxActive = true;
+        }
+
         state.renderRaf = window.requestAnimationFrame(render);
       }
 
@@ -1837,7 +3869,11 @@ self.onmessage = async (event) => {
         }
         window.cancelAnimationFrame(state.renderRaf);
         state.renderRaf = 0;
-        fxContext.clearRect(0, 0, DEMO_CONFIG.stageSize, DEMO_CONFIG.stageSize);
+        state.lastFxFrameAt = 0;
+        if (state.fxActive) {
+          fxContext.clearRect(0, 0, DEMO_CONFIG.stageSize, DEMO_CONFIG.stageSize);
+          state.fxActive = false;
+        }
       }
 
       function resetToAodVisualState() {
@@ -1848,6 +3884,7 @@ self.onmessage = async (event) => {
         motion.clockBlur = 0;
         motion.haloStrength = state.reduceMotion ? 0.16 : 0.26;
         motion.haloScale = 1;
+        motion.orbLift = 0;
         motion.orbAlpha = 0;
         motion.orbScale = 0.8;
         motion.orbAura = 0.14;
@@ -1927,9 +3964,12 @@ self.onmessage = async (event) => {
       function destroyPosePipeline() {
         disposeWorker();
         disposeFallbackLandmarker();
+        disposeMainHandLandmarker();
         state.pipelineMode = "";
+        state.handPipelineMode = "";
         state.capturePending = false;
         state.fallbackBusy = false;
+        state.mainHandBusy = false;
       }
 
       async function initFallbackLandmarker() {
@@ -2036,6 +4076,8 @@ self.onmessage = async (event) => {
             const message = event.data || {};
             if (message.type === "pose") {
               if (message.ready && !state.workerReady) {
+                state.handState.supported = Boolean(message.handAvailable);
+                state.handPipelineMode = message.handAvailable ? "worker" : "";
                 finalizeResolve();
                 return;
               }
@@ -2072,6 +4114,9 @@ self.onmessage = async (event) => {
             config: {
               wasmUrl: DEMO_CONFIG.mediaPipe.wasmUrl,
               modelUrl: DEMO_CONFIG.mediaPipe.modelUrl,
+              handModelUrl: DEMO_CONFIG.mediaPipe.handModelUrl,
+              lowPower: RUNTIME_TUNING.lowPower,
+              handGesture: DEMO_CONFIG.handGesture,
             },
           });
         });
@@ -2096,6 +4141,7 @@ self.onmessage = async (event) => {
       async function switchToFallback(reason) {
         console.warn("Switching pose detection to main thread.", reason);
         disposeWorker();
+        state.handPipelineMode = "";
         await initFallbackLandmarker();
       }
 
@@ -2110,10 +4156,13 @@ self.onmessage = async (event) => {
         state.capturePending = true;
         try {
           const frame = await createImageBitmap(ui.cameraFeed);
+          const handOnlyMode = isHandOnlyInteractionMode();
           state.worker.postMessage(
             {
               type: "frame",
               imageBitmap: frame,
+              gestureEnabled: handOnlyMode && state.handPipelineMode === "worker",
+              faceEnabled: !handOnlyMode,
               timestamp: performance.now(),
             },
             [frame]
@@ -2151,10 +4200,38 @@ self.onmessage = async (event) => {
             combinedPitch: sample.combinedPitch,
             attentiveness: sample.attentiveness,
             confidence: sample.confidence,
+            hand: blankHandState(false),
+            handAvailable: false,
             timestamp: performance.now(),
           });
         } finally {
           state.fallbackBusy = false;
+        }
+      }
+
+      async function captureMainHandGesture() {
+        if (!state.mainHandLandmarker || state.mainHandBusy) {
+          return;
+        }
+        if (state.phase !== "agent" || state.conversationState !== "options" || state.confirmedCoffeeId) {
+          return;
+        }
+        if (ui.cameraFeed.readyState < 2) {
+          return;
+        }
+
+        state.mainHandBusy = true;
+        try {
+          const timestamp = performance.now();
+          const result = state.mainHandLandmarker.detectForVideo(ui.cameraFeed, timestamp);
+          processHandSample(extractMainHandGesture(result?.landmarks?.[0], timestamp));
+        } catch (error) {
+          console.warn("Main-thread hand detection failed.", error);
+          disposeMainHandLandmarker();
+          state.handState.supported = false;
+          resetHandState(false);
+        } finally {
+          state.mainHandBusy = false;
         }
       }
 
@@ -2168,12 +4245,24 @@ self.onmessage = async (event) => {
           if (!state.stream) {
             return;
           }
+          const handOnlyMode = isHandOnlyInteractionMode();
           if (state.pipelineMode === "worker") {
-            void captureWorkerFrame();
-            return;
-          }
-          if (state.pipelineMode === "main") {
+            if (!(handOnlyMode && state.handPipelineMode === "main")) {
+              void captureWorkerFrame();
+            }
+          } else if (state.pipelineMode === "main" && !handOnlyMode) {
             void captureFallbackPose();
+          }
+
+          if (
+            handOnlyMode &&
+            state.handPipelineMode !== "worker"
+          ) {
+            if (state.mainHandLandmarker) {
+              void captureMainHandGesture();
+            } else {
+              void ensureHandGesturePipeline();
+            }
           }
         }, interval);
       }
@@ -2199,6 +4288,7 @@ self.onmessage = async (event) => {
           await ensurePosePipeline();
           startDetectionLoop();
           hideOverlay();
+          dismissConversation(true);
           resetToAodVisualState();
           state.resumeHint = false;
           setPhase("aod");
@@ -2228,6 +4318,7 @@ self.onmessage = async (event) => {
         state.pose.facePresent = false;
         state.smoothedPose.facePresent = false;
         state.particleTransition = null;
+        dismissConversation(true);
         resetToAodVisualState();
         setPhase("aod");
         if (detail) {
@@ -2279,9 +4370,12 @@ self.onmessage = async (event) => {
           return;
         }
 
+        buildCoffeeCards();
         applyRuntimeProfile();
+        configureFxCanvas();
         syncViewportMetrics();
         updateClock(true);
+        dismissConversation(true);
         resetToAodVisualState();
         initialiseMotion();
         startRenderLoop();
@@ -2308,6 +4402,8 @@ self.onmessage = async (event) => {
         const handleMotionPreferenceChange = (event) => {
           state.reduceMotion = event.matches;
           applyRuntimeProfile();
+          configureFxCanvas();
+          renderCoffeeCards(true);
           resetToAodVisualState();
         };
 
