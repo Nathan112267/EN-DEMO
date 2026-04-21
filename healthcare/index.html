@@ -33,31 +33,32 @@
               <div class="podcast-tray" id="podcastTray" aria-hidden="true">
                 <article class="podcast-card" id="podcastCard">
                   <div class="podcast-card-head">
-                    <div class="podcast-card-copy">
-                      <p class="podcast-card-index">Continue Listening</p>
-                      <p class="podcast-card-title">声动早咖啡</p>
-                      <div class="podcast-card-meta">
+                    <div class="podcast-card-copy" id="podcastCardCopy">
+                      <p class="podcast-card-index" id="podcastCardIndex">Continue Listening</p>
+                      <p class="podcast-card-title" id="podcastCardTitle">声动早咖啡</p>
+                      <div class="podcast-card-meta" id="podcastCardMeta">
                         <p class="podcast-card-subtitle">Podcast / Morning Brief</p>
                         <span class="podcast-card-badge">继续播放</span>
                       </div>
                     </div>
 
-                    <div class="podcast-art" aria-hidden="true">
+                    <div class="podcast-art" id="podcastArt" aria-hidden="true">
                       <span class="podcast-art-core"></span>
+                      <span class="podcast-art-label">声动早咖啡</span>
                       <span class="podcast-art-wave podcast-art-wave-a"></span>
                       <span class="podcast-art-wave podcast-art-wave-b"></span>
                       <span class="podcast-play-icon"></span>
                     </div>
                   </div>
 
-                  <p class="podcast-card-note">继续从上次暂停的位置，接着播放今天的早间内容。</p>
+                  <p class="podcast-card-note" id="podcastCardNote">继续从上次暂停的位置，接着播放今天的早间内容。</p>
 
-                  <div class="podcast-progress" aria-hidden="true">
+                  <div class="podcast-progress" id="podcastProgress" aria-hidden="true">
                     <span class="podcast-progress-fill" id="podcastProgressFill"></span>
                     <span class="podcast-progress-glint" id="podcastProgressGlint"></span>
                   </div>
 
-                  <div class="podcast-card-footer">
+                  <div class="podcast-card-footer" id="podcastCardFooter">
                     <div class="podcast-card-action">
                       <span class="podcast-card-action-dot"></span>
                       <span class="podcast-card-action-text">Resume Playback</span>
@@ -66,6 +67,88 @@
                   </div>
                 </article>
               </div>
+            </div>
+          </section>
+
+          <section class="detail-layer" id="detailLayer" aria-hidden="true">
+            <div class="detail-scroll" id="detailScroll">
+              <div class="detail-topbar" id="detailTopbar" data-detail-reveal="hero">
+                <div class="detail-cover" id="detailCover" aria-hidden="true">
+                  <div class="detail-cover-art">
+                    <span class="detail-cover-label">声动早咖啡</span>
+                  </div>
+                </div>
+
+                <button class="detail-pause" id="detailPause" type="button" aria-label="暂停播放">
+                  <span class="detail-pause-orbit"></span>
+                  <span class="detail-pause-bars"></span>
+                </button>
+              </div>
+
+              <div class="detail-header-copy" id="detailHeaderCopy" data-detail-reveal="hero">
+                <h1 class="detail-title">
+                  瑞幸瓶装咖啡将在月底上线，<br />
+                  人形机器人半马跑赢人类
+                </h1>
+                <p class="detail-source">
+                  声动早咖啡
+                  <span class="detail-source-arrow">›</span>
+                </p>
+              </div>
+
+              <div class="detail-meta-row" id="detailMetaRow" data-detail-reveal="meta">
+                <div class="detail-runtime">
+                  <span class="detail-runtime-dot">≡</span>
+                  <span>剩余5分钟</span>
+                  <span class="detail-runtime-separator">·</span>
+                  <span>15小时前</span>
+                </div>
+
+                <div class="detail-actions" aria-hidden="true">
+                  <span class="detail-action">清单</span>
+                  <span class="detail-action">评论 82</span>
+                  <span class="detail-action">收藏</span>
+                </div>
+              </div>
+
+              <div class="detail-divider" data-detail-reveal="meta">
+                <span class="detail-divider-pill">总结单集</span>
+              </div>
+
+              <section class="detail-body" id="detailBody">
+                <p class="detail-intro" data-detail-reveal="body">
+                  本期早咖啡为你带来与日常生活息息相关的商业科技动态，你将会听到：
+                </p>
+
+                <ul class="detail-points" data-detail-reveal="body">
+                  <li>中国手机市场一季度出货量下滑</li>
+                  <li>迪士尼推出影院认证品牌</li>
+                  <li>永辉超市一季度扭亏为盈</li>
+                  <li>12306 升级风控打击抢票软件</li>
+                </ul>
+
+                <p class="detail-paragraph" data-detail-reveal="body">
+                  本期还有关于人形机器人半马、Meta、奈飞、海航和 12306 的新动态，欢迎收听！
+                </p>
+              </section>
+
+              <section class="detail-section" data-detail-reveal="body">
+                <h2>主播</h2>
+                <div class="detail-host-card">
+                  <div class="detail-host-avatar">M</div>
+                  <div class="detail-host-copy">
+                    <p class="detail-host-name">Megan</p>
+                    <p class="detail-host-role">声动早咖啡 · Morning Brief Host</p>
+                  </div>
+                </div>
+              </section>
+
+              <section class="detail-section detail-section-foot" data-detail-reveal="body">
+                <h2>节目说明</h2>
+                <p>
+                  这是面向 Pura X 主屏的播客详情演示页，重点展示从外屏小卡片平滑过渡到内屏内容页的连续体验。
+                </p>
+              </section>
             </div>
           </section>
         </main>

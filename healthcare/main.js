@@ -16,28 +16,67 @@ const ui = {
   conversationText: document.querySelector("#conversationText"),
   podcastTray: document.querySelector("#podcastTray"),
   podcastCard: document.querySelector("#podcastCard"),
+  podcastCardIndex: document.querySelector("#podcastCardIndex"),
+  podcastCardTitle: document.querySelector("#podcastCardTitle"),
+  podcastCardMeta: document.querySelector("#podcastCardMeta"),
+  podcastCardNote: document.querySelector("#podcastCardNote"),
+  podcastCardFooter: document.querySelector("#podcastCardFooter"),
+  podcastProgress: document.querySelector("#podcastProgress"),
   podcastProgressFill: document.querySelector("#podcastProgressFill"),
   podcastProgressGlint: document.querySelector("#podcastProgressGlint"),
+  podcastArt: document.querySelector("#podcastArt"),
   podcastArtCore: document.querySelector(".podcast-art-core"),
   podcastArtWaves: document.querySelectorAll(".podcast-art-wave"),
+  detailLayer: document.querySelector("#detailLayer"),
+  detailScroll: document.querySelector("#detailScroll"),
+  detailTopbar: document.querySelector("#detailTopbar"),
+  detailHeaderCopy: document.querySelector("#detailHeaderCopy"),
+  detailMetaRow: document.querySelector("#detailMetaRow"),
+  detailPause: document.querySelector("#detailPause"),
+  detailBodyNodes: document.querySelectorAll('[data-detail-reveal="body"]'),
+  detailMetaNodes: document.querySelectorAll('[data-detail-reveal="meta"]'),
+  detailHeroNodes: document.querySelectorAll('[data-detail-reveal="hero"]'),
 };
 
 const root = document.documentElement;
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const DEMO_CONFIG = {
-  stageSize: 980,
+  stages: {
+    outer: {
+      width: 980,
+      height: 980,
+      borderRadius: 58,
+    },
+    inner: {
+      width: 1320,
+      height: 2120,
+      borderRadius: 76,
+    },
+  },
   timings: {
     initialDelayMs: 3000,
     promptDelayMs: 440,
-    cardDelayMs: 2000,
+    detailHoldAfterCardMs: 3000,
+    expandDurationMs: 1180,
   },
+};
+
+const stageState = {
+  width: DEMO_CONFIG.stages.outer.width,
+  height: DEMO_CONFIG.stages.outer.height,
+};
+
+const state = {
+  detailExpanded: false,
 };
 
 let openingTimeline = null;
 let ambientTimeline = null;
 let podcastTimeline = null;
+let detailTimeline = null;
 let openingTimeoutId = 0;
+let detailExpandTimeoutId = 0;
 
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
@@ -65,16 +104,47 @@ function syncViewportMetrics() {
   const offsetTop = visualViewport ? visualViewport.offsetTop : 0;
   const shortestSide = Math.max(1, Math.min(width, height));
   const framePadding = shortestSide < 420 ? 14 : 22;
-  const available = Math.max(1, shortestSide - framePadding * 2);
-  const scale = clamp(available / DEMO_CONFIG.stageSize, 0.22, 1);
-  const frameSize = DEMO_CONFIG.stageSize * scale;
+  const availableWidth = Math.max(1, width - framePadding * 2);
+  const availableHeight = Math.max(1, height - framePadding * 2);
+  const scale = clamp(
+    Math.min(availableWidth / stageState.width, availableHeight / stageState.height),
+    0.16,
+    1
+  );
 
   root.style.setProperty("--viewport-width", `${width.toFixed(2)}px`);
   root.style.setProperty("--viewport-height", `${height.toFixed(2)}px`);
   root.style.setProperty("--viewport-offset-x", `${offsetLeft.toFixed(2)}px`);
   root.style.setProperty("--viewport-offset-y", `${offsetTop.toFixed(2)}px`);
+  root.style.setProperty("--stage-width", `${stageState.width.toFixed(2)}px`);
+  root.style.setProperty("--stage-height", `${stageState.height.toFixed(2)}px`);
   root.style.setProperty("--stage-scale", scale.toFixed(4));
-  root.style.setProperty("--stage-frame-size", `${frameSize.toFixed(2)}px`);
+  root.style.setProperty("--stage-frame-width", `${(stageState.width * scale).toFixed(2)}px`);
+  root.style.setProperty("--stage-frame-height", `${(stageState.height * scale).toFixed(2)}px`);
+}
+
+function clearTimers() {
+  if (openingTimeoutId) {
+    window.clearTimeout(openingTimeoutId);
+    openingTimeoutId = 0;
+  }
+  if (detailExpandTimeoutId) {
+    window.clearTimeout(detailExpandTimeoutId);
+    detailExpandTimeoutId = 0;
+  }
+}
+
+function killTimelines() {
+  [openingTimeline, ambientTimeline, podcastTimeline, detailTimeline].forEach((timeline) => {
+    if (timeline) {
+      timeline.kill();
+    }
+  });
+
+  openingTimeline = null;
+  ambientTimeline = null;
+  podcastTimeline = null;
+  detailTimeline = null;
 }
 
 function setConversationState(nextState) {
@@ -86,20 +156,47 @@ function setConversationText(text) {
   ui.conversationText.textContent = text;
 }
 
+function setDetailInteractive(active) {
+  ui.detailLayer.setAttribute("aria-hidden", active ? "false" : "true");
+  ui.detailLayer.style.pointerEvents = active ? "auto" : "none";
+}
+
+function resetDetailRevealState() {
+  gsap.set(ui.detailLayer, {
+    autoAlpha: 0,
+  });
+
+  gsap.set([...ui.detailHeroNodes, ...ui.detailMetaNodes, ...ui.detailBodyNodes], {
+    autoAlpha: 0,
+    y: 28,
+    filter: "blur(18px)",
+  });
+
+  gsap.set(ui.detailPause, {
+    scale: 0.92,
+    transformOrigin: "50% 50%",
+  });
+
+  ui.detailScroll.scrollTop = 0;
+  setDetailInteractive(false);
+}
+
 function setInitialVisualState() {
-  if (openingTimeoutId) {
-    window.clearTimeout(openingTimeoutId);
-    openingTimeoutId = 0;
-  }
-  if (openingTimeline) {
-    openingTimeline.kill();
-  }
-  if (ambientTimeline) {
-    ambientTimeline.kill();
-  }
-  if (podcastTimeline) {
-    podcastTimeline.kill();
-  }
+  clearTimers();
+  killTimelines();
+  state.detailExpanded = false;
+
+  stageState.width = DEMO_CONFIG.stages.outer.width;
+  stageState.height = DEMO_CONFIG.stages.outer.height;
+  syncViewportMetrics();
+
+  gsap.set(ui.deviceStage, {
+    borderRadius: DEMO_CONFIG.stages.outer.borderRadius,
+  });
+
+  ui.deviceStage.dataset.phase = "aod";
+  ui.deviceStage.dataset.screenMode = "outer";
+  ui.agentLayer.setAttribute("aria-hidden", "true");
 
   gsap.set(ui.clockWrap, {
     autoAlpha: 1,
@@ -113,13 +210,14 @@ function setInitialVisualState() {
     autoAlpha: 0,
   });
 
-  ui.agentLayer.setAttribute("aria-hidden", "true");
   setConversationState("hidden");
   setConversationText("是否继续播放博客");
 
   gsap.set(ui.orbShell, {
+    autoAlpha: 1,
     xPercent: -50,
     yPercent: -50,
+    x: 0,
     y: 0,
     scale: 0.8,
     rotationX: 0,
@@ -165,6 +263,7 @@ function setInitialVisualState() {
   gsap.set(ui.podcastTray, {
     autoAlpha: 0,
     y: 28,
+    scale: 1,
     filter: "blur(18px)",
   });
 
@@ -173,7 +272,34 @@ function setInitialVisualState() {
     y: 26,
     scale: 0.82,
     filter: "blur(18px)",
+    borderRadius: 58,
     transformOrigin: "50% 0%",
+  });
+
+  gsap.set(ui.podcastArt, {
+    autoAlpha: 1,
+    x: 0,
+    y: 0,
+    scale: 1,
+    borderRadius: 42,
+    transformOrigin: "50% 50%",
+  });
+
+  gsap.set(ui.podcastCardTitle, {
+    autoAlpha: 1,
+    x: 0,
+    y: 0,
+    scale: 1,
+    transformOrigin: "left top",
+  });
+
+  gsap.set([ui.podcastCardIndex, ui.podcastCardMeta, ui.podcastCardNote, ui.podcastProgress, ui.podcastCardFooter], {
+    autoAlpha: 1,
+    x: 0,
+    y: 0,
+    scale: 1,
+    filter: "blur(0px)",
+    transformOrigin: "left top",
   });
 
   gsap.set(ui.podcastProgressFill, {
@@ -193,11 +319,11 @@ function setInitialVisualState() {
 
   gsap.set(ui.podcastArtWaves, {
     scale: 1,
-    opacity: (_, target) => (target.classList.contains("podcast-art-wave-a") ? 0.7 : 0.42),
+    opacity: (_, target) => (target.classList.contains("podcast-art-wave-a") ? 0.62 : 0.36),
     transformOrigin: "50% 50%",
   });
 
-  ui.deviceStage.dataset.phase = "aod";
+  resetDetailRevealState();
 }
 
 function startAmbientMotion() {
@@ -245,17 +371,25 @@ function startAmbientMotion() {
       },
       0
     )
-    .to(ui.orbLiquid, {
-      scale: 1.04,
-      rotate: 8,
-      duration: prefersReducedMotion ? 1.8 : 3.2,
-      ease: "sine.inOut",
-    }, 0)
-    .to(ui.orbCore, {
-      rotate: -4,
-      duration: prefersReducedMotion ? 1.8 : 3.2,
-      ease: "sine.inOut",
-    }, 0);
+    .to(
+      ui.orbLiquid,
+      {
+        scale: 1.04,
+        rotate: 8,
+        duration: prefersReducedMotion ? 1.8 : 3.2,
+        ease: "sine.inOut",
+      },
+      0
+    )
+    .to(
+      ui.orbCore,
+      {
+        rotate: -4,
+        duration: prefersReducedMotion ? 1.8 : 3.2,
+        ease: "sine.inOut",
+      },
+      0
+    );
 }
 
 function startPodcastMotion() {
@@ -264,7 +398,6 @@ function startPodcastMotion() {
   }
 
   podcastTimeline = gsap.timeline({ repeat: -1, defaults: { overwrite: true } });
-
   podcastTimeline
     .to(
       ui.podcastArtCore,
@@ -279,7 +412,7 @@ function startPodcastMotion() {
       ui.podcastArtWaves,
       {
         scale: (_, target) => (target.classList.contains("podcast-art-wave-a") ? 1.08 : 1.16),
-        opacity: (_, target) => (target.classList.contains("podcast-art-wave-a") ? 0.92 : 0.56),
+        opacity: (_, target) => (target.classList.contains("podcast-art-wave-a") ? 0.72 : 0.4),
         duration: prefersReducedMotion ? 1.3 : 1.9,
         ease: "sine.inOut",
         stagger: 0.08,
@@ -296,6 +429,21 @@ function startPodcastMotion() {
       },
       0
     );
+}
+
+function scheduleDetailExpand(delayMs) {
+  if (state.detailExpanded) {
+    return;
+  }
+
+  if (detailExpandTimeoutId) {
+    window.clearTimeout(detailExpandTimeoutId);
+  }
+
+  detailExpandTimeoutId = window.setTimeout(() => {
+    detailExpandTimeoutId = 0;
+    expandToInnerDetail();
+  }, delayMs);
 }
 
 function showConversationPrompt() {
@@ -338,7 +486,14 @@ function showConversationPrompt() {
 
 function showPodcastCard() {
   setConversationState("options");
-  gsap.killTweensOf([ui.conversationBubble, ui.podcastTray, ui.podcastCard, ui.podcastProgressFill, ui.podcastProgressGlint, ui.orbShell]);
+  gsap.killTweensOf([
+    ui.conversationBubble,
+    ui.podcastTray,
+    ui.podcastCard,
+    ui.podcastProgressFill,
+    ui.podcastProgressGlint,
+    ui.orbShell,
+  ]);
 
   if (prefersReducedMotion) {
     gsap.set(ui.conversationBubble, {
@@ -363,6 +518,7 @@ function showPodcastCard() {
     gsap.set(ui.podcastProgressGlint, { opacity: 0.44, xPercent: 160 });
     gsap.set(ui.orbShell, { y: -94, scale: 0.94 });
     startPodcastMotion();
+    scheduleDetailExpand(DEMO_CONFIG.timings.detailHoldAfterCardMs);
     return;
   }
 
@@ -412,6 +568,7 @@ function showPodcastCard() {
       overwrite: true,
       onComplete: () => {
         startPodcastMotion();
+        scheduleDetailExpand(DEMO_CONFIG.timings.detailHoldAfterCardMs);
       },
     }
   );
@@ -423,6 +580,265 @@ function showPodcastCard() {
     ease: "power2.out",
     overwrite: true,
   });
+}
+
+function expandToInnerDetail() {
+  if (state.detailExpanded) {
+    return;
+  }
+
+  state.detailExpanded = true;
+  if (ambientTimeline) {
+    ambientTimeline.kill();
+    ambientTimeline = null;
+  }
+  if (podcastTimeline) {
+    podcastTimeline.kill();
+    podcastTimeline = null;
+  }
+
+  ui.detailScroll.scrollTop = 0;
+  ui.deviceStage.dataset.phase = "expanding";
+  ui.deviceStage.dataset.screenMode = "inner";
+  ui.detailLayer.setAttribute("aria-hidden", "false");
+  ui.detailLayer.style.pointerEvents = "none";
+
+  if (prefersReducedMotion) {
+    stageState.width = DEMO_CONFIG.stages.inner.width;
+    stageState.height = DEMO_CONFIG.stages.inner.height;
+    syncViewportMetrics();
+
+    gsap.set(ui.deviceStage, {
+      borderRadius: DEMO_CONFIG.stages.inner.borderRadius,
+    });
+    gsap.set(ui.detailLayer, {
+      autoAlpha: 1,
+    });
+    gsap.set([...ui.detailHeroNodes, ...ui.detailMetaNodes, ...ui.detailBodyNodes], {
+      autoAlpha: 1,
+      y: 0,
+      filter: "blur(0px)",
+    });
+    gsap.set(ui.detailPause, {
+      scale: 1,
+    });
+    gsap.set(ui.agentLayer, {
+      autoAlpha: 0,
+    });
+    ui.agentLayer.setAttribute("aria-hidden", "true");
+    setDetailInteractive(true);
+    ui.deviceStage.dataset.phase = "detail";
+    return;
+  }
+
+  detailTimeline = gsap.timeline({
+    defaults: { overwrite: true },
+    onComplete: () => {
+      gsap.set(ui.agentLayer, {
+        autoAlpha: 0,
+      });
+      ui.agentLayer.setAttribute("aria-hidden", "true");
+      gsap.set(ui.podcastTray, {
+        autoAlpha: 0,
+      });
+      gsap.set(ui.orbShell, {
+        autoAlpha: 0,
+      });
+      setDetailInteractive(true);
+      ui.deviceStage.dataset.phase = "detail";
+    },
+  });
+
+  detailTimeline
+    .to(
+      stageState,
+      {
+        width: DEMO_CONFIG.stages.inner.width,
+        height: DEMO_CONFIG.stages.inner.height,
+        duration: DEMO_CONFIG.timings.expandDurationMs / 1000,
+        ease: "expo.inOut",
+        onUpdate: syncViewportMetrics,
+      },
+      0
+    )
+    .to(
+      ui.deviceStage,
+      {
+        borderRadius: DEMO_CONFIG.stages.inner.borderRadius,
+        duration: DEMO_CONFIG.timings.expandDurationMs / 1000,
+        ease: "expo.inOut",
+      },
+      0
+    )
+    .to(
+      ui.podcastTray,
+      {
+        y: -560,
+        duration: 1.06,
+        ease: "expo.inOut",
+      },
+      0
+    )
+    .to(
+      ui.podcastCard,
+      {
+        y: -24,
+        scale: 1.08,
+        borderRadius: 68,
+        duration: 1.06,
+        ease: "expo.inOut",
+      },
+      0
+    )
+    .to(
+      ui.podcastArt,
+      {
+        x: -246,
+        y: -256,
+        scale: 0.58,
+        borderRadius: 30,
+        duration: 1.02,
+        ease: "expo.inOut",
+      },
+      0.04
+    )
+    .to(
+      ui.podcastCardTitle,
+      {
+        x: -176,
+        y: -84,
+        scale: 0.48,
+        duration: 1.02,
+        ease: "expo.inOut",
+      },
+      0.04
+    )
+    .to(
+      ui.podcastCardIndex,
+      {
+        autoAlpha: 0,
+        y: -18,
+        duration: 0.26,
+        ease: "power2.out",
+      },
+      0.02
+    )
+    .to(
+      ui.podcastCardMeta,
+      {
+        autoAlpha: 0,
+        y: -12,
+        duration: 0.26,
+        ease: "power2.out",
+      },
+      0.04
+    )
+    .to(
+      [ui.podcastCardNote, ui.podcastProgress, ui.podcastCardFooter],
+      {
+        autoAlpha: 0,
+        y: 18,
+        duration: 0.32,
+        ease: "power2.out",
+        stagger: 0.02,
+      },
+      0.06
+    )
+    .to(
+      ui.orbShell,
+      {
+        autoAlpha: 0,
+        y: -150,
+        scale: 0.72,
+        duration: 0.56,
+        ease: "expo.out",
+      },
+      0.12
+    )
+    .fromTo(
+      ui.detailLayer,
+      {
+        autoAlpha: 0,
+      },
+      {
+        autoAlpha: 1,
+        duration: 0.44,
+        ease: "power1.out",
+      },
+      0.52
+    )
+    .fromTo(
+      [...ui.detailHeroNodes],
+      {
+        autoAlpha: 0,
+        y: 46,
+        filter: "blur(18px)",
+      },
+      {
+        autoAlpha: 1,
+        y: 0,
+        filter: "blur(0px)",
+        duration: 0.72,
+        ease: "expo.out",
+        stagger: 0.06,
+      },
+      0.68
+    )
+    .fromTo(
+      ui.detailPause,
+      {
+        scale: 0.92,
+      },
+      {
+        scale: 1,
+        duration: 0.7,
+        ease: "expo.out",
+      },
+      0.74
+    )
+    .fromTo(
+      [...ui.detailMetaNodes],
+      {
+        autoAlpha: 0,
+        y: 30,
+        filter: "blur(16px)",
+      },
+      {
+        autoAlpha: 1,
+        y: 0,
+        filter: "blur(0px)",
+        duration: 0.58,
+        ease: "expo.out",
+        stagger: 0.08,
+      },
+      0.9
+    )
+    .fromTo(
+      [...ui.detailBodyNodes],
+      {
+        autoAlpha: 0,
+        y: 34,
+        filter: "blur(18px)",
+      },
+      {
+        autoAlpha: 1,
+        y: 0,
+        filter: "blur(0px)",
+        duration: 0.7,
+        ease: "expo.out",
+        stagger: 0.08,
+      },
+      1.04
+    )
+    .to(
+      [ui.podcastCard, ui.podcastArt, ui.podcastCardTitle],
+      {
+        autoAlpha: 0,
+        duration: 0.24,
+        ease: "power2.out",
+      },
+      0.96
+    );
 }
 
 function startOpeningSequence() {
@@ -514,7 +930,7 @@ function startOpeningSequence() {
       startAmbientMotion();
     })
     .call(showConversationPrompt, null, `+=${DEMO_CONFIG.timings.promptDelayMs / 1000}`)
-    .call(showPodcastCard, null, `+=${DEMO_CONFIG.timings.cardDelayMs / 1000}`);
+    .call(showPodcastCard, null, "+=2");
 
   openingTimeoutId = window.setTimeout(() => {
     openingTimeline.play(0);
