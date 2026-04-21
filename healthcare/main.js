@@ -3,6 +3,8 @@ import { gsap } from "gsap";
 
 const ui = {
   deviceStage: document.querySelector("#deviceStage"),
+  startLayer: document.querySelector("#startLayer"),
+  startButton: document.querySelector("#startButton"),
   clockTime: document.querySelector("#clockTime"),
   clockWrap: document.querySelector("#clockWrap"),
   agentLayer: document.querySelector("#agentLayer"),
@@ -69,6 +71,7 @@ const stageState = {
 
 const state = {
   detailExpanded: false,
+  started: false,
 };
 
 let openingTimeline = null;
@@ -185,6 +188,7 @@ function setInitialVisualState() {
   clearTimers();
   killTimelines();
   state.detailExpanded = false;
+  state.started = false;
 
   stageState.width = DEMO_CONFIG.stages.outer.width;
   stageState.height = DEMO_CONFIG.stages.outer.height;
@@ -197,6 +201,11 @@ function setInitialVisualState() {
   ui.deviceStage.dataset.phase = "aod";
   ui.deviceStage.dataset.screenMode = "outer";
   ui.agentLayer.setAttribute("aria-hidden", "true");
+  gsap.set(ui.startLayer, {
+    autoAlpha: 1,
+  });
+  ui.startLayer.setAttribute("aria-hidden", "false");
+  ui.startLayer.style.pointerEvents = "auto";
 
   gsap.set(ui.clockWrap, {
     autoAlpha: 1,
@@ -842,8 +851,6 @@ function expandToInnerDetail() {
 }
 
 function startOpeningSequence() {
-  setInitialVisualState();
-
   openingTimeline = gsap.timeline({
     paused: true,
     defaults: { overwrite: true },
@@ -937,10 +944,42 @@ function startOpeningSequence() {
   }, DEMO_CONFIG.timings.initialDelayMs);
 }
 
+function startDemo() {
+  if (state.started) {
+    return;
+  }
+
+  state.started = true;
+  ui.startButton.disabled = true;
+
+  if (prefersReducedMotion) {
+    gsap.set(ui.startLayer, {
+      autoAlpha: 0,
+    });
+    ui.startLayer.setAttribute("aria-hidden", "true");
+    ui.startLayer.style.pointerEvents = "none";
+    startOpeningSequence();
+    return;
+  }
+
+  gsap.to(ui.startLayer, {
+    autoAlpha: 0,
+    duration: 0.28,
+    ease: "power2.out",
+    onComplete: () => {
+      ui.startLayer.setAttribute("aria-hidden", "true");
+      ui.startLayer.style.pointerEvents = "none";
+      startOpeningSequence();
+    },
+  });
+}
+
 function init() {
   syncViewportMetrics();
   updateClock(true);
-  startOpeningSequence();
+  setInitialVisualState();
+
+  ui.startButton.addEventListener("click", startDemo);
 
   window.setInterval(() => {
     updateClock();

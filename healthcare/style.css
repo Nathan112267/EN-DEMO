@@ -153,6 +153,62 @@ button {
   inset: 0;
 }
 
+.start-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding:
+    max(28px, env(safe-area-inset-top))
+    max(28px, env(safe-area-inset-right))
+    max(52px, env(safe-area-inset-bottom) + 24px)
+    max(28px, env(safe-area-inset-left));
+  pointer-events: none;
+}
+
+.start-button {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 206px;
+  min-height: 76px;
+  padding: 0 34px;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(26, 32, 50, 0.94), rgba(14, 18, 30, 0.9)),
+    rgba(12, 16, 24, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 20px 36px rgba(0, 0, 0, 0.34),
+    0 0 0 1px rgba(var(--cyan-rgb), 0.06);
+  color: rgba(245, 248, 255, 0.96);
+  font-size: 28px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition:
+    transform 220ms var(--ease-out-quart),
+    box-shadow 220ms var(--ease-out-quart),
+    border-color 220ms var(--ease-out-quart);
+}
+
+.start-button:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 24px 44px rgba(0, 0, 0, 0.38),
+    0 0 0 1px rgba(var(--cyan-rgb), 0.12);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.start-button:active {
+  transform: translateY(0) scale(0.98);
+}
+
 .aod-layer {
   display: grid;
   place-items: center;
@@ -570,7 +626,6 @@ button {
 
 .podcast-art-core,
 .podcast-art-wave,
-.podcast-art-label,
 .podcast-play-icon {
   position: absolute;
 }
@@ -582,18 +637,6 @@ button {
     radial-gradient(circle at 36% 34%, rgba(255, 255, 255, 0.42), transparent 24%),
     radial-gradient(circle at 56% 56%, rgba(255, 224, 181, 0.34), transparent 68%);
   filter: blur(2px);
-}
-
-.podcast-art-label {
-  left: 22px;
-  right: 22px;
-  bottom: 20px;
-  font-size: 26px;
-  line-height: 1.05;
-  letter-spacing: -0.04em;
-  color: rgba(31, 22, 15, 0.92);
-  font-weight: 700;
-  text-align: left;
 }
 
 .podcast-art-wave {
