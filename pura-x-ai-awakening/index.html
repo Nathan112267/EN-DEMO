@@ -21,6 +21,13 @@
         --purple-rgb: 154, 94, 255;
         --ice-rgb: 209, 255, 255;
         --ink-rgb: 1, 4, 14;
+        --device-glow-blur: 80px;
+        --clock-halo-blur: 58px;
+        --orb-aura-blur: 48px;
+        --orb-surface-backdrop: blur(22px) saturate(150%);
+        --orb-liquid-blur: 18px;
+        --orb-highlight-blur: 6px;
+        --overlay-backdrop: blur(22px) saturate(110%);
         --overlay-opacity: 1;
         --clock-alpha: 1;
         --clock-scale: 1;
@@ -129,7 +136,7 @@
           radial-gradient(circle at 79% 18%, rgba(var(--purple-rgb), 0.16), transparent 30%),
           radial-gradient(circle at 50% 86%, rgba(var(--cyan-rgb), 0.1), transparent 32%);
         opacity: 0.52;
-        filter: blur(80px);
+        filter: blur(var(--device-glow-blur));
       }
 
       .device-stage::after {
@@ -202,7 +209,7 @@
           radial-gradient(circle at 50% 50%, rgba(var(--purple-rgb), calc(var(--aod-halo-strength) * 0.72)), transparent 32%),
           radial-gradient(circle at 50% 50%, rgba(var(--cyan-rgb), calc(var(--aod-halo-strength) * 0.62)), transparent 46%);
         transform: scale(var(--aod-halo-scale));
-        filter: blur(58px);
+        filter: blur(var(--clock-halo-blur));
         opacity: 0.9;
       }
 
@@ -259,7 +266,7 @@
         background:
           radial-gradient(circle at 50% 50%, rgba(var(--cyan-rgb), calc(var(--orb-aura) * 0.34)), transparent 42%),
           radial-gradient(circle at 50% 50%, rgba(var(--purple-rgb), calc(var(--orb-aura) * 0.42)), transparent 66%);
-        filter: blur(48px);
+        filter: blur(var(--orb-aura-blur));
         transform: translateZ(-20px) scale(1.08);
       }
 
@@ -293,7 +300,7 @@
           inset 0 -20px 54px rgba(0, 0, 0, 0.2),
           0 28px 90px rgba(var(--purple-rgb), 0.16),
           0 18px 64px rgba(var(--cyan-rgb), 0.16);
-        backdrop-filter: blur(22px) saturate(150%);
+        backdrop-filter: var(--orb-surface-backdrop);
       }
 
       .orb-liquid {
@@ -310,7 +317,7 @@
             rgba(255, 255, 255, 0.04)
           );
         mix-blend-mode: screen;
-        filter: blur(18px) saturate(138%);
+        filter: blur(var(--orb-liquid-blur)) saturate(138%);
         opacity: 0.92;
       }
 
@@ -321,7 +328,7 @@
           radial-gradient(circle at 34% 26%, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.16) 24%, transparent 56%),
           radial-gradient(circle at 68% 72%, rgba(var(--purple-rgb), 0.18), transparent 42%);
         transform: translate3d(var(--orb-highlight-shift-x), var(--orb-highlight-shift-y), 44px) rotate(var(--orb-sheen-rotate));
-        filter: blur(6px);
+        filter: blur(var(--orb-highlight-blur));
         mix-blend-mode: screen;
       }
 
@@ -345,7 +352,7 @@
         position: absolute;
         inset: 0;
         background: rgba(0, 0, 0, 0.42);
-        backdrop-filter: blur(22px) saturate(110%);
+        backdrop-filter: var(--overlay-backdrop);
       }
 
       .permission-card {
@@ -602,13 +609,16 @@ function extractGaze(landmarks) {
 
 function enrichAttention(sample) {
   const headCentered = 1 - clamp(Math.max(Math.abs(sample.yaw) / 24, Math.abs(sample.pitch) / 22), 0, 1);
-  const gazeCentered = sample.gazeValid ? sample.gazeCentered : headCentered * 0.75;
-  const attentiveness = clamp(headCentered * 0.35 + gazeCentered * 0.65, 0, 1);
+  const gazeCentered = sample.gazeValid ? sample.gazeCentered : headCentered * 0.28;
+  const attentiveness = sample.gazeValid
+    ? clamp(headCentered * 0.42 + gazeCentered * 0.58, 0, 1)
+    : clamp(headCentered * 0.34, 0, 1);
 
   return {
     ...sample,
-    combinedYaw: sample.yaw * 0.45 + (sample.gazeValid ? sample.gazeYaw * 0.95 : 0),
-    combinedPitch: sample.pitch * 0.45 + (sample.gazeValid ? sample.gazePitch * 0.9 : 0),
+    headCentered,
+    combinedYaw: sample.gazeValid ? sample.yaw * 0.45 + sample.gazeYaw * 0.95 : sample.yaw * 0.82,
+    combinedPitch: sample.gazeValid ? sample.pitch * 0.45 + sample.gazePitch * 0.9 : sample.pitch * 0.82,
     attentiveness,
   };
 }
@@ -779,23 +789,29 @@ self.onmessage = async (event) => {
 
       const DEMO_CONFIG = deepFreeze({
         stageSize: 980,
-        detectionFps: 12,
+        detectionFps: 14,
         particleCount: 500,
         thresholds: {
-          attentiveDeg: 11,
-          awayDeg: 20,
-          headAwayDeg: 30,
-          attentionEnter: 0.56,
-          attentionExit: 0.24,
+          attentiveDeg: 13,
+          awayDeg: 18,
+          headAwayDeg: 28,
+          attentionEnter: 0.5,
+          attentionExit: 0.34,
+          snapWakeAttention: 0.86,
+          snapSleepAttention: 0.16,
+          snapWakeDeg: 5,
+          snapSleepDeg: 22,
         },
         timings: {
-          wakeHoldMs: 240,
-          sleepHoldMs: 900,
-          wakingMs: 800,
-          sleepingMs: 900,
+          wakeHoldMs: 180,
+          sleepHoldMs: 420,
+          snapWakeHoldMs: 80,
+          snapSleepHoldMs: 140,
+          wakingMs: 560,
+          sleepingMs: 520,
         },
         smoothing: {
-          poseAlpha: 0.22,
+          poseAlpha: 0.4,
         },
         orb: {
           radius: 148,
@@ -812,6 +828,29 @@ self.onmessage = async (event) => {
           ice: "225, 245, 255",
         },
       });
+
+      function detectRuntimeTuning() {
+        const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
+        const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const deviceMemory = navigator.deviceMemory || 8;
+        const hardwareConcurrency = navigator.hardwareConcurrency || 8;
+        const lowPower = coarsePointer || deviceMemory <= 4 || hardwareConcurrency <= 6;
+
+        return deepFreeze({
+          coarsePointer,
+          lowPower,
+          reducedMotion,
+          detectionFps: lowPower ? 12 : DEMO_CONFIG.detectionFps,
+          particleCount: lowPower ? 280 : DEMO_CONFIG.particleCount,
+          waveCount: lowPower ? 2 : DEMO_CONFIG.orb.waveCount,
+          waveSteps: lowPower ? 72 : 110,
+          captureWidth: lowPower ? 720 : 960,
+          captureHeight: lowPower ? 720 : 960,
+          motionGain: lowPower ? 0.82 : 1,
+        });
+      }
+
+      const RUNTIME_TUNING = detectRuntimeTuning();
 
       const ui = {
         stageFrame: document.getElementById("stageFrame"),
@@ -883,6 +922,7 @@ self.onmessage = async (event) => {
           facePresent: false,
           yaw: 0,
           pitch: 0,
+          headCentered: 0,
           gazeYaw: 0,
           gazePitch: 0,
           gazeCentered: 0,
@@ -898,6 +938,7 @@ self.onmessage = async (event) => {
           facePresent: false,
           yaw: 0,
           pitch: 0,
+          headCentered: 0,
           gazeYaw: 0,
           gazePitch: 0,
           gazeCentered: 0,
@@ -956,6 +997,38 @@ self.onmessage = async (event) => {
         const hours = String(date.getHours()).padStart(2, "0");
         const minutes = String(date.getMinutes()).padStart(2, "0");
         return hours + ":" + minutes;
+      }
+
+      function applyRuntimeProfile() {
+        const reducedEffects = RUNTIME_TUNING.lowPower || state.reduceMotion;
+        document.documentElement.style.setProperty(
+          "--device-glow-blur",
+          reducedEffects ? "48px" : "80px"
+        );
+        document.documentElement.style.setProperty(
+          "--clock-halo-blur",
+          reducedEffects ? "34px" : "58px"
+        );
+        document.documentElement.style.setProperty(
+          "--orb-aura-blur",
+          reducedEffects ? "28px" : "48px"
+        );
+        document.documentElement.style.setProperty(
+          "--orb-surface-backdrop",
+          reducedEffects ? "blur(12px) saturate(124%)" : "blur(22px) saturate(150%)"
+        );
+        document.documentElement.style.setProperty(
+          "--orb-liquid-blur",
+          reducedEffects ? "12px" : "18px"
+        );
+        document.documentElement.style.setProperty(
+          "--orb-highlight-blur",
+          reducedEffects ? "3px" : "6px"
+        );
+        document.documentElement.style.setProperty(
+          "--overlay-backdrop",
+          reducedEffects ? "blur(12px) saturate(104%)" : "blur(22px) saturate(110%)"
+        );
       }
 
       function midpoint(a, b) {
@@ -1047,13 +1120,16 @@ self.onmessage = async (event) => {
 
       function enrichAttention(sample) {
         const headCentered = 1 - clamp(Math.max(Math.abs(sample.yaw) / 24, Math.abs(sample.pitch) / 22), 0, 1);
-        const gazeCentered = sample.gazeValid ? sample.gazeCentered : headCentered * 0.75;
-        const attentiveness = clamp(headCentered * 0.35 + gazeCentered * 0.65, 0, 1);
+        const gazeCentered = sample.gazeValid ? sample.gazeCentered : headCentered * 0.28;
+        const attentiveness = sample.gazeValid
+          ? clamp(headCentered * 0.42 + gazeCentered * 0.58, 0, 1)
+          : clamp(headCentered * 0.34, 0, 1);
 
         return {
           ...sample,
-          combinedYaw: sample.yaw * 0.45 + (sample.gazeValid ? sample.gazeYaw * 0.95 : 0),
-          combinedPitch: sample.pitch * 0.45 + (sample.gazeValid ? sample.gazePitch * 0.9 : 0),
+          headCentered,
+          combinedYaw: sample.gazeValid ? sample.yaw * 0.45 + sample.gazeYaw * 0.95 : sample.yaw * 0.82,
+          combinedPitch: sample.gazeValid ? sample.pitch * 0.45 + sample.gazePitch * 0.9 : sample.pitch * 0.82,
           attentiveness,
         };
       }
@@ -1134,7 +1210,7 @@ self.onmessage = async (event) => {
       }
 
       function sampleClockPoints(text) {
-        const cacheKey = text + "|" + DEMO_CONFIG.particleCount;
+        const cacheKey = text + "|" + RUNTIME_TUNING.particleCount;
         const cached = state.pointCache.get(cacheKey);
         if (cached) {
           return cached;
@@ -1170,13 +1246,13 @@ self.onmessage = async (event) => {
 
         const points = [];
         if (!candidates.length) {
-          for (let index = 0; index < DEMO_CONFIG.particleCount; index += 1) {
+          for (let index = 0; index < RUNTIME_TUNING.particleCount; index += 1) {
             points.push({ x: DEMO_CONFIG.stageSize * 0.5, y: DEMO_CONFIG.stageSize * 0.5 });
           }
         } else {
-          const stride = Math.max(1, Math.floor(candidates.length / DEMO_CONFIG.particleCount));
+          const stride = Math.max(1, Math.floor(candidates.length / RUNTIME_TUNING.particleCount));
           let cursor = 0;
-          for (let index = 0; index < DEMO_CONFIG.particleCount; index += 1) {
+          for (let index = 0; index < RUNTIME_TUNING.particleCount; index += 1) {
             const point = candidates[cursor % candidates.length];
             points.push({ x: point.x, y: point.y });
             cursor += stride;
@@ -1274,7 +1350,7 @@ self.onmessage = async (event) => {
           clockBlur: state.reduceMotion ? 2 : 22,
           haloStrength: 0.08,
           haloScale: state.reduceMotion ? 1.02 : 0.88,
-          duration: state.reduceMotion ? 0.22 : 0.32,
+          duration: state.reduceMotion ? 0.16 : 0.2,
           ease: "power2.out",
         });
         gsap.to(motion, {
@@ -1283,13 +1359,13 @@ self.onmessage = async (event) => {
           orbAura: state.reduceMotion ? 0.38 : 1,
           ringAlpha: state.reduceMotion ? 0.14 : 0.32,
           waveAlpha: 1,
-          duration: state.reduceMotion ? 0.32 : 0.88,
+          duration: state.reduceMotion ? 0.22 : 0.46,
           ease: "expo.out",
         });
 
         state.transitionTimer = window.setTimeout(() => {
           completeWakeTransition();
-        }, state.reduceMotion ? 260 : DEMO_CONFIG.timings.wakingMs);
+        }, state.reduceMotion ? 180 : DEMO_CONFIG.timings.wakingMs);
       }
 
       function triggerSleep() {
@@ -1310,7 +1386,7 @@ self.onmessage = async (event) => {
           orbAura: 0.18,
           ringAlpha: 0.08,
           waveAlpha: 0,
-          duration: state.reduceMotion ? 0.28 : 0.72,
+          duration: state.reduceMotion ? 0.18 : 0.34,
           ease: "power2.inOut",
         });
         gsap.to(motion, {
@@ -1320,14 +1396,14 @@ self.onmessage = async (event) => {
           clockBlur: 0,
           haloStrength: state.reduceMotion ? 0.16 : 0.26,
           haloScale: 1,
-          delay: state.reduceMotion ? 0.04 : 0.32,
-          duration: state.reduceMotion ? 0.3 : 0.54,
+          delay: state.reduceMotion ? 0.02 : 0.12,
+          duration: state.reduceMotion ? 0.2 : 0.28,
           ease: "power3.out",
         });
 
         state.transitionTimer = window.setTimeout(() => {
           completeSleepTransition();
-        }, state.reduceMotion ? 320 : DEMO_CONFIG.timings.sleepingMs);
+        }, state.reduceMotion ? 220 : DEMO_CONFIG.timings.sleepingMs);
       }
 
       function updateStateMachine(now) {
@@ -1337,8 +1413,12 @@ self.onmessage = async (event) => {
           return;
         }
 
+        const wakeEligible = pose.gazeValid
+          ? pose.gazeCentered > 0.42 && pose.gazeOpenness > 0.12
+          : pose.headCentered > 0.965 && pose.confidence > 0.7;
         const attentive =
           pose.facePresent &&
+          wakeEligible &&
           pose.attentiveness > DEMO_CONFIG.thresholds.attentionEnter &&
           Math.abs(pose.combinedYaw) < DEMO_CONFIG.thresholds.attentiveDeg &&
           Math.abs(pose.combinedPitch) < DEMO_CONFIG.thresholds.attentiveDeg;
@@ -1349,13 +1429,31 @@ self.onmessage = async (event) => {
           Math.abs(pose.combinedPitch) > DEMO_CONFIG.thresholds.awayDeg ||
           Math.abs(pose.yaw) > DEMO_CONFIG.thresholds.headAwayDeg ||
           Math.abs(pose.pitch) > DEMO_CONFIG.thresholds.headAwayDeg;
+        const snapWake =
+          pose.facePresent &&
+          pose.gazeValid &&
+          pose.gazeCentered > 0.72 &&
+          pose.attentiveness > DEMO_CONFIG.thresholds.snapWakeAttention &&
+          Math.abs(pose.combinedYaw) < DEMO_CONFIG.thresholds.snapWakeDeg &&
+          Math.abs(pose.combinedPitch) < DEMO_CONFIG.thresholds.snapWakeDeg;
+        const snapSleep =
+          !pose.facePresent ||
+          pose.attentiveness < DEMO_CONFIG.thresholds.snapSleepAttention ||
+          Math.abs(pose.combinedYaw) > DEMO_CONFIG.thresholds.snapSleepDeg ||
+          Math.abs(pose.combinedPitch) > DEMO_CONFIG.thresholds.snapSleepDeg;
+        const effectiveWakeHold = snapWake
+          ? DEMO_CONFIG.timings.snapWakeHoldMs
+          : Math.max(120, DEMO_CONFIG.timings.wakeHoldMs - pose.attentiveness * 40);
+        const effectiveSleepHold = snapSleep
+          ? DEMO_CONFIG.timings.snapSleepHoldMs
+          : Math.max(260, DEMO_CONFIG.timings.sleepHoldMs - (1 - pose.attentiveness) * 80);
 
         if (state.phase === "aod") {
           if (attentive) {
             if (!state.wakeCandidateSince) {
               state.wakeCandidateSince = now;
             }
-            if (now - state.wakeCandidateSince >= DEMO_CONFIG.timings.wakeHoldMs) {
+            if (now - state.wakeCandidateSince >= effectiveWakeHold) {
               triggerWake();
             }
           } else {
@@ -1369,7 +1467,7 @@ self.onmessage = async (event) => {
             if (!state.sleepCandidateSince) {
               state.sleepCandidateSince = now;
             }
-            if (now - state.sleepCandidateSince >= DEMO_CONFIG.timings.sleepHoldMs) {
+            if (now - state.sleepCandidateSince >= effectiveSleepHold) {
               triggerSleep();
             }
           } else {
@@ -1384,6 +1482,7 @@ self.onmessage = async (event) => {
           facePresent: Boolean(sample.facePresent),
           yaw: sample.yaw || 0,
           pitch: sample.pitch || 0,
+          headCentered: sample.headCentered || 0,
           gazeYaw: sample.gazeYaw || 0,
           gazePitch: sample.gazePitch || 0,
           gazeCentered: sample.gazeCentered || 0,
@@ -1401,6 +1500,7 @@ self.onmessage = async (event) => {
             state.smoothedPose.facePresent = true;
             state.smoothedPose.yaw = state.pose.yaw;
             state.smoothedPose.pitch = state.pose.pitch;
+            state.smoothedPose.headCentered = state.pose.headCentered;
             state.smoothedPose.gazeYaw = state.pose.gazeYaw;
             state.smoothedPose.gazePitch = state.pose.gazePitch;
             state.smoothedPose.gazeCentered = state.pose.gazeCentered;
@@ -1419,6 +1519,11 @@ self.onmessage = async (event) => {
             state.smoothedPose.pitch = lerp(
               state.smoothedPose.pitch,
               state.pose.pitch,
+              DEMO_CONFIG.smoothing.poseAlpha
+            );
+            state.smoothedPose.headCentered = lerp(
+              state.smoothedPose.headCentered,
+              state.pose.headCentered,
               DEMO_CONFIG.smoothing.poseAlpha
             );
             state.smoothedPose.gazeYaw = lerp(
@@ -1465,6 +1570,7 @@ self.onmessage = async (event) => {
           }
         } else {
           state.smoothedPose.facePresent = false;
+          state.smoothedPose.headCentered = 0;
           state.smoothedPose.gazeValid = false;
           state.smoothedPose.gazeYaw = 0;
           state.smoothedPose.gazePitch = 0;
@@ -1495,7 +1601,7 @@ self.onmessage = async (event) => {
         fxContext.globalCompositeOperation = "screen";
         fxContext.globalAlpha = clamp(motion.waveAlpha, 0, 1);
 
-        for (let ringIndex = 0; ringIndex < DEMO_CONFIG.orb.waveCount; ringIndex += 1) {
+        for (let ringIndex = 0; ringIndex < RUNTIME_TUNING.waveCount; ringIndex += 1) {
           const baseRadius =
             DEMO_CONFIG.orb.radius +
             44 +
@@ -1503,7 +1609,7 @@ self.onmessage = async (event) => {
             oscillators.breathe * (state.reduceMotion ? 2 : 10);
           fxContext.beginPath();
 
-          const steps = 110;
+          const steps = RUNTIME_TUNING.waveSteps;
           for (let step = 0; step <= steps; step += 1) {
             const progress = step / steps;
             const angle = progress * Math.PI * 2;
@@ -1605,6 +1711,7 @@ self.onmessage = async (event) => {
         const breathe = state.reduceMotion ? oscillators.breathe * 0.18 : oscillators.breathe;
         const morph = state.reduceMotion ? oscillators.morph * 0.1 : oscillators.morph;
         const shimmer = state.reduceMotion ? oscillators.shimmer * 0.18 : oscillators.shimmer;
+        const motionGain = RUNTIME_TUNING.motionGain;
         const yaw = state.smoothedPose.facePresent ? state.smoothedPose.yaw : 0;
         const pitch = state.smoothedPose.facePresent ? state.smoothedPose.pitch : 0;
         const focusYaw = state.smoothedPose.facePresent ? state.smoothedPose.combinedYaw : 0;
@@ -1619,7 +1726,8 @@ self.onmessage = async (event) => {
           "--clock-shift-x",
           (
             (state.phase === "aod" ? clamp(focusYaw * 1.15, -18, 18) : clamp(focusYaw * 0.24, -6, 6)) *
-            (0.2 + attentiveness * 0.9)
+            (0.2 + attentiveness * 0.9) *
+            motionGain
           ).toFixed(2) + "px"
         );
         document.documentElement.style.setProperty(
@@ -1627,7 +1735,7 @@ self.onmessage = async (event) => {
           (
             motion.clockShiftY +
             Math.sin(now * 0.0018) * (state.phase === "aod" ? 4 : 1.2) +
-            clamp(focusPitch * 0.58, -10, 10) * (0.15 + attentiveness * 0.7)
+            clamp(focusPitch * 0.58, -10, 10) * (0.15 + attentiveness * 0.7) * motionGain
           ).toFixed(2) + "px"
         );
         document.documentElement.style.setProperty("--clock-blur", motion.clockBlur.toFixed(2) + "px");
@@ -1659,15 +1767,15 @@ self.onmessage = async (event) => {
         document.documentElement.style.setProperty(
           "--orb-highlight-shift-x",
           (
-            Math.sin(now * 0.0013 + shimmer) * (state.reduceMotion ? 3 : 16) +
-            clamp(focusYaw * 0.9, -12, 12)
+            Math.sin(now * 0.0013 + shimmer) * (state.reduceMotion ? 3 : 16) * motionGain +
+            clamp(focusYaw * 0.9, -12, 12) * motionGain
           ).toFixed(2) + "px"
         );
         document.documentElement.style.setProperty(
           "--orb-highlight-shift-y",
           (
-            Math.cos(now * 0.0011 + shimmer) * (state.reduceMotion ? 2 : 11) +
-            clamp(focusPitch * 0.65, -10, 10)
+            Math.cos(now * 0.0011 + shimmer) * (state.reduceMotion ? 2 : 11) * motionGain +
+            clamp(focusPitch * 0.65, -10, 10) * motionGain
           ).toFixed(2) + "px"
         );
         document.documentElement.style.setProperty("--orb-sheen-rotate", (shimmer * 14).toFixed(2) + "deg");
@@ -1769,8 +1877,9 @@ self.onmessage = async (event) => {
           audio: false,
           video: {
             facingMode: "user",
-            width: { ideal: 1280 },
-            height: { ideal: 720 },
+            width: { ideal: RUNTIME_TUNING.captureWidth },
+            height: { ideal: RUNTIME_TUNING.captureHeight },
+            frameRate: { ideal: 24, max: 30 },
           },
         });
 
@@ -2054,7 +2163,7 @@ self.onmessage = async (event) => {
           return;
         }
 
-        const interval = Math.round(1000 / DEMO_CONFIG.detectionFps);
+        const interval = Math.round(1000 / RUNTIME_TUNING.detectionFps);
         state.detectionTimer = window.setInterval(() => {
           if (!state.stream) {
             return;
@@ -2170,6 +2279,7 @@ self.onmessage = async (event) => {
           return;
         }
 
+        applyRuntimeProfile();
         syncViewportMetrics();
         updateClock(true);
         resetToAodVisualState();
@@ -2197,6 +2307,7 @@ self.onmessage = async (event) => {
         });
         const handleMotionPreferenceChange = (event) => {
           state.reduceMotion = event.matches;
+          applyRuntimeProfile();
           resetToAodVisualState();
         };
 
