@@ -18,6 +18,7 @@ export default defineConfig({
           new URL("./pura-x-ai-awakening/index.html", import.meta.url)
         ),
         aiTaskbar: fileURLToPath(new URL("./ai-taskbar/index.html", import.meta.url)),
+        aiNotification: fileURLToPath(new URL("./scene2/index.html", import.meta.url)),
         healthcare: fileURLToPath(new URL("./healthcare/index.html", import.meta.url)),
         dataCollection: fileURLToPath(new URL("./data-collection/index.html", import.meta.url)),
         voiceOrderDemo: fileURLToPath(new URL("./voice-order-demo/index.html", import.meta.url)),

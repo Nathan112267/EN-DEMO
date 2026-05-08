@@ -8,6 +8,16 @@
       "source": "/pura-x-ai-awakening.html",
       "destination": "/pura-x-ai-awakening/",
       "permanent": true
+    },
+    {
+      "source": "/ai-notification",
+      "destination": "/scene2/",
+      "permanent": true
+    },
+    {
+      "source": "/ai-notification/",
+      "destination": "/scene2/",
+      "permanent": true
     }
   ]
 }
