@@ -18,6 +18,16 @@
       "source": "/ai-notification/",
       "destination": "/scene2/",
       "permanent": true
+    },
+    {
+      "source": "/ai-image-picker",
+      "destination": "/scene3/",
+      "permanent": true
+    },
+    {
+      "source": "/ai-image-picker/",
+      "destination": "/scene3/",
+      "permanent": true
     }
   ]
 }
