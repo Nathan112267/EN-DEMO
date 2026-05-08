@@ -28,6 +28,16 @@
       "source": "/ai-image-picker/",
       "destination": "/scene3/",
       "permanent": true
+    },
+    {
+      "source": "/ai-companion",
+      "destination": "/scene4/",
+      "permanent": true
+    },
+    {
+      "source": "/ai-companion/",
+      "destination": "/scene4/",
+      "permanent": true
     }
   ]
 }

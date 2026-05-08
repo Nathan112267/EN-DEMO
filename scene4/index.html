@@ -1,0 +1,981 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8" />
+<title>Pura X · AI陪伴</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+<style>
+  :root { --canvas-w: 1600px; --canvas-h: 2560px; --ink: #ffffff; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+  html, body { width: 100%; height: 100%; background: #000; font-family: "Inter", system-ui, -apple-system, "PingFang SC", sans-serif; color: var(--ink); overflow: hidden; }
+  #stage { position: fixed; inset: 0; background: #000; overflow: hidden; }
+  #canvas { position: absolute; left: 50%; top: 50%; width: var(--canvas-w); height: var(--canvas-h); transform-origin: center center; overflow: hidden;
+    background:
+      radial-gradient(ellipse 90% 70% at 78% 12%, oklch(0.32 0.12 280 / 0.85), transparent 60%),
+      radial-gradient(ellipse 80% 60% at 18% 88%, oklch(0.28 0.10 220 / 0.75), transparent 60%),
+      linear-gradient(160deg, oklch(0.13 0.04 270) 0%, oklch(0.08 0.025 240) 60%, oklch(0.05 0.02 230) 100%);
+  }
+  .stars { position: absolute; inset: 0; pointer-events: none; opacity: 0.35;
+    background-image:
+      radial-gradient(1px 1px at 12% 22%, #fff 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 71% 14%, #fff 50%, transparent 51%),
+      radial-gradient(1px 1px at 35% 71%, #fff 50%, transparent 51%),
+      radial-gradient(1px 1px at 88% 64%, #fff 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 56% 39%, #fff 50%, transparent 51%);
+  }
+  #app { position: absolute; inset: 0; }
+</style>
+</head>
+<body>
+<div id="stage"><div id="canvas"><div class="stars"></div><div id="app"></div></div></div>
+
+<script type="module" src="./main.jsx"></script>
+
+<script>
+  function fit() {
+    const cv = document.getElementById('canvas');
+    const sx = window.innerWidth / 1600;
+    const sy = window.innerHeight / 2560;
+    const s = Math.min(sx, sy);
+    cv.style.transform = `translate(-50%, -50%) scale(${s})`;
+  }
+  window.addEventListener('resize', fit);
+  fit();
+</script>
+
+<script type="text/babel" data-presets="react">
+// Original abstract glyph icons. NO brand reproduction.
+// Each icon is rendered onto a rounded-square tile.
+const Icon = {};
+
+Icon.Camera = ({s=1}) => (
+  <svg viewBox="0 0 64 64" width="100%" height="100%">
+    <rect x="6" y="16" width="52" height="38" rx="9" fill="none" stroke="currentColor" strokeWidth="3"/>
+    <rect x="22" y="10" width="20" height="8" rx="2.5" fill="currentColor"/>
+    <circle cx="32" cy="35" r="11" fill="none" stroke="currentColor" strokeWidth="3"/>
+    <circle cx="32" cy="35" r="4" fill="currentColor"/>
+    <circle cx="50" cy="24" r="2" fill="currentColor"/>
+  </svg>
+);
+
+Icon.Messages = () => (
+  <svg viewBox="0 0 64 64" width="100%" height="100%">
+    <path d="M10 20 q0-8 8-8 h28 q8 0 8 8 v18 q0 8-8 8 h-18 l-10 8 v-8 h-0 q-8 0-8-8 z" fill="currentColor" opacity="0.18" stroke="currentColor" strokeWidth="3" strokeLinejoin="round"/>
+    <circle cx="22" cy="29" r="2.5" fill="currentColor"/>
+    <circle cx="32" cy="29" r="2.5" fill="currentColor"/>
+    <circle cx="42" cy="29" r="2.5" fill="currentColor"/>
+  </svg>
+);
+
+Icon.Photos = () => (
+  <svg viewBox="0 0 64 64" width="100%" height="100%">
+    <rect x="8" y="12" width="48" height="40" rx="7" fill="none" stroke="currentColor" strokeWidth="3"/>
+    <path d="M8 44 l14-14 12 12 8-8 14 14" fill="none" stroke="currentColor" strokeWidth="3" strokeLinejoin="round"/>
+    <circle cx="44" cy="22" r="4" fill="currentColor"/>
+  </svg>
+);
+
+Icon.Settings = () => (
+  <svg viewBox="0 0 64 64" width="100%" height="100%">
+    <g stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round">
+      <circle cx="32" cy="32" r="10" />
+      <path d="M32 6 v8 M32 50 v8 M6 32 h8 M50 32 h8 M14 14 l5.5 5.5 M44.5 44.5 L50 50 M50 14 l-5.5 5.5 M14 50 l5.5-5.5"/>
+    </g>
+    <circle cx="32" cy="32" r="3" fill="currentColor"/>
+  </svg>
+);
+
+Icon.Phone = () => (
+  <svg viewBox="0 0 64 64" width="100%" height="100%">
+    <path d="M14 12 q0-4 4-4 h6 q3 0 4 3 l4 10 q1 3-2 5 l-4 3 q5 9 14 14 l3-4 q2-3 5-2 l10 4 q3 1 3 4 v6 q0 4-4 4 q-26 0-43-43 z" fill="currentColor"/>
+  </svg>
+);
+
+Icon.Mail = () => (
+  <svg viewBox="0 0 64 64" width="100%" height="100%">
+    <rect x="6" y="14" width="52" height="36" rx="6" fill="none" stroke="currentColor" strokeWidth="3"/>
+    <path d="M8 18 l24 18 l24-18" fill="none" stroke="currentColor" strokeWidth="3" strokeLinejoin="round"/>
+  </svg>
+);
+
+Icon.Calendar = () => (
+  <svg viewBox="0 0 64 64" width="100%" height="100%">
+    <rect x="8" y="12" width="48" height="44" rx="6" fill="none" stroke="currentColor" strokeWidth="3"/>
+    <path d="M8 24 h48" stroke="currentColor" strokeWidth="3"/>
+    <rect x="20" y="6" width="4" height="12" rx="2" fill="currentColor"/>
+    <rect x="40" y="6" width="4" height="12" rx="2" fill="currentColor"/>
+    <rect x="18" y="32" width="8" height="8" rx="1.5" fill="currentColor"/>
+    <rect x="38" y="32" width="8" height="8" rx="1.5" fill="currentColor" opacity="0.5"/>
+    <rect x="28" y="42" width="8" height="8" rx="1.5" fill="currentColor" opacity="0.5"/>
+  </svg>
+);
+
+Icon.Map = () => (
+  <svg viewBox="0 0 64 64" width="100%" height="100%">
+    <path d="M8 16 l16-6 l16 6 l16-6 v42 l-16 6 l-16-6 l-16 6 z" fill="none" stroke="currentColor" strokeWidth="3" strokeLinejoin="round"/>
+    <path d="M24 10 v42 M40 16 v42" stroke="currentColor" strokeWidth="3"/>
+    <circle cx="44" cy="30" r="3" fill="currentColor"/>
+  </svg>
+);
+
+Icon.Music = () => (
+  <svg viewBox="0 0 64 64" width="100%" height="100%">
+    <path d="M22 44 v-26 l24-6 v26" fill="none" stroke="currentColor" strokeWidth="3" strokeLinejoin="round"/>
+    <ellipse cx="18" cy="46" rx="6" ry="5" fill="currentColor"/>
+    <ellipse cx="42" cy="42" rx="6" ry="5" fill="currentColor"/>
+  </svg>
+);
+
+Icon.Browser = () => (
+  <svg viewBox="0 0 64 64" width="100%" height="100%">
+    <circle cx="32" cy="32" r="22" fill="none" stroke="currentColor" strokeWidth="3"/>
+    <ellipse cx="32" cy="32" rx="10" ry="22" fill="none" stroke="currentColor" strokeWidth="3"/>
+    <path d="M10 32 h44 M14 20 h36 M14 44 h36" stroke="currentColor" strokeWidth="3"/>
+  </svg>
+);
+
+Icon.Wallet = () => (
+  <svg viewBox="0 0 64 64" width="100%" height="100%">
+    <rect x="6" y="14" width="52" height="36" rx="6" fill="none" stroke="currentColor" strokeWidth="3"/>
+    <path d="M40 32 h18" stroke="currentColor" strokeWidth="6" strokeLinecap="round"/>
+    <circle cx="44" cy="32" r="2" fill="#000"/>
+  </svg>
+);
+
+Icon.Notes = () => (
+  <svg viewBox="0 0 64 64" width="100%" height="100%">
+    <path d="M14 8 h28 l12 12 v36 q0 4-4 4 h-36 q-4 0-4-4 v-44 q0-4 4-4 z" fill="none" stroke="currentColor" strokeWidth="3" strokeLinejoin="round"/>
+    <path d="M42 8 v12 h12" fill="none" stroke="currentColor" strokeWidth="3" strokeLinejoin="round"/>
+    <path d="M20 32 h24 M20 40 h24 M20 48 h16" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
+  </svg>
+);
+
+Icon.Health = () => (
+  <svg viewBox="0 0 64 64" width="100%" height="100%">
+    <path d="M32 54 C 14 42, 6 30, 12 20 C 18 10, 30 14, 32 22 C 34 14, 46 10, 52 20 C 58 30, 50 42, 32 54 Z" fill="none" stroke="currentColor" strokeWidth="3" strokeLinejoin="round"/>
+    <path d="M14 32 h8 l3-6 l5 14 l4-10 l3 6 l11 0" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round"/>
+  </svg>
+);
+
+Icon.Weather = () => (
+  <svg viewBox="0 0 64 64" width="100%" height="100%">
+    <circle cx="22" cy="26" r="9" fill="currentColor"/>
+    <path d="M18 42 q-10 0-10 8 q0 7 9 7 h28 q9 0 9-9 q0-10-11-11 q-2-9-12-9 q-7 0-10 6" fill="none" stroke="currentColor" strokeWidth="3" strokeLinejoin="round"/>
+  </svg>
+);
+
+Icon.AI = () => (
+  <svg viewBox="0 0 64 64" width="100%" height="100%">
+    <defs>
+      <linearGradient id="aiGrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stopColor="#7ad9ff"/>
+        <stop offset="1" stopColor="#b58bff"/>
+      </linearGradient>
+    </defs>
+    <path d="M32 6 L40 24 L58 32 L40 40 L32 58 L24 40 L6 32 L24 24 Z" fill="url(#aiGrad)"/>
+    <path d="M48 8 l3 6 l6 3 l-6 3 l-3 6 l-3-6 l-6-3 l6-3 z" fill="#fff" opacity="0.85"/>
+  </svg>
+);
+
+Icon.Files = () => (
+  <svg viewBox="0 0 64 64" width="100%" height="100%">
+    <path d="M8 18 q0-4 4-4 h12 l6 6 h22 q4 0 4 4 v26 q0 4-4 4 h-40 q-4 0-4-4 z" fill="none" stroke="currentColor" strokeWidth="3" strokeLinejoin="round"/>
+    <path d="M8 28 h48" stroke="currentColor" strokeWidth="3"/>
+  </svg>
+);
+
+Icon.Clock = () => (
+  <svg viewBox="0 0 64 64" width="100%" height="100%">
+    <circle cx="32" cy="32" r="22" fill="none" stroke="currentColor" strokeWidth="3"/>
+    <path d="M32 16 v16 l11 7" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
+    <circle cx="32" cy="32" r="2.5" fill="currentColor"/>
+  </svg>
+);
+
+Icon.Calculator = () => (
+  <svg viewBox="0 0 64 64" width="100%" height="100%">
+    <rect x="10" y="6" width="44" height="52" rx="6" fill="none" stroke="currentColor" strokeWidth="3"/>
+    <rect x="16" y="12" width="32" height="12" rx="2" fill="currentColor" opacity="0.25"/>
+    <g fill="currentColor">
+      <circle cx="20" cy="34" r="2.5"/><circle cx="32" cy="34" r="2.5"/><circle cx="44" cy="34" r="2.5"/>
+      <circle cx="20" cy="44" r="2.5"/><circle cx="32" cy="44" r="2.5"/><circle cx="44" cy="44" r="2.5"/>
+      <circle cx="20" cy="52" r="2.5"/><circle cx="32" cy="52" r="2.5"/><circle cx="44" cy="52" r="2.5"/>
+    </g>
+  </svg>
+);
+
+Icon.Gallery = () => (
+  <svg viewBox="0 0 64 64" width="100%" height="100%">
+    <rect x="8" y="8" width="48" height="48" rx="8" fill="none" stroke="currentColor" strokeWidth="3"/>
+    <circle cx="22" cy="22" r="4" fill="currentColor"/>
+    <path d="M8 48 l14-14 l10 10 l8-6 l14 12" fill="none" stroke="currentColor" strokeWidth="3" strokeLinejoin="round"/>
+  </svg>
+);
+
+window.Icon = Icon;
+
+// Desktop modeled after the reference screenshot:
+// - Large slim clock + small date row
+// - Search pill
+// - 4-col tight icon grid with labels
+// - Dock with 4 icons
+const { useState: dUseState, useEffect: dUseEffect } = React;
+
+function StatusBar() {
+  const [time] = dUseState('14:02');
+  return (
+    <div className="status-bar">
+      <div className="sb-left">
+        <span className="sb-carrier">no service</span>
+        <span className="sb-time">{time}</span>
+      </div>
+      <div className="sb-cutout" />
+      <div className="sb-right">
+        <svg width="22" height="16" viewBox="0 0 22 16"><g fill="#fff">
+          <rect x="0" y="10" width="3" height="6" rx="0.8"/>
+          <rect x="5" y="7" width="3" height="9" rx="0.8"/>
+          <rect x="10" y="4" width="3" height="12" rx="0.8"/>
+          <rect x="15" y="1" width="3" height="15" rx="0.8"/>
+        </g></svg>
+        <svg width="22" height="16" viewBox="0 0 22 16"><g fill="none" stroke="#fff" strokeWidth="1.6" strokeLinecap="round">
+          <path d="M2 6 q9-7 18 0"/><path d="M5 9 q6-5 12 0"/><path d="M8 12 q3-3 6 0"/></g><circle cx="11" cy="14" r="1.2" fill="#fff"/></svg>
+        <div className="sb-battery">
+          <div className="sb-batt-fill" />
+          <div className="sb-batt-cap" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Original abstract iconography. Each app has a name + a colored tile + an inner glyph.
+const APPS = [
+  { key:'gallery2', name:'AppGallery', kind:'tile', tone:'#E8404E', glyph:'storeA' },
+  { key:'themes', name:'Themes', kind:'tile', tone:'#9C7BFF', glyph:'themes' },
+  { key:'mydevice', name:'My Device', kind:'tile', tone:'#3B82F6', glyph:'phoneOutline' },
+  { key:'search', name:'Search', kind:'tile', tone:'#3B82F6', glyph:'searchG' },
+
+  { key:'gamectr', name:'GameCenter', kind:'tile', tone:'#22C55E', glyph:'controller' },
+  { key:'books', name:'Books', kind:'tile', tone:'#EC4899', glyph:'books' },
+  { key:'music', name:'Music', kind:'tile', tone:'#EF4444', glyph:'note' },
+  { key:'video', name:'Video', kind:'tile', tone:'#F59E0B', glyph:'play' },
+
+  { key:'health', name:'Health', kind:'tile', tone:'#22C55E', glyph:'heart' },
+  { key:'maps', name:'Maps', kind:'tile', tone:'#06B6D4', glyph:'pin' },
+  { key:'settings', name:'Settings', kind:'tile', tone:'#94A3B8', glyph:'gear' },
+  { key:'gallery', name:'Gallery', kind:'tile', tone:'#FB923C', glyph:'frame' },
+];
+
+const DOCK = [
+  { key:'phone', name:'Phone', tone:'#22C55E', glyph:'phone' },
+  { key:'sms', name:'Messages', tone:'#3B82F6', glyph:'sms' },
+  { key:'photos', name:'Photos', tone:'#FFFFFF', glyph:'photos' },
+  { key:'cam', name:'Camera', tone:'#1F2937', glyph:'cam' },
+];
+
+function Glyph({ id, color }) {
+  const w = '100%', h='100%';
+  switch (id) {
+    case 'storeA':
+      return <svg viewBox="0 0 64 64" width={w} height={h}><path d="M16 50 l10-30 l4-8 h4 l4 8 l10 30 h-8 l-2-7 h-12 l-2 7 z M26 36 h12 l-6-18 z" fill="#fff"/></svg>;
+    case 'themes':
+      return <svg viewBox="0 0 64 64" width={w} height={h}><circle cx="22" cy="32" r="10" fill="#fff" opacity="0.6"/><circle cx="42" cy="32" r="10" fill="#fff" opacity="0.85"/><circle cx="32" cy="22" r="10" fill="#fff" opacity="0.95"/></svg>;
+    case 'phoneOutline':
+      return <svg viewBox="0 0 64 64" width={w} height={h}><rect x="20" y="10" width="24" height="44" rx="5" fill="none" stroke="#fff" strokeWidth="3"/><rect x="28" y="14" width="8" height="2" rx="1" fill="#fff"/><circle cx="32" cy="48" r="2" fill="#fff"/></svg>;
+    case 'searchG':
+      return <svg viewBox="0 0 64 64" width={w} height={h}><circle cx="28" cy="28" r="14" fill="none" stroke="#fff" strokeWidth="4"/><path d="M40 40 l10 10" stroke="#fff" strokeWidth="4" strokeLinecap="round"/><circle cx="28" cy="28" r="6" fill="#fff" opacity="0.6"/></svg>;
+    case 'controller':
+      return <svg viewBox="0 0 64 64" width={w} height={h}><path d="M14 22 q-6 0-6 8 v8 q0 8 8 8 q4 0 6-3 l4-5 h12 l4 5 q2 3 6 3 q8 0 8-8 v-8 q0-8-6-8 z" fill="#fff"/><circle cx="22" cy="32" r="2.5" fill={color}/><circle cx="42" cy="30" r="2" fill={color}/><circle cx="46" cy="34" r="2" fill={color}/></svg>;
+    case 'books':
+      return <svg viewBox="0 0 64 64" width={w} height={h}><path d="M14 14 h16 q4 0 4 4 v32 q0-4-4-4 h-16 z M50 14 h-16 q-4 0-4 4 v32 q0-4 4-4 h16 z" fill="#fff"/></svg>;
+    case 'note':
+      return <svg viewBox="0 0 64 64" width={w} height={h}><path d="M24 44 v-22 l20-5 v22" fill="none" stroke="#fff" strokeWidth="3" strokeLinejoin="round"/><ellipse cx="22" cy="46" rx="5" ry="4" fill="#fff"/><ellipse cx="42" cy="42" rx="5" ry="4" fill="#fff"/></svg>;
+    case 'play':
+      return <svg viewBox="0 0 64 64" width={w} height={h}><path d="M22 18 L46 32 L22 46 Z" fill="#fff"/></svg>;
+    case 'heart':
+      return <svg viewBox="0 0 64 64" width={w} height={h}><path d="M32 50 C 16 40, 10 30, 14 22 C 18 14, 28 16, 32 24 C 36 16, 46 14, 50 22 C 54 30, 48 40, 32 50 Z" fill="#fff"/><path d="M14 32 h6 l3-5 l4 10 l3-7 l3 4 l9 0" fill="none" stroke={color} strokeWidth="2.4" strokeLinejoin="round" strokeLinecap="round"/></svg>;
+    case 'pin':
+      return <svg viewBox="0 0 64 64" width={w} height={h}><path d="M32 12 c-9 0-16 7-16 16 c0 11 16 24 16 24 s16-13 16-24 c0-9-7-16-16-16 z" fill="#fff"/><circle cx="32" cy="28" r="6" fill={color}/></svg>;
+    case 'gear':
+      return <svg viewBox="0 0 64 64" width={w} height={h}><g fill="#fff"><circle cx="32" cy="32" r="9"/><path d="M32 8 l3 6 l-3 4 l-3-4 z M32 56 l-3-6 l3-4 l3 4 z M8 32 l6-3 l4 3 l-4 3 z M56 32 l-6 3 l-4-3 l4-3 z M15 15 l6 1 l1 6 l-6-1 z M49 49 l-6-1 l-1-6 l6 1 z M49 15 l-1 6 l-6 1 l1-6 z M15 49 l1-6 l6-1 l-1 6 z"/></g><circle cx="32" cy="32" r="3" fill={color}/></svg>;
+    case 'frame':
+      return <svg viewBox="0 0 64 64" width={w} height={h}><rect x="10" y="14" width="44" height="36" rx="4" fill="#fff"/><circle cx="22" cy="24" r="3" fill={color}/><path d="M10 44 l12-12 l9 9 l8-6 l15 12" fill={color} stroke={color} strokeWidth="0.5"/></svg>;
+    case 'phone':
+      return <svg viewBox="0 0 64 64" width={w} height={h}><path d="M14 12 q0-4 4-4 h6 q3 0 4 3 l4 10 q1 3-2 5 l-4 3 q5 9 14 14 l3-4 q2-3 5-2 l10 4 q3 1 3 4 v6 q0 4-4 4 q-26 0-43-43 z" fill="#fff"/></svg>;
+    case 'sms':
+      return <svg viewBox="0 0 64 64" width={w} height={h}><path d="M10 22 q0-10 10-10 h24 q10 0 10 10 v14 q0 10-10 10 h-14 l-12 8 v-8 q-8-2-8-10 z" fill="#fff"/><circle cx="24" cy="29" r="2.4" fill={color}/><circle cx="32" cy="29" r="2.4" fill={color}/><circle cx="40" cy="29" r="2.4" fill={color}/></svg>;
+    case 'photos':
+      return <svg viewBox="0 0 64 64" width={w} height={h}>
+        <g transform="translate(32 32)">
+          <circle r="14" fill="#FFD15D" transform="rotate(0)"/>
+          <circle r="14" fill="#22C55E" transform="rotate(60) translate(8 0)" opacity="0.85"/>
+          <circle r="14" fill="#3B82F6" transform="rotate(120) translate(8 0)" opacity="0.85"/>
+          <circle r="14" fill="#EC4899" transform="rotate(180) translate(8 0)" opacity="0.85"/>
+          <circle r="14" fill="#A78BFA" transform="rotate(240) translate(8 0)" opacity="0.85"/>
+          <circle r="14" fill="#EF4444" transform="rotate(300) translate(8 0)" opacity="0.85"/>
+        </g>
+      </svg>;
+    case 'cam':
+      return <svg viewBox="0 0 64 64" width={w} height={h}><rect x="6" y="18" width="52" height="32" rx="6" fill="#fff"/><rect x="22" y="12" width="20" height="8" rx="2" fill="#fff"/><circle cx="32" cy="34" r="9" fill={color}/><circle cx="32" cy="34" r="4" fill="#fff"/></svg>;
+    default: return null;
+  }
+}
+
+function AppTile({ app, size=220 }) {
+  const isLight = app.tone === '#FFFFFF';
+  return (
+    <div className="app">
+      <div className="app-tile" style={{ width:size, height:size, background: app.tone, boxShadow: isLight ? '0 8px 22px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.8)' : undefined }}>
+        <div className="app-tile-glow" />
+        <div className="app-tile-glyph" style={{ color: isLight ? '#1F2937' : '#fff' }}>
+          <Glyph id={app.glyph} color={app.tone}/>
+        </div>
+      </div>
+      <div className="app-name">{app.name}</div>
+    </div>
+  );
+}
+
+function Desktop() {
+  return (
+    <div className="desktop">
+      <StatusBar />
+      <div className="desk-page">
+        <div className="hero">
+          <div className="hero-time">14:02</div>
+          <div className="hero-meta">
+            <span>Mon, 20 May</span>
+            <span className="hero-cloud">
+              <svg viewBox="0 0 24 16" width="22" height="14"><path d="M6 12 q-4 0-4-3 q0-3 3-3 q0-3 4-3 q3 0 4 2 q1-1 3-1 q4 0 4 4 q3 0 3 2 q0 2-3 2 z" fill="rgba(255,255,255,0.85)"/></svg>
+            </span>
+          </div>
+        </div>
+
+        <div className="search-pill">
+          <svg viewBox="0 0 24 24" width="22" height="22"><circle cx="11" cy="11" r="7" fill="none" stroke="rgba(255,255,255,0.65)" strokeWidth="2"/><path d="M16 16 l5 5" stroke="rgba(255,255,255,0.65)" strokeWidth="2" strokeLinecap="round"/></svg>
+          <span>Search or enter URL</span>
+        </div>
+
+        <div className="grid">
+          {APPS.map(a => <AppTile key={a.key} app={a}/>)}
+        </div>
+
+        <div className="page-dots">
+          <span className="dot active"/><span className="dot"/><span className="dot"/>
+        </div>
+
+        <div className="dock">
+          {DOCK.map(a => <AppTile key={a.key} app={a} size={220}/>)}
+        </div>
+
+        <div className="home-indicator" />
+      </div>
+    </div>
+  );
+}
+
+window.Desktop = Desktop;
+
+// Purple/blue AI breathing light along the four edges of the screen.
+function LightFrame({ visible }) {
+  return (
+    <div className={"light-frame" + (visible ? " in" : "")}>
+      <div className="light-edge top"></div>
+      <div className="light-edge bottom"></div>
+      <div className="light-edge left"></div>
+      <div className="light-edge right"></div>
+      <div className="light-corner tl"></div>
+      <div className="light-corner tr"></div>
+      <div className="light-corner bl"></div>
+      <div className="light-corner br"></div>
+    </div>
+  );
+}
+
+window.LightFrame = LightFrame;
+
+// AI Companion bar — slides in from the right edge.
+// States:
+//   idle        : just the orb + hint text
+//   listening   : orb pressed/listening, sonar pulse
+//   thinking    : user msg shown, AI is "thinking"
+//   replied     : both user msg + AI reply visible
+//   flights     : bar widens, flight cards revealed
+
+function EyeIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+         strokeLinecap="round" strokeLinejoin="round">
+      <path d="M2 12 s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12 z" />
+      <circle cx="12" cy="12" r="3.2" />
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"
+         strokeLinecap="round">
+      <path d="M6 6 L18 18 M18 6 L6 18" />
+    </svg>
+  );
+}
+
+function PlaneIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+         strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 12 L21 6 L18 11 L11 12.6 L8 18 L6.5 17.6 L7.6 13.6 L3.6 13 Z" />
+    </svg>
+  );
+}
+
+const FLIGHTS = [
+  { dep:'06:30', arr:'09:50', from:'SZX', to:'PEK',
+    airline:'国航 CA1305', dur:'3h 20m', stops:'直飞', plane:'330',
+    price:'¥ 980', tag:'最早起飞', tagTone:'cool' },
+  { dep:'09:15', arr:'12:30', from:'SZX', to:'PEK',
+    airline:'南航 CZ3105', dur:'3h 15m', stops:'直飞', plane:'320',
+    price:'¥ 1,180', tag:'推荐', tagTone:'hot' },
+  { dep:'11:05', arr:'14:25', from:'SZX', to:'PEK',
+    airline:'厦航 MF8108', dur:'3h 20m', stops:'直飞', plane:'737',
+    price:'¥ 920', tag:'准点率高', tagTone:'cool' },
+  { dep:'13:40', arr:'17:05', from:'SZX', to:'PEK',
+    airline:'海航 HU7802', dur:'3h 25m', stops:'直飞', plane:'737',
+    price:'¥ 860', tag:'最低价', tagTone:'green' },
+  { dep:'16:25', arr:'19:55', from:'SZX', to:'PEK',
+    airline:'川航 3U8902', dur:'3h 30m', stops:'直飞', plane:'350',
+    price:'¥ 1,260', tag:'宽体机', tagTone:'mute' },
+  { dep:'19:50', arr:'23:20', from:'SZX', to:'PEK',
+    airline:'东航 MU5135', dur:'3h 30m', stops:'直飞', plane:'320',
+    price:'¥ 1,050', tag:'晚班', tagTone:'mute' },
+];
+
+// Reasons + hotels shown when the recommended flight is expanded.
+// All reasons are drawn from the user's Feishu workspace data
+// (calendar, docs, past trips) so the recommendation feels "知道你".
+const REASONS = [
+  { src:'飞书日历', text:'你 5 月 15 日 14:00 有「Q2 评审会」，12:30 落地刚好赶上' },
+  { src:'飞书出行', text:'返程已自动锁定 5 月 17 日傍晚，往返均预留 2h 缓冲' },
+  { src:'飞书文档', text:'《北京客户拜访计划》提到首日下午需到客户现场' },
+  { src:'飞书审批', text:'你过去 5 次北京出差全部选了上午时段，准点率 92%' },
+];
+
+const HOTELS = [
+  { name:'北京王府井希尔顿酒店',
+    chip:'含双早', area:'王府井',
+    badge:'近会场 · 1.2km',
+    rating:'4.8', reviews:'1,238',
+    price:'¥ 1,280', sub:'/晚',
+    grad:'linear-gradient(135deg, oklch(0.82 0.16 35) 0%, oklch(0.62 0.18 25) 50%, oklch(0.48 0.18 350) 100%)',
+    deco:'sun' },
+  { name:'前门同仁堂主题酒店',
+    chip:'地铁 5min', area:'前门',
+    badge:'文化体验 · 老城',
+    rating:'4.6', reviews:'986',
+    price:'¥ 980', sub:'/晚',
+    grad:'linear-gradient(135deg, oklch(0.78 0.14 200) 0%, oklch(0.58 0.18 240) 55%, oklch(0.40 0.18 290) 100%)',
+    deco:'gate' },
+  { name:'三里屯洲际行政套房',
+    chip:'CBD 商务', area:'三里屯',
+    badge:'行政酒廊 · 含 4 项福利',
+    rating:'4.9', reviews:'2,054',
+    price:'¥ 1,580', sub:'/晚',
+    grad:'linear-gradient(135deg, oklch(0.82 0.14 150) 0%, oklch(0.58 0.16 180) 55%, oklch(0.40 0.18 230) 100%)',
+    deco:'tower' },
+  { name:'北京王府半岛酒店',
+    chip:'米其林餐厅', area:'金鱼胡同',
+    badge:'奢华入选 · 行政接送',
+    rating:'4.9', reviews:'3,402',
+    price:'¥ 2,180', sub:'/晚',
+    grad:'linear-gradient(135deg, oklch(0.86 0.10 90) 0%, oklch(0.66 0.16 60) 55%, oklch(0.42 0.16 30) 100%)',
+    deco:'crown' },
+];
+
+function StarIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+      <path d="M12 2 L14.6 8.6 L21.6 9.2 L16.3 13.8 L18 20.6 L12 16.9 L6 20.6 L7.7 13.8 L2.4 9.2 L9.4 8.6 Z"/>
+    </svg>
+  );
+}
+
+// Hotels rail with an automatic ping-pong demo (mimics a finger swiping
+// through the cards). Stops the moment the user interacts.
+function HotelsRail({ items, stopDown }) {
+  const railRef = React.useRef(null);
+  const idxRef = React.useRef(0);
+  const dirRef = React.useRef(1);
+  const stoppedRef = React.useRef(false);
+  const timerRef = React.useRef(null);
+  const [activeIdx, setActiveIdx] = React.useState(0);
+  const [showCue, setShowCue] = React.useState(true);
+
+  React.useEffect(() => {
+    const rail = railRef.current;
+    if (!rail) return;
+
+    const stepTo = (i) => {
+      const cardEl = rail.querySelector('.hotel-card');
+      if (!cardEl) return;
+      const cardW = cardEl.offsetWidth + 24; // gap = 24
+      rail.scrollTo({ left: i * cardW, behavior: 'smooth' });
+      setActiveIdx(i);
+    };
+
+    const tick = () => {
+      if (stoppedRef.current) return;
+      let next = idxRef.current + dirRef.current;
+      if (next >= items.length) { dirRef.current = -1; next = items.length - 2; }
+      else if (next < 0)         { dirRef.current = 1;  next = 1; }
+      idxRef.current = next;
+      stepTo(next);
+      timerRef.current = setTimeout(tick, 2400);
+    };
+
+    // Kick off demo after a short pause so user notices the rail.
+    timerRef.current = setTimeout(tick, 1100);
+
+    const stopDemo = () => {
+      stoppedRef.current = true;
+      setShowCue(false);
+      clearTimeout(timerRef.current);
+    };
+    rail.addEventListener('pointerdown', stopDemo, { once: true });
+    rail.addEventListener('wheel', stopDemo, { once: true, passive: true });
+
+    return () => {
+      stoppedRef.current = true;
+      clearTimeout(timerRef.current);
+      rail.removeEventListener('pointerdown', stopDemo);
+      rail.removeEventListener('wheel', stopDemo);
+    };
+  }, [items.length]);
+
+  return (
+    <React.Fragment>
+      <div className="hotels-rail-wrap">
+        <div className="hotels-rail"
+             ref={railRef}
+             onMouseDown={stopDown}
+             onTouchStart={stopDown}>
+          {items.map((h, i) => (
+            <div key={h.name} className="hotel-card"
+                 style={{ animationDelay: `${i * 90 + 200}ms` }}>
+              <div className="hotel-image" style={{ background: h.grad }}>
+                <div className="hotel-image-deco" data-deco={h.deco} />
+                <div className="hotel-image-shine" />
+                <div className="hotel-image-area">{h.area}</div>
+                <div className="hotel-image-rating">
+                  <StarIcon /> <span>{h.rating}</span>
+                </div>
+                <div className="hotel-image-chip">{h.chip}</div>
+              </div>
+              <div className="hotel-info">
+                <div className="hotel-name">{h.name}</div>
+                <div className="hotel-meta">
+                  <span>{h.badge}</span>
+                  <span className="dotsep">·</span>
+                  <span>{h.reviews} 条评价</span>
+                </div>
+                <div className="hotel-info-bot">
+                  <div className="hotel-price">
+                    <span className="hp-num">{h.price}</span>
+                    <span className="hp-sub">{h.sub}</span>
+                  </div>
+                  <button className="hotel-book" onClick={stopDown}>预订</button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* pagination dots tracking the active card */}
+      <div className="hotels-dots">
+        {items.map((_, i) => (
+          <span key={i} className={"hd-dot" + (i === activeIdx ? " active" : "")} />
+        ))}
+      </div>
+    </React.Fragment>
+  );
+}
+
+function FlightCard({ f, idx, visible, isExpanded, onCardClick }) {
+  const delay = visible ? (idx * 90 + 120) : 0;
+  const isRecommended = f.tag === '推荐';
+  const cls = "flight-card"
+    + (visible ? " in" : "")
+    + (isRecommended ? " recommended" : "")
+    + (isExpanded ? " expanded" : "");
+
+  const handleClick = (e) => {
+    if (!isRecommended) return;
+    onCardClick && onCardClick(f);
+  };
+  const stop = (e) => { e.stopPropagation(); };
+
+  return (
+    <div className={cls}
+         style={{ transitionDelay: `${delay}ms` }}
+         onMouseDown={stop}
+         onTouchStart={stop}
+         onClick={handleClick}>
+      <div className="flight-row-top">
+        <div className="flight-times">
+          <div className="flight-time">{f.dep}</div>
+          <div className="flight-route">
+            <span className="flight-from">{f.from}</span>
+            <span className="flight-arrow">
+              <span className="flight-line" />
+              <span className="flight-plane">
+                <PlaneIcon />
+              </span>
+            </span>
+            <span className="flight-to">{f.to}</span>
+          </div>
+          <div className="flight-time">{f.arr}</div>
+        </div>
+        <div className={"flight-tag tag-" + f.tagTone}>{f.tag}</div>
+      </div>
+      <div className="flight-row-bot">
+        <div className="flight-meta">
+          <span>{f.airline}</span>
+          <span className="dotsep">·</span>
+          <span>{f.stops}</span>
+          <span className="dotsep">·</span>
+          <span>{f.dur}</span>
+          <span className="dotsep">·</span>
+          <span>{f.plane}</span>
+        </div>
+        <div className="flight-price">{f.price}</div>
+      </div>
+
+      {/* "Tap to see why" hint — only on the recommended card, only when collapsed */}
+      {isRecommended && !isExpanded && (
+        <div className="flight-tap-hint">
+          <span>点击查看推荐理由 · 同步酒店</span>
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none"
+               stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"
+               strokeLinejoin="round">
+            <path d="M6 9 L12 15 L18 9"/>
+          </svg>
+        </div>
+      )}
+
+      {/* Expanded section: reasons + hotels + actions */}
+      {isRecommended && isExpanded && (
+        <div className="flight-expand">
+          <div className="expand-section">
+            <div className="expand-section-head">
+              <span className="expand-spark">✨</span>
+              <span>根据你的飞书行程为你推荐</span>
+            </div>
+            <div className="reasons">
+              {REASONS.map((r, i) => (
+                <div key={i} className="reason"
+                     style={{ animationDelay: `${i * 70 + 60}ms` }}>
+                  <span className="reason-src">{r.src}</span>
+                  <span className="reason-text">{r.text}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="expand-section hotels-section">
+            <div className="expand-section-head">
+              <span className="expand-spark">🏨</span>
+              <span>顺便预订北京的酒店</span>
+              <span className="expand-section-sub">已为你筛选 {HOTELS.length} 家 · 左右滑动查看</span>
+            </div>
+            <HotelsRail items={HOTELS} stopDown={stop} />
+          </div>
+
+          <div className="expand-actions">
+            <button className="expand-btn ghost" onClick={stop}>仅订机票</button>
+            <button className="expand-btn primary" onClick={stop}>机票 + 酒店一键预订</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AICompanion({ progress, open, onClose, onPointerDown,
+                       aiState, onOrbPress,
+                       expandedAirline, onCardClick }) {
+  const t = open ? 1 : progress;
+  const translate = (1 - t) * 100;
+  const overlayClass = "ai-bar-overlay" + (t > 0.05 ? " in" : "");
+  const stopDown = (e) => { e.stopPropagation(); };
+
+  // Derived flags
+  const showUserMsg = aiState === 'thinking' || aiState === 'replied' || aiState === 'flights';
+  const showAiReply = aiState === 'replied' || aiState === 'flights';
+  const expanded    = aiState === 'flights';
+  const flightsVisible = aiState === 'flights';
+
+  // orb modifier classes
+  const orbClass = "ai-orb"
+    + (aiState === 'listening' ? ' pressed listening' : '')
+    + (aiState === 'thinking'  ? ' thinking' : '')
+    + (aiState === 'replied' || aiState === 'flights' ? ' replied' : '');
+
+  const idleHint = aiState === 'idle' ? '点击或按住说话' :
+                   aiState === 'listening' ? '正在聆听…' :
+                   aiState === 'thinking'  ? '正在思考…' :
+                   '继续说话';
+
+  return (
+    <React.Fragment>
+      <div className={overlayClass}
+           style={{ background: `rgba(0,0,0,${(t * 0.32).toFixed(3)})` }}
+           onClick={onClose} />
+
+      <div className={"ai-bar" + (expanded ? " expanded" : "")}
+           style={{ transform: `translateX(${translate}%)` }}
+           onMouseDown={onPointerDown}
+           onTouchStart={onPointerDown}>
+
+        <button className="ai-bar-close"
+                onMouseDown={stopDown}
+                onTouchStart={stopDown}
+                onClick={onClose}
+                aria-label="关闭">
+          <CloseIcon />
+        </button>
+
+        {/* TOP: hint card OR initial recognize-screen action — only when idle */}
+        {aiState === 'idle' && (
+          <React.Fragment>
+            <div className="ai-bar-hint">
+              当前页面需要手动<br/>触发识屏
+            </div>
+            <div className="ai-bar-action">
+              <EyeIcon />
+              <span>识别屏幕</span>
+            </div>
+          </React.Fragment>
+        )}
+
+        {/* CONVERSATION area — appears once user has talked */}
+        {(showUserMsg || showAiReply) && (
+          <div className="ai-bar-chat">
+            {showUserMsg && (
+              <div className="chat-bubble user-bubble">
+                帮我买一张去北京的机票
+              </div>
+            )}
+            {showAiReply && (
+              <div className="chat-bubble ai-bubble">
+                <span className="ai-bubble-tag">AI</span>
+                好的，正在帮你查询机票
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* FLIGHTS panel — only visible when expanded */}
+        {expanded && (
+          <div className="flights-panel">
+            <div className="flights-head">
+              <div>
+                <div className="flights-title">为你找到 {FLIGHTS.length} 个航班</div>
+                <div className="flights-sub">深圳 SZX → 北京 PEK · 5 月 15 日 · 周五</div>
+              </div>
+              <div className="flights-filter">
+                <span className="filter-chip active">推荐</span>
+                <span className="filter-chip">价格</span>
+                <span className="filter-chip">起飞时间</span>
+              </div>
+            </div>
+            <div className="flights-list">
+              {FLIGHTS.map((f, i) => (
+                <FlightCard key={f.airline}
+                            f={f} idx={i}
+                            visible={flightsVisible}
+                            isExpanded={expandedAirline === f.airline}
+                            onCardClick={onCardClick} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="ai-bar-spacer" />
+
+        <div className="ai-bar-voice">
+          <div className={orbClass}
+               onMouseDown={(e) => { stopDown(e); onOrbPress && onOrbPress(); }}
+               onTouchStart={(e) => { stopDown(e); onOrbPress && onOrbPress(); }}>
+            <div className="ai-orb-pulse" />
+            <div className="ai-orb-pulse delay" />
+          </div>
+          <div className="ai-bar-voice-text">{idleHint}</div>
+        </div>
+      </div>
+    </React.Fragment>
+  );
+}
+
+window.AICompanion = AICompanion;
+
+// Scene 4 main app:
+//   1. Desktop renders immediately (same as scene1).
+//   2. After 4 seconds, AI light frame fades in around the edges.
+//   3. Swipe right-to-left to slide the AI companion bar in.
+//   4. Tap the voice orb → press animation + simulated dialogue:
+//        - user: "帮我买一张去北京的机票"
+//        - AI:  "好的，正在帮你查询机票"
+//      then bar widens to the left and reveals flight cards.
+
+const { useState: aUseState, useEffect: aUseEffect, useRef: aUseRef, useCallback: aUseCallback } = React;
+
+function App() {
+  const [lightOn, setLightOn] = aUseState(false);
+  const [barOpen, setBarOpen] = aUseState(false);
+  const [barProgress, setBarProgress] = aUseState(0); // 0..1
+  // aiState: 'idle' | 'listening' | 'thinking' | 'replied' | 'flights'
+  const [aiState, setAiState] = aUseState('idle');
+  const [expandedAirline, setExpandedAirline] = aUseState(null);
+  const aiTimers = aUseRef([]);
+  const dragRef = aUseRef({ active: false, startX: 0, startProgress: 0, moved: false });
+
+  // Trigger AI light frame after 4 seconds
+  aUseEffect(() => {
+    const id = setTimeout(() => setLightOn(true), 4000);
+    return () => clearTimeout(id);
+  }, []);
+
+  const animateTo = aUseCallback((from, to, dur = 420) => {
+    const start = performance.now();
+    const opening = to > from;
+    const tick = (now) => {
+      const t = Math.min(1, (now - start) / dur);
+      const eased = opening
+        ? 1 - Math.pow(1 - t, 3)
+        : (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+      const v = from + (to - from) * eased;
+      setBarProgress(v);
+      if (t < 1) requestAnimationFrame(tick);
+      else setBarOpen(to >= 1);
+    };
+    requestAnimationFrame(tick);
+  }, []);
+
+  const onPointerDown = aUseCallback((e) => {
+    if (!lightOn) return;
+    const x = (e.touches ? e.touches[0].clientX : e.clientX);
+    dragRef.current = { active: true, startX: x, startProgress: barOpen ? 1 : barProgress, moved: false };
+  }, [lightOn, barOpen, barProgress]);
+
+  const onPointerMove = aUseCallback((e) => {
+    if (!dragRef.current.active) return;
+    const x = (e.touches ? e.touches[0].clientX : e.clientX);
+    const dx = x - dragRef.current.startX;
+    if (Math.abs(dx) > 4) dragRef.current.moved = true;
+    const vw = window.innerWidth;
+    const delta = -dx / (vw * 0.45);
+    let p = dragRef.current.startProgress + delta;
+    p = Math.max(0, Math.min(1, p));
+    setBarProgress(p);
+    if (p >= 1) setBarOpen(true);
+    if (p <= 0) setBarOpen(false);
+  }, []);
+
+  const onPointerUp = aUseCallback(() => {
+    if (!dragRef.current.active) return;
+    const moved = dragRef.current.moved;
+    dragRef.current.active = false;
+    if (!moved) return;
+    setBarProgress(p => {
+      const target = p > 0.4 ? 1 : 0;
+      const dur = target === 1 ? 420 : 520;
+      animateTo(p, target, dur);
+      return p;
+    });
+  }, [animateTo]);
+
+  aUseEffect(() => {
+    window.addEventListener('mousemove', onPointerMove);
+    window.addEventListener('mouseup', onPointerUp);
+    window.addEventListener('touchmove', onPointerMove, { passive: true });
+    window.addEventListener('touchend', onPointerUp);
+    return () => {
+      window.removeEventListener('mousemove', onPointerMove);
+      window.removeEventListener('mouseup', onPointerUp);
+      window.removeEventListener('touchmove', onPointerMove);
+      window.removeEventListener('touchend', onPointerUp);
+    };
+  }, [onPointerMove, onPointerUp]);
+
+  // ---- AI dialogue choreography ----
+  const clearAiTimers = () => {
+    aiTimers.current.forEach(t => clearTimeout(t));
+    aiTimers.current = [];
+  };
+
+  const onOrbPress = aUseCallback(() => {
+    if (aiState !== 'idle') return;
+    clearAiTimers();
+    setAiState('listening');
+
+    // 800ms later, user message lands
+    aiTimers.current.push(setTimeout(() => setAiState('thinking'), 1100));
+    // 1900ms later, AI reply lands
+    aiTimers.current.push(setTimeout(() => setAiState('replied'), 2300));
+    // 3200ms later, expand bar + show flights
+    aiTimers.current.push(setTimeout(() => setAiState('flights'), 3500));
+  }, [aiState]);
+
+  const closeBar = aUseCallback(() => {
+    clearAiTimers();
+    animateTo(barOpen ? 1 : barProgress, 0, 540);
+    // reset AI state shortly after close completes
+    setTimeout(() => { setAiState('idle'); setExpandedAirline(null); }, 600);
+  }, [animateTo, barOpen, barProgress]);
+
+  const onCardClick = aUseCallback((flight) => {
+    // Only the recommended card is interactive — toggle its expansion.
+    if (flight.tag !== '推荐') return;
+    setExpandedAirline(prev => prev === flight.airline ? null : flight.airline);
+  }, []);
+
+  return (
+    <div className="app-root">
+      <window.Desktop />
+
+      <window.LightFrame visible={lightOn} />
+
+      <div className={"swipe-hint" + (lightOn && barProgress < 0.05 ? " in" : "")}>
+        <div className="swipe-hint-arrow"></div>
+        <div className="swipe-hint-text">向左滑出 AI</div>
+      </div>
+
+      <window.AICompanion
+        open={barOpen}
+        progress={barProgress}
+        onClose={closeBar}
+        onPointerDown={onPointerDown}
+        aiState={aiState}
+        onOrbPress={onOrbPress}
+        expandedAirline={expandedAirline}
+        onCardClick={onCardClick}
+      />
+
+      {lightOn && barProgress < 0.05 && (
+        <div className="drag-zone-right"
+             onMouseDown={onPointerDown}
+             onTouchStart={onPointerDown} />
+      )}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('app')).render(<App/>);
+</script>
+</body>
+</html>
