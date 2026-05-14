@@ -124,6 +124,10 @@ function getViewByOffset(view, offset) {
   return AI_CARD_VIEWS[next].id;
 }
 
+function clamp01(value) {
+  return Math.max(0, Math.min(1, value));
+}
+
 function ProductVisual({ item }) {
   if (item.img) {
     return <img src={item.img} alt="" />;
@@ -301,11 +305,116 @@ function HardwareStatus({ armed, capturedItem }) {
           {capturedItem
             ? `${capturedItem.productName} · BLE HID`
             : armed
-              ? "在图片上画圈弹出 AI 卡片"
+              ? "画圈弹卡，长按收进陪伴栏"
               : "MPR121 铜箔会发送 Space down"}
         </small>
       </div>
     </div>
+  );
+}
+
+function CompanionBar({ progress, items, onClose, onPointerDown }) {
+  const t = clamp01(progress);
+  const translate = (1 - t) * 100;
+  const latest = items[0];
+  const hasItems = Boolean(latest);
+  const stopDown = (event) => event.stopPropagation();
+
+  return (
+    <React.Fragment>
+      <div
+        className={"companion-overlay" + (t > 0.04 ? " in" : "")}
+        style={{ background: `rgba(29, 27, 24, ${(t * 0.18).toFixed(3)})` }}
+        onClick={onClose}
+      />
+      <aside
+        className={"companion-bar" + (hasItems ? " has-items" : "")}
+        style={{
+          opacity: Math.min(1, t * 8),
+          transform: `translate3d(${translate}%, 0, 0)`,
+        }}
+        onMouseDown={onPointerDown}
+        onTouchStart={onPointerDown}
+        aria-label="AI 陪伴栏"
+      >
+        <button
+          className="companion-close"
+          type="button"
+          aria-label="关闭陪伴栏"
+          onMouseDown={stopDown}
+          onTouchStart={stopDown}
+          onClick={onClose}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
+            <path d="M6 6l12 12M18 6L6 18" />
+          </svg>
+        </button>
+
+        <div className="companion-head">
+          <div className="companion-kicker">
+            <span />
+            NOMI · 陪伴栏
+          </div>
+          <h2>{hasItems ? "我接住这张图了" : "陪伴栏待命"}</h2>
+          <p>
+            {hasItems
+              ? "图片已进入侧栏，可以继续追加更多画面。"
+              : "等待你把屏幕里的图片交给我。"}
+          </p>
+        </div>
+
+        {!hasItems && (
+          <div className="companion-empty">
+            <span>READY</span>
+            <strong>右侧边缘已连接</strong>
+            <p>背触选中的图片会出现在这里。</p>
+          </div>
+        )}
+
+        {hasItems && (
+          <div className="companion-body">
+            <div className="companion-current">
+              <div className="companion-current-img">
+                <ProductVisual item={latest} />
+              </div>
+              <div className="companion-current-copy">
+                <span>{latest.kind}</span>
+                <strong>{latest.productName}</strong>
+                <p>{latest.summary}</p>
+              </div>
+            </div>
+
+            <div className="companion-actions" aria-label="陪伴栏操作">
+              <button type="button">找相似</button>
+              <button type="button">比价</button>
+              <button type="button">保存</button>
+            </div>
+
+            <div className="companion-thread">
+              <div className="companion-message user">
+                <span>我想把这张图拿出来继续看。</span>
+              </div>
+              <div className="companion-message ai">
+                <span>已加入侧栏，我会保留它的主体、价格和相似线索。</span>
+              </div>
+            </div>
+
+            {items.length > 1 && (
+              <div className="companion-strip" aria-label="已加入陪伴栏的图片">
+                {items.slice(0, 4).map((item) => (
+                  <div className="companion-thumb" key={item.id}>
+                    <ProductVisual item={item} />
+                  </div>
+                ))}
+                <span>{items.length}</span>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div className="companion-footer">AI 记忆槽 · {items.length}/4</div>
+      </aside>
+    </React.Fragment>
   );
 }
 
@@ -547,8 +656,24 @@ function App() {
   const [armed, setArmed] = React.useState(false);
   const [selected, setSelected] = React.useState(null);
   const [notice, setNotice] = React.useState("");
+  const [barProgress, setBarProgress] = React.useState(0);
+  const [companionItems, setCompanionItems] = React.useState([]);
   const armedRef = React.useRef(false);
   const noticeTimerRef = React.useRef(null);
+  const barProgressRef = React.useRef(0);
+  const barAnimationRef = React.useRef(0);
+  const barDragRef = React.useRef({
+    active: false,
+    moved: false,
+    startX: 0,
+    startProgress: 0,
+  });
+
+  const setBarProgressClamped = React.useCallback((value) => {
+    const next = clamp01(value);
+    barProgressRef.current = next;
+    setBarProgress(next);
+  }, []);
 
   const showNotice = React.useCallback((text) => {
     setNotice(text);
@@ -560,6 +685,40 @@ function App() {
     armedRef.current = held;
     setArmed(held);
   }, []);
+
+  const animateBarTo = React.useCallback((from, to, duration) => {
+    const animationId = barAnimationRef.current + 1;
+    barAnimationRef.current = animationId;
+    const start = performance.now();
+    const opening = to > from;
+
+    const tick = (now) => {
+      if (barAnimationRef.current !== animationId) return;
+
+      const raw = Math.min(1, (now - start) / duration);
+      const eased = opening
+        ? 1 - Math.pow(1 - raw, 3)
+        : raw < 0.5
+          ? 4 * raw * raw * raw
+          : 1 - Math.pow(-2 * raw + 2, 3) / 2;
+
+      setBarProgressClamped(from + (to - from) * eased);
+
+      if (raw < 1) {
+        window.requestAnimationFrame(tick);
+      }
+    };
+
+    window.requestAnimationFrame(tick);
+  }, [setBarProgressClamped]);
+
+  const closeCompanion = React.useCallback(() => {
+    animateBarTo(barProgressRef.current, 0, 520);
+  }, [animateBarTo]);
+
+  const openCompanion = React.useCallback(() => {
+    animateBarTo(barProgressRef.current, 1, 420);
+  }, [animateBarTo]);
 
   React.useEffect(() => {
     const isBackTouchKey = (event) => event.code === "Space" || event.key === " ";
@@ -587,15 +746,106 @@ function App() {
     };
   }, [setHeld]);
 
-  React.useEffect(() => () => window.clearTimeout(noticeTimerRef.current), []);
+  React.useEffect(() => () => {
+    window.clearTimeout(noticeTimerRef.current);
+    barAnimationRef.current += 1;
+  }, []);
+
+  const startBarDrag = React.useCallback((event) => {
+    const point = event.touches ? event.touches[0] : event;
+    if (!point) return;
+
+    barAnimationRef.current += 1;
+    barDragRef.current = {
+      active: true,
+      moved: false,
+      startX: point.clientX,
+      startProgress: barProgressRef.current,
+    };
+  }, []);
+
+  const moveBarDrag = React.useCallback((event) => {
+    if (!barDragRef.current.active) return;
+
+    const point = event.touches ? event.touches[0] : event;
+    if (!point) return;
+
+    const dx = point.clientX - barDragRef.current.startX;
+    if (Math.abs(dx) > 4) {
+      barDragRef.current.moved = true;
+    }
+
+    const distance = Math.max(320, window.innerWidth * 0.45);
+    setBarProgressClamped(barDragRef.current.startProgress - dx / distance);
+  }, [setBarProgressClamped]);
+
+  const endBarDrag = React.useCallback(() => {
+    if (!barDragRef.current.active) return;
+
+    const moved = barDragRef.current.moved;
+    barDragRef.current.active = false;
+    if (!moved) return;
+
+    const target = barProgressRef.current > 0.36 ? 1 : 0;
+    animateBarTo(barProgressRef.current, target, target ? 420 : 520);
+  }, [animateBarTo]);
+
+  React.useEffect(() => {
+    window.addEventListener("mousemove", moveBarDrag);
+    window.addEventListener("mouseup", endBarDrag);
+    window.addEventListener("touchmove", moveBarDrag, { passive: true });
+    window.addEventListener("touchend", endBarDrag);
+
+    return () => {
+      window.removeEventListener("mousemove", moveBarDrag);
+      window.removeEventListener("mouseup", endBarDrag);
+      window.removeEventListener("touchmove", moveBarDrag);
+      window.removeEventListener("touchend", endBarDrag);
+    };
+  }, [endBarDrag, moveBarDrag]);
 
   const pickItem = React.useCallback((item) => {
     if (!armedRef.current) {
-      showNotice("先按住背面铜箔，再圈选图片");
+      showNotice("先按住背面铜箔，再画圈或长按图片");
       return;
     }
-    showNotice(`圈住 ${item.productName} 再松手`);
+    showNotice(`圈住 ${item.productName} 弹卡，长按可加入陪伴栏`);
   }, [showNotice]);
+
+  const findItemByPoint = React.useCallback((point) => {
+    const canvas = document.getElementById("canvas");
+    if (!canvas) return null;
+
+    const canvasRect = canvas.getBoundingClientRect();
+    const scale = canvasRect.width / 1600;
+    const buttons = Array.from(document.querySelectorAll("[data-card-id] .xhs-card-img"));
+
+    for (const button of buttons) {
+      const card = button.closest("[data-card-id]");
+      const id = card?.getAttribute("data-card-id");
+      const item = ITEM_BY_ID[id];
+      if (!item) continue;
+
+      const rect = button.getBoundingClientRect();
+      const target = {
+        left: (rect.left - canvasRect.left) / scale,
+        right: (rect.right - canvasRect.left) / scale,
+        top: (rect.top - canvasRect.top) / scale,
+        bottom: (rect.bottom - canvasRect.top) / scale,
+      };
+
+      if (
+        point.x >= target.left &&
+        point.x <= target.right &&
+        point.y >= target.top &&
+        point.y <= target.bottom
+      ) {
+        return item;
+      }
+    }
+
+    return null;
+  }, []);
 
   const findItemByCircle = React.useCallback((bounds) => {
     const canvas = document.getElementById("canvas");
@@ -676,11 +926,39 @@ function App() {
     setNotice("");
   }, [findItemByCircle, showNotice]);
 
+  const addItemToCompanion = React.useCallback((item) => {
+    setCompanionItems((current) => [
+      item,
+      ...current.filter((entry) => entry.id !== item.id),
+    ].slice(0, 4));
+    setSelected(null);
+    showNotice(`${item.productName} 已进入陪伴栏`);
+    openCompanion();
+  }, [openCompanion, showNotice]);
+
+  const completeLongPress = React.useCallback((point) => {
+    if (!armedRef.current) {
+      showNotice("先按住背面铜箔，再长按图片");
+      return;
+    }
+
+    const item = findItemByPoint(point);
+    if (!item) {
+      showNotice("长按图片主体才能加入陪伴栏");
+      return;
+    }
+
+    addItemToCompanion(item);
+  }, [addItemToCompanion, findItemByPoint, showNotice]);
+
   const replay = React.useCallback(() => {
     setSelected(null);
     setNotice("");
+    setCompanionItems([]);
     setHeld(false);
-  }, [setHeld]);
+    barAnimationRef.current += 1;
+    setBarProgressClamped(0);
+  }, [setBarProgressClamped, setHeld]);
 
   return (
     <div className={"app-root" + (armed ? " is-armed" : "") + (notice ? " needs-touch" : "")}>
@@ -695,10 +973,26 @@ function App() {
       <DrawCircleLayer
         active={armed && !selected}
         onComplete={completeCircle}
+        onLongPress={completeLongPress}
         onInvalid={() => showNotice("画一个圈来选择图片")}
       />
+      <div className={"swipe-hint" + (barProgress < 0.05 ? " in" : "")}>
+        <div className="swipe-hint-arrow" />
+        <div className="swipe-hint-text">向左唤起陪伴栏</div>
+      </div>
+      <CompanionBar
+        progress={barProgress}
+        items={companionItems}
+        onClose={closeCompanion}
+        onPointerDown={startBarDrag}
+      />
+      <div
+        className={"drag-zone-right" + (barProgress < 0.05 ? " in" : "")}
+        onMouseDown={startBarDrag}
+        onTouchStart={startBarDrag}
+      />
       <div className={"tap-note" + (notice ? " warn" : "")}>
-        {notice || (armed ? "保持背触按住，在图片上画圈" : "BLE HID: Space hold = 背触按住")}
+        {notice || (armed ? "画圈弹卡，长按图片进入陪伴栏" : "右侧边框左滑唤起陪伴栏")}
       </div>
       <AICard item={selected} visible={Boolean(selected)} onClose={() => setSelected(null)} />
       <button className="replay-btn in" type="button" aria-label="重播演示" onClick={replay}>

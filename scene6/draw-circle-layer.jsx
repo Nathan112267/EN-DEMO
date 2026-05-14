@@ -2,6 +2,8 @@ import React from "react";
 
 const CANVAS_WIDTH = 1600;
 const CANVAS_HEIGHT = 2560;
+const LONG_PRESS_MS = 620;
+const LONG_PRESS_MOVE = 28;
 
 function distance(a, b) {
   return Math.hypot(a.x - b.x, a.y - b.y);
@@ -64,14 +66,26 @@ function buildPath(points) {
   return d;
 }
 
-function DrawCircleLayer({ active, onComplete, onInvalid }) {
+function DrawCircleLayer({ active, onComplete, onInvalid, onLongPress }) {
   const [points, setPoints] = React.useState([]);
   const [drawing, setDrawing] = React.useState(false);
   const [complete, setComplete] = React.useState(false);
   const svgRef = React.useRef(null);
   const pointsRef = React.useRef([]);
+  const longPressTimerRef = React.useRef(null);
+  const longPressOriginRef = React.useRef(null);
+  const longPressFiredRef = React.useRef(false);
+
+  const clearLongPress = React.useCallback(() => {
+    window.clearTimeout(longPressTimerRef.current);
+    longPressTimerRef.current = null;
+  }, []);
 
   React.useEffect(() => {
+    clearLongPress();
+    longPressOriginRef.current = null;
+    longPressFiredRef.current = false;
+
     if (!active) {
       pointsRef.current = [];
       setPoints([]);
@@ -84,7 +98,9 @@ function DrawCircleLayer({ active, onComplete, onInvalid }) {
     setPoints([]);
     setDrawing(false);
     setComplete(false);
-  }, [active]);
+  }, [active, clearLongPress]);
+
+  React.useEffect(() => () => clearLongPress(), [clearLongPress]);
 
   const toLocal = React.useCallback((event) => {
     const svg = svgRef.current;
@@ -100,11 +116,14 @@ function DrawCircleLayer({ active, onComplete, onInvalid }) {
   }, []);
 
   const resetStroke = React.useCallback(() => {
+    clearLongPress();
+    longPressOriginRef.current = null;
+    longPressFiredRef.current = false;
     pointsRef.current = [];
     setPoints([]);
     setDrawing(false);
     setComplete(false);
-  }, []);
+  }, [clearLongPress]);
 
   const onDown = React.useCallback((event) => {
     if (complete) return;
@@ -116,7 +135,26 @@ function DrawCircleLayer({ active, onComplete, onInvalid }) {
     pointsRef.current = [point];
     setPoints([point]);
     setDrawing(true);
-  }, [complete, toLocal]);
+    longPressOriginRef.current = point;
+    longPressFiredRef.current = false;
+
+    if (onLongPress) {
+      clearLongPress();
+      longPressTimerRef.current = window.setTimeout(() => {
+        const origin = longPressOriginRef.current;
+        if (!origin) return;
+
+        longPressFiredRef.current = true;
+        onLongPress(origin);
+        clearLongPress();
+        longPressOriginRef.current = null;
+        pointsRef.current = [];
+        setPoints([]);
+        setDrawing(false);
+        setComplete(false);
+      }, LONG_PRESS_MS);
+    }
+  }, [clearLongPress, complete, onLongPress, toLocal]);
 
   const onMove = React.useCallback((event) => {
     if (!drawing || complete) return;
@@ -124,15 +162,28 @@ function DrawCircleLayer({ active, onComplete, onInvalid }) {
     const point = toLocal(event);
     if (!point) return;
 
+    const origin = longPressOriginRef.current;
+    if (origin && distance(point, origin) > LONG_PRESS_MOVE) {
+      clearLongPress();
+    }
+
+    if (longPressFiredRef.current) return;
+
     const current = pointsRef.current;
     const last = current[current.length - 1];
     if (last && distance(point, last) < 5) return;
 
     pointsRef.current = [...current, point];
     setPoints(pointsRef.current);
-  }, [complete, drawing, toLocal]);
+  }, [clearLongPress, complete, drawing, toLocal]);
 
   const finish = React.useCallback((event) => {
+    clearLongPress();
+    if (longPressFiredRef.current) {
+      resetStroke();
+      return;
+    }
+
     if (!drawing) return;
     event?.preventDefault?.();
     event?.currentTarget?.releasePointerCapture?.(event.pointerId);
@@ -152,7 +203,7 @@ function DrawCircleLayer({ active, onComplete, onInvalid }) {
       onComplete?.({ points: finalPoints, bounds });
       resetStroke();
     }, 220);
-  }, [drawing, onComplete, onInvalid, resetStroke]);
+  }, [clearLongPress, drawing, onComplete, onInvalid, resetStroke]);
 
   const pathD = React.useMemo(() => buildPath(points), [points]);
 
