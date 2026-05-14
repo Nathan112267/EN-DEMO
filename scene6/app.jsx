@@ -1,4 +1,5 @@
 import React from "react";
+import DrawCircleLayer from "./draw-circle-layer.jsx";
 
 const FEED_IMAGES = {
   fashion: new URL("../scene3/images/fashion.jpg", import.meta.url).href,
@@ -171,8 +172,8 @@ function FeedCard({ item, armed, selected, onPick }) {
         className="xhs-card-img"
         type="button"
         style={{ aspectRatio: `400 / ${Math.round(item.ratio * 400)}` }}
-        aria-label={`背触选图：${item.productName}`}
-        onClick={(event) => onPick(item, event.currentTarget)}
+        aria-label={`背触圈选：${item.productName}`}
+        onClick={() => onPick(item)}
       >
         <ProductVisual item={item} />
         <span className="scan-reticle" aria-hidden="true" />
@@ -300,7 +301,7 @@ function HardwareStatus({ armed, capturedItem }) {
           {capturedItem
             ? `${capturedItem.productName} · BLE HID`
             : armed
-              ? "点击任意图片弹出 AI 卡片"
+              ? "在图片上画圈弹出 AI 卡片"
               : "MPR121 铜箔会发送 Space down"}
         </small>
       </div>
@@ -545,9 +546,15 @@ function AICard({ item, visible, onClose }) {
 function App() {
   const [armed, setArmed] = React.useState(false);
   const [selected, setSelected] = React.useState(null);
-  const [flash, setFlash] = React.useState(false);
+  const [notice, setNotice] = React.useState("");
   const armedRef = React.useRef(false);
-  const flashTimerRef = React.useRef(null);
+  const noticeTimerRef = React.useRef(null);
+
+  const showNotice = React.useCallback((text) => {
+    setNotice(text);
+    window.clearTimeout(noticeTimerRef.current);
+    noticeTimerRef.current = window.setTimeout(() => setNotice(""), 1100);
+  }, []);
 
   const setHeld = React.useCallback((held) => {
     armedRef.current = held;
@@ -580,27 +587,103 @@ function App() {
     };
   }, [setHeld]);
 
-  React.useEffect(() => () => window.clearTimeout(flashTimerRef.current), []);
+  React.useEffect(() => () => window.clearTimeout(noticeTimerRef.current), []);
 
   const pickItem = React.useCallback((item) => {
     if (!armedRef.current) {
-      setFlash(true);
-      window.clearTimeout(flashTimerRef.current);
-      flashTimerRef.current = window.setTimeout(() => setFlash(false), 900);
+      showNotice("先按住背面铜箔，再圈选图片");
       return;
     }
-    setSelected(item);
-    setFlash(false);
+    showNotice(`圈住 ${item.productName} 再松手`);
+  }, [showNotice]);
+
+  const findItemByCircle = React.useCallback((bounds) => {
+    const canvas = document.getElementById("canvas");
+    if (!canvas) return null;
+
+    const canvasRect = canvas.getBoundingClientRect();
+    const scale = canvasRect.width / 1600;
+    const padded = {
+      left: bounds.left - 36,
+      right: bounds.right + 36,
+      top: bounds.top - 36,
+      bottom: bounds.bottom + 36,
+      width: bounds.width + 72,
+      height: bounds.height + 72,
+      cx: bounds.cx,
+      cy: bounds.cy,
+    };
+
+    let best = null;
+    const buttons = Array.from(document.querySelectorAll("[data-card-id] .xhs-card-img"));
+    for (const button of buttons) {
+      const card = button.closest("[data-card-id]");
+      const id = card?.getAttribute("data-card-id");
+      const item = ITEM_BY_ID[id];
+      if (!item) continue;
+
+      const rect = button.getBoundingClientRect();
+      const target = {
+        left: (rect.left - canvasRect.left) / scale,
+        right: (rect.right - canvasRect.left) / scale,
+        top: (rect.top - canvasRect.top) / scale,
+        bottom: (rect.bottom - canvasRect.top) / scale,
+      };
+      target.width = target.right - target.left;
+      target.height = target.bottom - target.top;
+
+      const overlapW = Math.max(0, Math.min(padded.right, target.right) - Math.max(padded.left, target.left));
+      const overlapH = Math.max(0, Math.min(padded.bottom, target.bottom) - Math.max(padded.top, target.top));
+      const overlap = overlapW * overlapH;
+      const targetArea = Math.max(1, target.width * target.height);
+      const circleArea = Math.max(1, padded.width * padded.height);
+      const targetCenterInside =
+        padded.cx >= target.left &&
+        padded.cx <= target.right &&
+        padded.cy >= target.top &&
+        padded.cy <= target.bottom;
+      const circleCenterInside =
+        (target.left + target.right) / 2 >= padded.left &&
+        (target.left + target.right) / 2 <= padded.right &&
+        (target.top + target.bottom) / 2 >= padded.top &&
+        (target.top + target.bottom) / 2 <= padded.bottom;
+      const score =
+        overlap / Math.min(targetArea, circleArea) +
+        (targetCenterInside ? 0.55 : 0) +
+        (circleCenterInside ? 0.35 : 0);
+
+      if (!best || score > best.score) {
+        best = { item, score };
+      }
+    }
+
+    return best && best.score > 0.18 ? best.item : null;
   }, []);
+
+  const completeCircle = React.useCallback(({ bounds }) => {
+    if (!armedRef.current) {
+      showNotice("先按住背面铜箔，再圈选图片");
+      return;
+    }
+
+    const item = findItemByCircle(bounds);
+    if (!item) {
+      showNotice("圈住图片主体再松手");
+      return;
+    }
+
+    setSelected(item);
+    setNotice("");
+  }, [findItemByCircle, showNotice]);
 
   const replay = React.useCallback(() => {
     setSelected(null);
-    setFlash(false);
+    setNotice("");
     setHeld(false);
   }, [setHeld]);
 
   return (
-    <div className={"app-root" + (armed ? " is-armed" : "") + (flash ? " needs-touch" : "")}>
+    <div className={"app-root" + (armed ? " is-armed" : "") + (notice ? " needs-touch" : "")}>
       <XhsFeed armed={armed} selectedId={selected?.id} onPick={pickItem} />
       <div className={"light-frame" + (armed ? " in" : "")}>
         <div className="light-edge top" />
@@ -609,8 +692,13 @@ function App() {
         <div className="light-edge right" />
       </div>
       <HardwareStatus armed={armed} capturedItem={selected} />
-      <div className={"tap-note" + (flash ? " warn" : "")}>
-        {flash ? "先按住背面铜箔，再点图片" : "BLE HID: Space hold = 背触按住"}
+      <DrawCircleLayer
+        active={armed && !selected}
+        onComplete={completeCircle}
+        onInvalid={() => showNotice("画一个圈来选择图片")}
+      />
+      <div className={"tap-note" + (notice ? " warn" : "")}>
+        {notice || (armed ? "保持背触按住，在图片上画圈" : "BLE HID: Space hold = 背触按住")}
       </div>
       <AICard item={selected} visible={Boolean(selected)} onClose={() => setSelected(null)} />
       <button className="replay-btn in" type="button" aria-label="重播演示" onClick={replay}>
