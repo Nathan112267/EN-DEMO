@@ -106,6 +106,22 @@ const FEED_ITEMS = [
 ];
 
 const ITEM_BY_ID = Object.fromEntries(FEED_ITEMS.map((item) => [item.id, item]));
+const AI_CARD_VIEWS = [
+  { id: "summary", label: "识别", aria: "AI 识别结果" },
+  { id: "similar", label: "找相似", aria: "相似线索" },
+  { id: "compare", label: "比价", aria: "比价建议" },
+];
+
+function getViewIndex(view) {
+  const index = AI_CARD_VIEWS.findIndex((entry) => entry.id === view);
+  return index >= 0 ? index : 0;
+}
+
+function getViewByOffset(view, offset) {
+  const current = getViewIndex(view);
+  const next = (current + offset + AI_CARD_VIEWS.length) % AI_CARD_VIEWS.length;
+  return AI_CARD_VIEWS[next].id;
+}
 
 function ProductVisual({ item }) {
   if (item.img) {
@@ -295,10 +311,13 @@ function HardwareStatus({ armed, capturedItem }) {
 function AICard({ item, visible, onClose }) {
   const [shown, setShown] = React.useState("");
   const [view, setView] = React.useState("summary");
+  const [slideDirection, setSlideDirection] = React.useState(null);
+  const slideTimerRef = React.useRef(null);
 
   React.useEffect(() => {
     setShown("");
     setView("summary");
+    setSlideDirection(null);
     if (!visible || !item) return undefined;
 
     let index = 0;
@@ -319,15 +338,82 @@ function AICard({ item, visible, onClose }) {
     };
   }, [visible, item]);
 
+  React.useEffect(() => () => window.clearTimeout(slideTimerRef.current), []);
+
+  const markSlide = React.useCallback((direction) => {
+    setSlideDirection(direction);
+    window.clearTimeout(slideTimerRef.current);
+    slideTimerRef.current = window.setTimeout(() => setSlideDirection(null), 360);
+  }, []);
+
+  const moveView = React.useCallback((offset) => {
+    setView((current) => {
+      const next = getViewByOffset(current, offset);
+      if (next !== current) {
+        markSlide(offset > 0 ? "right" : "left");
+      }
+      return next;
+    });
+  }, [markSlide]);
+
+  const chooseView = React.useCallback((next) => {
+    setView((current) => {
+      if (next === current) return current;
+      markSlide(getViewIndex(next) > getViewIndex(current) ? "right" : "left");
+      return next;
+    });
+  }, [markSlide]);
+
+  React.useEffect(() => {
+    if (!visible) return undefined;
+
+    const onKeyDown = (event) => {
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        moveView(1);
+      }
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        moveView(-1);
+      }
+    };
+
+    const onBackSwipe = (event) => {
+      const direction = event.detail?.direction;
+      const delta = event.detail?.delta;
+      if (direction === "right" || direction === "next" || delta > 0) {
+        moveView(1);
+      }
+      if (direction === "left" || direction === "previous" || delta < 0) {
+        moveView(-1);
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("backswipe", onBackSwipe);
+
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("backswipe", onBackSwipe);
+    };
+  }, [visible, moveView]);
+
   if (!visible || !item) return null;
 
   const done = shown.length >= item.summary.length;
+  const viewIndex = getViewIndex(view);
+  const viewMeta = AI_CARD_VIEWS[viewIndex];
 
   return (
     <React.Fragment>
       <div className="modal-backdrop" onClick={onClose} />
       <div className="ai-card-halo" />
-      <section className="ai-card" aria-label="AI 视觉识别卡片">
+      <section
+        className={
+          "ai-card view-" + view + (slideDirection ? " swipe-" + slideDirection : "")
+        }
+        aria-label="AI 视觉识别卡片"
+      >
         <button className="ai-card-close" type="button" aria-label="关闭 AI 卡片" onClick={onClose}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
             <path d="M6 6l12 12M18 6L6 18" />
@@ -336,52 +422,99 @@ function AICard({ item, visible, onClose }) {
 
         <div className="ai-card-label">
           <span className="pulse" />
-          {view === "summary" ? "NOMI · 背触识图" : "NOMI · 找相似"}
+          NOMI · {viewMeta.label}
         </div>
 
         <h2 className="ai-card-title">
           为你识别到这个 <span>{item.productType}</span>
         </h2>
 
-        <div className={"ai-track " + (view === "similar" ? "show-similar" : "show-summary")}>
-          <div className="ai-pane summary-pane">
-            <div className="ai-card-stream">
-              <p>
-                {shown}
-                {!done && <span className="cursor" />}
-              </p>
-            </div>
-            <div className="ai-card-product">
-              <div className="ai-card-product-img">
-                <ProductVisual item={item} />
-              </div>
-              <div className="ai-card-product-info">
-                <div className="brand">{item.productName}</div>
-                <div className="price">{item.price}</div>
-              </div>
-            </div>
-          </div>
+        <div className="ai-card-switcher" role="tablist" aria-label="AI 卡片界面">
+          {AI_CARD_VIEWS.map((entry) => (
+            <button
+              key={entry.id}
+              className={"ai-view-tab" + (view === entry.id ? " active" : "")}
+              type="button"
+              role="tab"
+              aria-selected={view === entry.id}
+              aria-label={entry.aria}
+              onClick={() => chooseView(entry.id)}
+            >
+              <span className="ai-view-dot" />
+              <span>{entry.label}</span>
+            </button>
+          ))}
+        </div>
 
-          <div className="ai-pane similar-pane">
-            <div className="sim-panel">
-              <div className="sim-head">
-                <div className="sim-title">相似线索已整理</div>
-                <div className="sim-sub">按主体、语境和收藏意图排序</div>
+        <div className="ai-track" style={{ "--view-index": viewIndex }}>
+          <div className="ai-strip">
+            <div className="ai-pane summary-pane">
+              <div className="ai-card-stream">
+                <p>
+                  {shown}
+                  {!done && <span className="cursor" />}
+                </p>
               </div>
-              <div className="sim-list">
-                {item.similar.map((label, index) => (
-                  <div className="sim-chip" key={label} style={{ transitionDelay: `${index * 70}ms` }}>
-                    <span>{index + 1}</span>
-                    {label}
+              <div className="ai-card-product">
+                <div className="ai-card-product-img">
+                  <ProductVisual item={item} />
+                </div>
+                <div className="ai-card-product-info">
+                  <div className="brand">{item.productName}</div>
+                  <div className="price">{item.price}</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="ai-pane similar-pane">
+              <div className="sim-panel">
+                <div className="sim-head">
+                  <div className="sim-title">相似线索已整理</div>
+                  <div className="sim-sub">按主体、语境和收藏意图排序</div>
+                </div>
+                <div className="sim-list">
+                  {item.similar.map((label, index) => (
+                    <div className="sim-chip" key={label}>
+                      <span>{index + 1}</span>
+                      {label}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="ai-pane compare-pane">
+              <div className="compare-panel">
+                <div className="compare-head">
+                  <div className="compare-title">比价路径已生成</div>
+                  <div className="compare-sub">同款优先，找不到同款时切到相似替代</div>
+                </div>
+                <div className="compare-hero">
+                  <div>
+                    <span>参考价</span>
+                    <strong>{item.price}</strong>
                   </div>
-                ))}
+                  <small>{item.productName}</small>
+                </div>
+                <div className="compare-rows">
+                  {["官方旗舰", "达人挂链", "二级相似"].map((source, index) => (
+                    <div className="compare-row" key={source}>
+                      <span className="compare-rank">0{index + 1}</span>
+                      <div>
+                        <strong>{source}</strong>
+                        <small>{index === 0 ? item.productType : item.similar[index - 1] || item.kind}</small>
+                      </div>
+                      <em>{index === 0 ? "优先" : index === 1 ? "可比" : "备选"}</em>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         <div className="ai-card-actions">
-          <button className={"ai-action" + (view === "summary" ? " primary" : "")} type="button" onClick={() => setView("summary")}>
+          <button className={"ai-action" + (view === "summary" ? " primary" : "")} type="button" onClick={() => chooseView("summary")}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M3 6h2l1.6 11a2 2 0 0 0 2 1.7h7.8a2 2 0 0 0 2-1.7L20 9H6" />
               <circle cx="9" cy="21" r="1.3" />
@@ -389,14 +522,14 @@ function AICard({ item, visible, onClose }) {
             </svg>
             购买同款
           </button>
-          <button className={"ai-action" + (view === "similar" ? " primary" : "")} type="button" onClick={() => setView("similar")}>
+          <button className={"ai-action" + (view === "similar" ? " primary" : "")} type="button" onClick={() => chooseView("similar")}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <circle cx="11" cy="11" r="7" />
               <path d="M20 20l-4-4" />
             </svg>
             找相似
           </button>
-          <button className="ai-action" type="button" onClick={() => setView("summary")}>
+          <button className={"ai-action" + (view === "compare" ? " primary" : "")} type="button" onClick={() => chooseView("compare")}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <path d="M3 6h13M3 12h9M3 18h13" />
               <path d="M19 4l3 3-3 3M21 14l-3 3 3 3" />
