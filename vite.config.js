@@ -21,6 +21,7 @@ export default defineConfig({
         aiNotification: fileURLToPath(new URL("./scene2/index.html", import.meta.url)),
         aiImagePicker: fileURLToPath(new URL("./scene3/index.html", import.meta.url)),
         aiCompanion: fileURLToPath(new URL("./scene4/index.html", import.meta.url)),
+        hardwareAiPicker: fileURLToPath(new URL("./scene6/index.html", import.meta.url)),
         healthcare: fileURLToPath(new URL("./healthcare/index.html", import.meta.url)),
         dataCollection: fileURLToPath(new URL("./data-collection/index.html", import.meta.url)),
         voiceOrderDemo: fileURLToPath(new URL("./voice-order-demo/index.html", import.meta.url)),

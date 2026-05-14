@@ -12,6 +12,7 @@ This workspace contains multiple browser demos built with Vite, including the Hu
 - AI Notification: `/scene2/` (also `/ai-notification/` on Vercel)
 - AI Image Picker: `/scene3/` (also `/ai-image-picker/` on Vercel)
 - AI Companion: `/scene4/` (also `/ai-companion/` on Vercel)
+- Hardware AI Picker: `/scene6/` (also `/hardware-ai-picker/` on Vercel)
 - Healthcare skin scan demo: `/healthcare/`
 
 ## Deploy to Vercel
@@ -44,6 +45,8 @@ After deploy, the Pura X page will be available at:
 - `/ai-image-picker/`
 - `/scene4/`
 - `/ai-companion/`
+- `/scene6/`
+- `/hardware-ai-picker/`
 - `/healthcare/`
 
 The old path is also supported and will redirect automatically:

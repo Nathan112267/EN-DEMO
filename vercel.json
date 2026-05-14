@@ -38,6 +38,16 @@
       "source": "/ai-companion/",
       "destination": "/scene4/",
       "permanent": true
+    },
+    {
+      "source": "/hardware-ai-picker",
+      "destination": "/scene6/",
+      "permanent": true
+    },
+    {
+      "source": "/hardware-ai-picker/",
+      "destination": "/scene6/",
+      "permanent": true
     }
   ]
 }
